@@ -1,0 +1,14 @@
+###
+@rootUrl = http://localhost:3000
+
+###Get New form  news-alpha-vantage
+curl --location '{{rootUrl}}/top-manga/story-lists'
+
+###Get New form  news-alpha-vantage
+curl --location '{{rootUrl}}/top-manga/story-lists/Murim-Rpg-Simulation'
+
+###Get New form  news-alpha-vantage
+curl --location '{{rootUrl}}/top-manga/story-lists/Bj-Archmage'
+
+###Get New form  news-alpha-vantage
+curl --location '{{rootUrl}}/top-manga/mangas/Bj-Archmage/chapter-2'
