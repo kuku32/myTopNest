@@ -1,7 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ConfigService, ConfigModule } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { TopMangaModule } from './top-manga/top-manga.module';
 @Module({
   imports: [
@@ -11,7 +9,7 @@ import { TopMangaModule } from './top-manga/top-manga.module';
     }),
     TopMangaModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
