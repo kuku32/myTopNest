@@ -1,5 +1,6 @@
-###
-@rootUrl = http://localhost:3000
+### 
+# @rootUrl = http://localhost:3000
+@rootUrl = https://topmaga.adaptable.app
 
 ###Get New form  news-alpha-vantage
 curl --location '{{rootUrl}}/top-manga/story-lists'
