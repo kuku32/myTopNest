@@ -1,6 +1,6 @@
 ### 
-@rootUrl = http://localhost:3000
-# @rootUrl = https://topmaga.adaptable.app
+# @rootUrl = http://localhost:3000
+@rootUrl = https://my-top-nest.vercel.app
 
 ###Get New form  news-alpha-vantage
 curl --location '{{rootUrl}}/top-manga/story-lists'
@@ -14,7 +14,6 @@ curl --location '{{rootUrl}}/top-manga/story-lists/Bj-Archmage'
 ###Get New form  news-alpha-vantage
 curl --location '{{rootUrl}}/top-manga/mangas/Bj-Archmage/chapter-2'
 
-@test = https://eleceed-default-rtdb.firebaseio.com/prod/eyJhbGciOiJSUzI1NiIsImtpZCLLII6ImE2YzYzNTNm/eleceed/chapter-1.json
 ###Get pageViolation
 curl --location '{{rootUrl}}/top-manga/eleceed/pageViolation'
 
