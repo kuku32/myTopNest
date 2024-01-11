@@ -36,4 +36,26 @@ export class TopMangaService {
       throw new UnauthorizedException("You're not allow");
     }
   }
+
+  /**THIS FOR ELECEED WEB */ 
+
+  async getEleceedByChapter(chapter:string){
+    try{
+      let BASE_URL = `${this.configService.get<any>('ELECEED_FB')}/eleceed/chapter-${chapter}.json`;
+      console.log('BASE_URL', BASE_URL)
+      const response = await axios.get(BASE_URL);
+      return response?.data
+    }catch(error){
+      throw new UnauthorizedException("You're not allow");
+    }
+  }
+  async getEleceedOTherAttr(other:string){
+    try{
+      let BASE_URL = `${this.configService.get<any>('ELECEED_FB')}/${other}.json`;
+      const response = await axios.get(BASE_URL);
+      return response?.data
+    }catch(error){
+      throw new UnauthorizedException("You're not allow");
+    }
+  }
 }
