@@ -1,6 +1,6 @@
 ### 
-# @rootUrl = http://localhost:3000
-@rootUrl = https://my-top-nest.vercel.app
+@rootUrl = http://localhost:3000
+# @rootUrl = https://my-top-nest.vercel.app
 
 ###Get New form  news-alpha-vantage
 curl --location '{{rootUrl}}/top-manga/story-lists'
@@ -21,3 +21,6 @@ curl --location '{{rootUrl}}/top-manga/eleceed/pageViolation'
 curl --location '{{rootUrl}}/top-manga/eleceed/maxlength'
 ###Get New form  news-alpha-vantage
 curl --location '{{rootUrl}}/top-manga/eleceed/1'
+
+###Get New form  news-alpha-vantage
+curl --location '{{rootUrl}}/top-manga/ip'

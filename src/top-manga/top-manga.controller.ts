@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete,Req  } from '@nestjs/common';
 import { TopMangaService } from './top-manga.service';
 
 @Controller('top-manga')
@@ -27,5 +27,11 @@ export class TopMangaController {
     }else{
       return this.topMangaService.getEleceedByChapter(chapter)
     }
+  }
+
+  @Get('ip')
+  getIpAddress(@Req() request): string {
+    const ipAddress = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
+    return ipAddress;
   }
 }
