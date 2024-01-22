@@ -34,4 +34,10 @@ export class TopMangaController {
     const ipAddress = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
     return ipAddress;
   }
+
+  @Get('/auth')
+  authenticate() {
+    return this.topMangaService.postImagekitIo()
+
+  }
 }

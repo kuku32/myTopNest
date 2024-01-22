@@ -24,3 +24,9 @@ curl --location '{{rootUrl}}/top-manga/eleceed/1'
 
 ###Get New form  news-alpha-vantage
 curl --location '{{rootUrl}}/top-manga/ip'
+
+###Get New form  news-alpha-vantage
+curl --location '{{rootUrl}}/top-manga/auth'
+
+###Get New form  news-alpha-vantage
+curl --location 'http://localhost:3001/auth'
