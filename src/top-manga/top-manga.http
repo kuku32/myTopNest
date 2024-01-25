@@ -1,6 +1,6 @@
 ### 
-# @rootUrl = http://localhost:3000
-@rootUrl = https://my-top-nest.vercel.app
+@rootUrl = http://localhost:3000
+# @rootUrl = https://my-top-nest.vercel.app
 
 ###Get New form  news-alpha-vantage
 curl --location '{{rootUrl}}/top-manga/story-lists'
@@ -29,4 +29,4 @@ curl --location '{{rootUrl}}/top-manga/ip'
 curl --location '{{rootUrl}}/top-manga/auth'
 
 ###Get New form  news-alpha-vantage
-curl --location 'https://my-top-nest.vercel.app/top-manga/auth'
+curl --location 'http://localhost:3000/top-manga/Bj-Archmage/2'

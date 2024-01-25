@@ -40,11 +40,19 @@ export class TopMangaService {
   }
 
   /**THIS FOR ELECEED WEB */ 
+  async getmangasVELE(type:string,chapter:string){
+    try{
+      let BASE_URL = `${this.configService.get<any>('FIREBASE_DATA')}/mangas/${type}/chapter-${chapter}.json`;
+      const response = await axios.get(BASE_URL);
+      return response?.data
+    }catch(error){
+      throw new UnauthorizedException("You're not allow");
+    }
+  }
 
   async getEleceedByChapter(chapter:string){
     try{
       let BASE_URL = `${this.configService.get<any>('ELECEED_FB')}/eleceed/chapter-${chapter}.json`;
-      console.log('BASE_URL', BASE_URL)
       const response = await axios.get(BASE_URL);
       return response?.data
     }catch(error){

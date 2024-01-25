@@ -29,6 +29,11 @@ export class TopMangaController {
     }
   }
 
+  @Get('/:type/:chapter')
+  getmangasVELE(@Param('type') type: string,@Param('chapter') chapter: string){
+    return this.topMangaService.getmangasVELE(type,chapter)
+  }
+
   @Get('ip')
   getIpAddress(@Req() request): string {
     const ipAddress = request.headers['x-forwarded-for'] || request.connection.remoteAddress;
