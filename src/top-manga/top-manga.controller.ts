@@ -31,7 +31,12 @@ export class TopMangaController {
 
   @Get('/:type/:chapter')
   getmangasVELE(@Param('type') type: string,@Param('chapter') chapter: string){
-    return this.topMangaService.getmangasVELE(type,chapter)
+    if(['maxlength','pageViolation'].includes(chapter)){
+      return this.topMangaService.getmangasVELEAttr(type,chapter)
+    }else{
+      return this.topMangaService.getmangasVELE(type,chapter)
+    }
+    
   }
 
   @Get('ip')
