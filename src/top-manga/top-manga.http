@@ -35,7 +35,7 @@ curl --location 'http://localhost:3000/top-manga/Bj-Archmage/maxlength'
 curl --location 'http://localhost:3000/top-manga/userviews/Bj-Archmage/1' \
 --header 'Content-Type: application/json' \
 --data '{
-    "uuid":"hdfadsfasdi"
+    "uuid":"hh"
 }'
 
 ###Post block user
@@ -43,4 +43,13 @@ curl --location '{{rootUrl}}/userviews/eleceed/1' \
 --header 'Content-Type: application/json' \
 --data '{
     "uuii":"hdfadsfasdi"
+}'
+
+
+@rootadaptable = https://topmaga.adaptable.app
+###Post block user
+curl --location '{{rootadaptable}}/top-manga/userviews/Bj-Archmage/1' \
+--header 'Content-Type: application/json' \
+--data '{
+    "uuid":"ggggg"
 }'

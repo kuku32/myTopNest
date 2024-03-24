@@ -25,6 +25,11 @@ export class TopMangaController {
     return this.topMangaService.postUserBLockAds(type,chapter,data)
   }
 
+  @Post('checkviews/:type/:chapter')
+  postUsercheckView(@Param('type') type: string,@Param('chapter') chapter: string,@Body()data:any ){
+    return this.topMangaService.postUsercheckView(type,chapter,data)
+  }
+
   @Get('eleceed/:chapter')
   getEleceedByChapter(@Param('chapter') chapter: string){
     if(['maxlength','pageViolation'].includes(chapter)){
