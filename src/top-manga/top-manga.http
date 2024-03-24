@@ -1,15 +1,46 @@
 ### 
 # @rootUrl = http://localhost:3000
-@rootUrl = https://topmaga.adaptable.app
+@rootUrl = https://my-top-nest.vercel.app
 
-###Get New form  news-alpha-vantage
+###Get all story-lists details
 curl --location '{{rootUrl}}/top-manga/story-lists'
 
-###Get New form  news-alpha-vantage
+###Get story-lists Murim-Rpg-Simulation
 curl --location '{{rootUrl}}/top-manga/story-lists/Murim-Rpg-Simulation'
 
-###Get New form  news-alpha-vantage
+###Get story-lists Bj-Archmage
 curl --location '{{rootUrl}}/top-manga/story-lists/Bj-Archmage'
 
-###Get New form  news-alpha-vantage
+###Get
 curl --location '{{rootUrl}}/top-manga/mangas/Bj-Archmage/chapter-2'
+
+###Get pageViolation
+curl --location '{{rootUrl}}/top-manga/eleceed/pageViolation'
+
+###Get maxlength
+curl --location '{{rootUrl}}/top-manga/eleceed/maxlength'
+###Get eleceed/1
+curl --location '{{rootUrl}}/top-manga/eleceed/1'
+
+###Get ip
+curl --location '{{rootUrl}}/top-manga/ip'
+
+###Get check auth
+curl --location '{{rootUrl}}/top-manga/auth'
+
+###Get 
+curl --location 'http://localhost:3000/top-manga/Bj-Archmage/maxlength'
+
+###Post block user
+curl --location 'http://localhost:3000/top-manga/userviews/Bj-Archmage/1' \
+--header 'Content-Type: application/json' \
+--data '{
+    "uuii":"hdfadsfasdi"
+}'
+
+###Post block user
+curl --location '{{rootUrl}}/userviews/eleceed/1' \
+--header 'Content-Type: application/json' \
+--data '{
+    "uuii":"hdfadsfasdi"
+}'
