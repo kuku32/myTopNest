@@ -35,12 +35,12 @@ curl --location 'http://localhost:3000/top-manga/Bj-Archmage/maxlength'
 curl --location 'http://localhost:3000/top-manga/userviews/Bj-Archmage/1' \
 --header 'Content-Type: application/json' \
 --data '{
-    "uuii":"hdfadsfasdi"
+    "uuid":"hdfadsfasdi"
 }'
 
 ###Post block user
-curl --location '{{rootUrl}}/userviews/eleceed/1' \
+curl --location '{{rootUrl}}/top-manga/userviews/eleceed/1' \
 --header 'Content-Type: application/json' \
 --data '{
-    "uuii":"hdfadsfasdi"
+    "uuid":"hdfadsfasdi"
 }'
