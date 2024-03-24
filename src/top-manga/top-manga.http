@@ -1,6 +1,6 @@
 ### 
-@rootUrl = http://localhost:3000
-# @rootUrl = https://my-top-nest.vercel.app
+# @rootUrl = http://localhost:3000
+@rootUrl = https://my-top-nest.vercel.app
 
 ###Get all story-lists details
 curl --location '{{rootUrl}}/top-manga/story-lists'
@@ -33,6 +33,13 @@ curl --location 'http://localhost:3000/top-manga/Bj-Archmage/maxlength'
 
 ###Post block user
 curl --location 'http://localhost:3000/top-manga/userviews/Bj-Archmage/1' \
+--header 'Content-Type: application/json' \
+--data '{
+    "uuii":"hdfadsfasdi"
+}'
+
+###Post block user
+curl --location '{{rootUrl}}/userviews/eleceed/1' \
 --header 'Content-Type: application/json' \
 --data '{
     "uuii":"hdfadsfasdi"
