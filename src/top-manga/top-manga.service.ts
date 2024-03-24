@@ -41,7 +41,7 @@ export class TopMangaService {
 
   async postUserBLockAds(type:string,chapter:string, data:any){
     try{
-      let BASE_URL = `${this.configService.get<any>('FIREBASE_DATA')}/userviews/${type}/${chapter}.json`;
+      let BASE_URL = `${this.configService.get<any>('FIREBASE_DATA')}/userviews/${type}/${chapter}/${data?.uuid}.json`;
       const response = await axios.put(BASE_URL, data);
       return response?.data
     }catch(error){
