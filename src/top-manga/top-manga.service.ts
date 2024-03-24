@@ -39,6 +39,16 @@ export class TopMangaService {
     }
   }
 
+  async postUserBLockAds(type:string,chapter:string, data:any){
+    try{
+      let BASE_URL = `${this.configService.get<any>('FIREBASE_DATA')}/userviews/${type}/${chapter}.json`;
+      const response = await axios.post(BASE_URL, data);
+      return response?.data
+    }catch(error){
+      throw new UnauthorizedException("You're not allow");
+    }
+  }
+
   /**THIS FOR ELECEED WEB */ 
   async getmangasVELE(type:string,chapter:string){
     try{
