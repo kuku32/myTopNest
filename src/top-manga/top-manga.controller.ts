@@ -34,6 +34,10 @@ export class TopMangaController {
   PostUserInteraction(@Param('action') action: string,@Param('type') type: string,@Param('chapter') chapter: string,@Body()data:any ){
     return this.topMangaService.PostUserInteraction(action,type,chapter,data)
   }
+  @Get('userinteraction/:action/:type/:chapter')
+  GetUserInteraction(@Param('action') action: string,@Param('type') type?: string,@Param('chapter') chapter?: string ){
+    return this.topMangaService.GetUserInteraction(action,type,chapter)
+  }
 
   @Get('eleceed/:chapter')
   getEleceedByChapter(@Param('chapter') chapter: string){
