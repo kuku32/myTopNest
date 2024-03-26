@@ -30,6 +30,11 @@ export class TopMangaController {
     return this.topMangaService.postUsercheckView(type,chapter,data)
   }
 
+  @Post('userinteraction/:action/:type/:chapter')
+  PostUserInteraction(@Param('action') action: string,@Param('type') type: string,@Param('chapter') chapter: string,@Body()data:any ){
+    return this.topMangaService.PostUserInteraction(action,type,chapter,data)
+  }
+
   @Get('eleceed/:chapter')
   getEleceedByChapter(@Param('chapter') chapter: string){
     if(['maxlength','pageViolation'].includes(chapter)){

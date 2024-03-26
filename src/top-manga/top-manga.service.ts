@@ -57,6 +57,16 @@ export class TopMangaService {
       throw new UnauthorizedException("You're not allow");
     }
   }
+
+  async PostUserInteraction(action:string,type:string,chapter:string, data:any){
+    try{
+      let BASE_URL = `${this.configService.get<any>('FIREBASE_DATA')}/userinteraction/${action}/${type}/${chapter}/${data?.uuid}.json`;
+      const response = await axios.put(BASE_URL, data);
+      return response?.data
+    }catch(error){
+      throw new UnauthorizedException("You're not allow");
+    }
+  }
   /**THIS FOR ELECEED WEB */ 
   async getmangasVELE(type:string,chapter:string){
     try{
