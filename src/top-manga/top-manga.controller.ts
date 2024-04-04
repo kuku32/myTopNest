@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete,Req, UseGuards  } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete,Req, UseGuards, Query  } from '@nestjs/common';
 import { TopMangaService } from './top-manga.service';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
@@ -37,8 +37,11 @@ export class TopMangaController {
   PostUserInteraction(@Param('action') action: string,@Param('type') type: string,@Param('chapter') chapter: string,@Body()data:any ){
     return this.topMangaService.PostUserInteraction(action,type,chapter,data)
   }
-  @Get('userinteraction/:action/:type/:chapter')
-  GetUserInteraction(@Param('action') action: string,@Param('type') type?: string,@Param('chapter') chapter?: string ){
+  @Get('userinteraction')
+  GetUserInteraction(
+    @Query('action') action: string,
+    @Query('type') type: string,
+    @Query('chapter') chapter?: string ){
     return this.topMangaService.GetUserInteraction(action,type,chapter)
   }
 

@@ -31,6 +31,11 @@ curl --location '{{rootUrl}}/top-manga/auth'
 ###Get 
 curl --location 'http://localhost:3000/top-manga/Bj-Archmage/maxlength'
 
+
+###Get 
+curl --location 'http://localhost:3000/top-manga/userinteraction'
+
+
 ###Post block user
 curl --location 'http://localhost:3000/top-manga/userviews/Bj-Archmage/1' \
 --header 'Content-Type: application/json' \
