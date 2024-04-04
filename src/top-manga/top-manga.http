@@ -1,6 +1,6 @@
 ### 
-# @rootUrl = http://localhost:3000
-@rootUrl = https://my-top-nest.vercel.app
+@rootUrl = http://localhost:3000
+# @rootUrl = https://my-top-nest.vercel.app
 
 ###Get all story-lists details
 curl --location '{{rootUrl}}/top-manga/story-lists'

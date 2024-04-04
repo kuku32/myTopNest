@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete,Req  } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete,Req, UseGuards  } from '@nestjs/common';
 import { TopMangaService } from './top-manga.service';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('top-manga')
 export class TopMangaController {
@@ -30,6 +31,8 @@ export class TopMangaController {
     return this.topMangaService.postUsercheckView(type,chapter,data)
   }
 
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { limit: 10, ttl: 3000 } })
   @Post('userinteraction/:action/:type/:chapter')
   PostUserInteraction(@Param('action') action: string,@Param('type') type: string,@Param('chapter') chapter: string,@Body()data:any ){
     return this.topMangaService.PostUserInteraction(action,type,chapter,data)
