@@ -27,7 +27,7 @@ export class TopMangaController {
 
   @Get('eleceed/:chapter')
   getEleceedByChapter(@Param('chapter') chapter: string){
-    if(['maxlength','pageViolation'].includes(chapter)){
+    if(['maxlength','pageViolation','targetAge'].includes(chapter)){
       return this.topMangaService.getEleceedOTherAttr(chapter)
     }else{
       return this.topMangaService.getEleceedByChapter(chapter)
@@ -36,7 +36,7 @@ export class TopMangaController {
 
   @Get('/:type/:chapter')
   getmangasVELE(@Param('type') type: string,@Param('chapter') chapter: string){
-    if(['maxlength','pageViolation'].includes(chapter)){
+    if(['maxlength','pageViolation','targetAge'].includes(chapter)){
       return this.topMangaService.getmangasVELEAttr(type,chapter)
     }else{
       return this.topMangaService.getmangasVELE(type,chapter)
