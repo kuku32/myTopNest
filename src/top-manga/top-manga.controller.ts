@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete,Req  } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete,Req, Query  } from '@nestjs/common';
 import { TopMangaService } from './top-manga.service';
 
 @Controller('top-manga')
@@ -6,13 +6,13 @@ export class TopMangaController {
   constructor(private readonly topMangaService: TopMangaService) {}
 
   @Get('story-lists')
-  getStoryLists(){
-    return this.topMangaService.getStoryLists()
+  getStoryLists(@Query('page')page:any){
+    return this.topMangaService.getStoryLists(page)
   }
 
   @Get('story-lists/:type')
-  getStoryList(@Param('type') type: string){
-    return this.topMangaService.getStoryList(type)
+  getStoryList(@Param('type') type: string, @Query('page')page:string){
+    return this.topMangaService.getStoryList(type, page)
   }
 
   @Get('mangas/:type/:chapter')

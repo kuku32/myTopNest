@@ -8,10 +8,10 @@ import * as crypto from 'crypto';
 @Injectable()
 export class TopMangaService {
   constructor(private readonly configService: ConfigService){}
-  async getStoryLists(){
+  async getStoryLists(page?:any){
 
     try{
-      let BASE_URL = `${this.configService.get<any>('FIREBASE_DATA')}/story-lists.json`;
+      let BASE_URL = `${this.configService.get<any>('FIREBASE_DATA')}/story-lists${page?page:''}.json`;
       const response = await axios.get(BASE_URL);
       return response?.data
     }catch(error){
@@ -19,9 +19,9 @@ export class TopMangaService {
     }
   }
 
-  async getStoryList(type:string){
+  async getStoryList(type:string, page?:any){
     try{
-      let BASE_URL = `${this.configService.get<any>('FIREBASE_DATA')}/story-lists/${type}.json`;
+      let BASE_URL = `${this.configService.get<any>('FIREBASE_DATA')}/story-lists${page?page:''}/${type}.json`;
       const response = await axios.get(BASE_URL);
       return response?.data
     }catch(error){
