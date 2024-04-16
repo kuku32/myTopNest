@@ -25,14 +25,14 @@ export class TopMangaController {
     return this.topMangaService.postUserBLockAds(type,chapter,data)
   }
 
-  @Get('eleceed/:chapter')
-  getEleceedByChapter(@Param('chapter') chapter: string){
-    if(['maxlength','pageViolation','targetAge'].includes(chapter)){
-      return this.topMangaService.getEleceedOTherAttr(chapter)
-    }else{
-      return this.topMangaService.getEleceedByChapter(chapter)
-    }
-  }
+  // @Get('eleceed/:chapter')
+  // getEleceedByChapter(@Param('chapter') chapter: string){
+  //   if(['maxlength','pageViolation','targetAge'].includes(chapter)){
+  //     return this.topMangaService.getEleceedOTherAttr(chapter)
+  //   }else{
+  //     return this.topMangaService.getEleceedByChapter(chapter)
+  //   }
+  // }
 
   @Get('/:type/:chapter')
   getmangasVELE(@Param('type') type: string,@Param('chapter') chapter: string){

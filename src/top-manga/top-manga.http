@@ -1,6 +1,6 @@
 ### 
-# @rootUrl = http://localhost:3000
-@rootUrl = https://my-top-nest.vercel.app
+@rootUrl = http://localhost:3000
+# @rootUrl = https://my-top-nest.vercel.app
 
 ###Get all story-lists details
 curl --location '{{rootUrl}}/top-manga/story-lists'
@@ -20,8 +20,9 @@ curl --location '{{rootUrl}}/top-manga/eleceed/pageViolation'
 ###Get maxlength
 curl --location '{{rootUrl}}/top-manga/eleceed/maxlength'
 ###Get eleceed/1
-curl --location '{{rootUrl}}/top-manga/eleceed/1'
-
+curl --location '{{rootUrl}}/top-manga/eleceed/293'
+###Get eleceed/0 infor
+curl --location '{{rootUrl}}/top-manga/eleceed/293'
 ###Get ip
 curl --location '{{rootUrl}}/top-manga/ip'
 
