@@ -3,26 +3,21 @@
 # @rootUrl = https://my-top-nest.vercel.app
 
 ###Get all story-lists details
-curl --location '{{rootUrl}}/top-manga/story-lists'
+curl --location '{{rootUrl}}/top-manga/story-lists?page=mangas'
 
-###Get story-lists Murim-Rpg-Simulation
-curl --location '{{rootUrl}}/top-manga/story-lists/Murim-Rpg-Simulation'
+###Get story-lists Astral-Pet-Store
+curl --location '{{rootUrl}}/top-manga/story-lists/Astral-Pet-Store?page=mangas'
 
-###Get story-lists Bj-Archmage
-curl --location '{{rootUrl}}/top-manga/story-lists/Bj-Archmage'
 
-###Get
-curl --location '{{rootUrl}}/top-manga/mangas/Bj-Archmage/chapter-2'
+###Get story-lists eleceed
+curl --location '{{rootUrl}}/top-manga/story-lists/eleceed?page=mangas'
 
-###Get pageViolation
-curl --location '{{rootUrl}}/top-manga/eleceed/pageViolation'
+###Get story-lists eleceed chapter
+curl --location '{{rootUrl}}/top-manga/eleceed/294'
 
-###Get maxlength
-curl --location '{{rootUrl}}/top-manga/eleceed/maxlength'
-###Get eleceed/1
-curl --location '{{rootUrl}}/top-manga/eleceed/293'
-###Get eleceed/0 infor
-curl --location '{{rootUrl}}/top-manga/eleceed/293'
+###Get story-lists eleceed detail
+curl --location '{{rootUrl}}/top-manga/eleceed/0-info'
+
 ###Get ip
 curl --location '{{rootUrl}}/top-manga/ip'
 
