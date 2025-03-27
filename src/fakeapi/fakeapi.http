@@ -1,0 +1,15 @@
+@rootUrl = http://localhost:3000
+# @rootUrl = https://my-top-nest.vercel.app
+
+
+###Get Users
+curl --location '{{rootUrl}}/fakeapi/users'
+
+###Get posts
+curl --location '{{rootUrl}}/fakeapi/posts'
+
+###Get comments
+curl --location '{{rootUrl}}/fakeapi/comments'
+
+###Get comments by Id
+curl --location '{{rootUrl}}/fakeapi/comments?postId=1'
