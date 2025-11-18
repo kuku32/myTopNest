@@ -1,17 +1,20 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { TopMangaModule } from './top-manga/top-manga.module';
-import { FakeapiModule } from './fakeapi/fakeapi.module';
+
+import { StockModule } from './stock/stock.module';
+import { TasksService } from './tasks.service';
+import { ScheduleModule } from '@nestjs/schedule';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
-    TopMangaModule,
-    FakeapiModule,
+    ScheduleModule.forRoot(),
+    StockModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [TasksService],
 })
 export class AppModule {}
