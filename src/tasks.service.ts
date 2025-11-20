@@ -13,9 +13,10 @@ export class TasksService {
   private readonly logger = new Logger(TasksService.name);
 
   // Example: run every 1 minute
-  @Cron(CronExpression.EVERY_10_SECONDS)
+  @Cron(CronExpression.EVERY_5_MINUTES)
   handleEveryMinute() {
     this.logger.log('⏰ Running cron task every minute');
+    this.webhooksService.sendTemporaryWebhook('query.stockTicker', 'YOHE ')
   }
 
   // Example: run every 15 minutes during trading hours (9:30 AM - 4:00 PM ET)
