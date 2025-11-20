@@ -5,6 +5,7 @@ import { StockHelperService } from 'src/webhook/stockHelper.service';
 import * as DTO from './dto';
 import { AttachmentBuilder, EmbedBuilder, WebhookClient } from 'discord.js';
 import { ConfigService } from '@nestjs/config';
+import * as dbrs from './database.api';
 @Injectable()
 export class WebhookService {
   getHello() {
@@ -369,4 +370,141 @@ export class WebhookService {
       .filter((item): item is { name: string; value: string; inline: boolean } => item !== undefined);
   }
   
+
+  async TwReveseNOAPI(ticker: string, timefame: string) {
+    let tem = timefame;
+    if (timefame.includes('hour')) {
+      tem = timefame.slice(0, 2);
+    } else if (timefame.includes('week')) {
+      tem = '1week';
+    } else if (timefame.includes('month')) {
+      tem = '1month';
+    }
+    if(ticker.includes('USD')){
+      // ticker = this.stockHelperService.getmatch1only(ticker)
+      // return this.getCoinHistory(ticker, '5m')
+      ticker = this.stockHelperService.formatSymbol(ticker)
+    }
+    let BASE_URL = `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=${tem}&outputsize=400&dp=2&apikey=`;
+    console.log(BASE_URL)
+    const response = await this.tryCatchtwelvedata(BASE_URL);
+    if (response?.status == 'ok') {
+      const responseRe =  response.values;
+      const reversedData = [...responseRe].reverse(); // clone + reverse
+      const dataOut = plainToInstance(DTO.ChartOutTwelveData, reversedData, {
+        excludeExtraneousValues: true,
+      })
+      const newData = await this.stockHelperService.returnNewData(dataOut);
+      return newData;
+    }
+    // return null;
+  }
+  getRandomNumber(x: number): number {
+    return Math.floor(Math.random() * (x + 1));
+  }
+  keys = this.configService.get<any>('twelvedata').split(',');
+  // keys =['1f978ae4f4d74a7aa2ad9259dcd9ed54','3168052d38164f3abcb7aff8ab98d806']
+  repeat =   0; // which key we're on
+  index = this.getRandomNumber(this.keys.length-1)
+
+  nextKey(keys) {
+    const key = keys[this.index];
+    this.repeat++;
+    if (this.repeat === 3) {
+      this.repeat = 0;
+      this.index = (this.index + 1) % keys.length; // loop back to start
+      console.log(this.index)
+    }
+    return key;
+  }
+  async tryCatchtwelvedata(BASE_URL: string, maxRetries = this.keys.length) {
+    let attempt = 0;
+    while (attempt < maxRetries) {
+      const nextKey = this.nextKey(this.keys);
+      const url = `${BASE_URL}${nextKey}`;
+      console.log(`:12:Trying Key: 12: ${nextKey.slice(0, 4)}...`);
+  
+      try {
+        const response = await axios.get(url);
+        if (response.data?.code === 404) {
+          console.warn(':12: Received 404 code in response, breaking...');
+          return null; 
+        }
+        if (response.data?.status === 'error') {
+          throw new Error(':12:API returned error status: 12');
+        }
+        return response.data; // success!
+      } catch (error: any) {
+        attempt++;
+              // Detect 404 from Axios response
+        if (error.response?.status === 404) {
+          console.warn(':12: Received HTTP 404 from TwelveData, breaking...');
+          return null; 
+        }
+        console.error(`:12:Error with key ${nextKey.slice(0, 4)}...:`, error?.message || error);
+        if (attempt >= maxRetries) {
+          throw new Error(':12:All API keys failed: 12');
+        }
+      }
+    }
+    // If none of the API keys work, throw an error
+  }
+
+
+  async onModuleInit() {
+    // This runs ONCE when the app starts
+    await this.loadWashSellList();
+    // await this.getRsilist('rsiD-0-15')
+    // await this.getRsilist('MACD_AB_NEG')
+    // await this.getRsilist('MACD_AB_POS')
+    // await this.getRsilist('MACD_BL_NEG', 5, 5)
+    // await this.getRsilist('MACD_BL_POS')
+  }
+  washSell30: any[] = [];
+  async loadWashSellList() {
+    // const data = await dbrs.getData('post-wash-sell');
+    const data = await this.FireBaseApi('get','stock-related/post-wash-sell.json','')
+    const getwashsell30 = dbrs.getwashsell30(data);
+    this.washSell30 = getwashsell30;
+    // console.table(this.washSell30)
+    console.log(`✅ Loaded ${this.washSell30.length} wash-sell symbols`);
+  }
+
+  getWashSellList() {
+    return this.washSell30;
+  }
+
+  async getRsilist(path:string, dayrange:number = 5,limit:number = 10) {
+    const data = await this.FireBaseApi('get',`stock-related/${path}.json`,'')
+    const symbolLists = dbrs.getlastXdays(data,dayrange, limit);
+    console.log(`✅ Loaded: ${path} : ${symbolLists.length} symbols`);
+  }
+
+  async FireBaseApi(method:'post'|'patch'|'put'|'delete'|'get',endpoint:string, data: any,) {
+    const firebaseRoot = this.configService.get<any>('FIREBASE_DATA')
+    let BASE_URL = `${firebaseRoot}/${endpoint}`;
+    try {
+      const response = await axios.request({
+        method: method || 'get',
+        url: BASE_URL,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: data,
+        maxBodyLength: Infinity,
+      });
+    
+      // Axios automatically parses JSON, so just return response.data
+      return response.data;
+    
+    } catch (error) {
+      // Match fetch's "return 'skipped'" behavior
+      if (error.response) {
+        console.error(`❌ Failed request. Status: ${error.response.status}`);
+      } else {
+        console.error(`❌ Network or Axios error: ${error.message}`);
+      }
+      return 'skipped';
+    }
+  }
 }
