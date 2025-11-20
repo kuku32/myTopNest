@@ -115,10 +115,10 @@ export class TasksService {
     ) {
       await this.sendDiscord(`BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}` , `${ticker} -ON- ${timeframe}`, lastdata,channel);
     }    
-    else{
-      await this.sendDiscord(`BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}` , `${ticker} -ON- ${timeframe}`, lastdata,channel);
-      // this.webhooksService.sendTemporaryWebhook(`railway BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDDivergence}): ${lastdata?.date}` , `${ticker} RSI 5MIN -ON- ${timeframe}`, lastdata,channel);
-    }
+    // else{
+    //   await this.sendDiscord(`BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}` , `${ticker} -ON- ${timeframe}`, lastdata,channel);
+    //   // this.webhooksService.sendTemporaryWebhook(`railway BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDDivergence}): ${lastdata?.date}` , `${ticker} RSI 5MIN -ON- ${timeframe}`, lastdata,channel);
+    // }
   }
   // @Cron(CronExpression.EVERY_MINUTE)
   async wakeupcall() {
