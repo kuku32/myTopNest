@@ -14,17 +14,9 @@ export class TasksService {
       ) {}
   private readonly logger = new Logger(TasksService.name);
 
-
-  // Example: run every 15 minutes during trading hours (9:30 AM - 4:00 PM ET)
-  // @Cron('*/15 14-21 * * 1-5') // Adjust to UTC time
-  // @Cron(CronExpression.EVERY_10_SECONDS)
-  // handleMarketCron() {
-  //   this.logger.log('📈 Running 15-min trading check (market hours)');
-  // }
-
   @Cron(CronExpression.EVERY_5_MINUTES)
-  // @Cron(CronExpression.EVERY_10_SECONDS)
   async handleCronCrypto() {
+    this.wakeupcall()
     this.logger.log('Running scheduled task for EVERY_5_MINUTES');
     const date = new Date()
     const timeframe = '5m'
@@ -68,10 +60,9 @@ export class TasksService {
   ) {
     const date = new Date();
     await this.sendDiscord(`CHECKBOT ${category} ${timeframe} RUN AT: ${date}`, `RSIENDBOT ${category} ${timeframe}`, 'Nono', 'CRON_CHECK');
-
     // Delay 2 minutes before processing
     // const washselllists = this.LocalPLWR.getWashSellList() || []
-    // await new Promise((resolve) => setTimeout(resolve, 2 * 60 * 1000));
+    await new Promise((resolve) => setTimeout(resolve, 2 * 60 * 1000));
 
     for (const ticker of tickers) {
       // if (washselllists.includes(ticker)) {
@@ -129,7 +120,7 @@ export class TasksService {
       // this.webhooksService.sendTemporaryWebhook(`railway BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDDivergence}): ${lastdata?.date}` , `${ticker} RSI 5MIN -ON- ${timeframe}`, lastdata,channel);
     }
   }
-  @Cron(CronExpression.EVERY_MINUTE)
+  // @Cron(CronExpression.EVERY_MINUTE)
   async wakeupcall() {
     try {
       const date = new Date()
