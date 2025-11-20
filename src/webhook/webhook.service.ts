@@ -454,9 +454,13 @@ export class WebhookService {
   async onModuleInit() {
     // This runs ONCE when the app starts
     await this.loadWashSellList();
-    await this.getRsilist('rsiD-0-15', 7,7)
-    await this.getRsilist('MACD_AB_NEG', 5,20)
-    await this.getRsilist('MACD_BL_NEG', 5,30)
+    // await this.getRsilist('rsiD-0-15', 7,7)
+    // await this.getRsilist('MACD_AB_NEG', 5,20)
+    // await this.getRsilist('MACD_BL_NEG', 5,30)
+    // await this.getRsilist('MACD_AB_POS')
+    // await this.getRsilist('MACD_BL_POS')
+    // await this.getRsilist('MACD_AB_NEG')
+    await this.getRsilist('MACD_BL_NEG',60)
   }
   washSell30: any[] = [];
   dolist: any[] = [];
@@ -474,7 +478,7 @@ export class WebhookService {
   getDolist() {
     return this.dolist;
   }
-  async getRsilist(path:string, dayrange:number = 5,limit:number = 100) {
+  async getRsilist(path:string,limit:number = 100,dayrange:number = 7) {
     const data = await this.FireBaseApi('get',`stock-related/${path}.json`,'')
     const symbolLists = dbrs.getlastXdays(data,dayrange, limit);
     this.dolist = [... this.dolist,...symbolLists]
