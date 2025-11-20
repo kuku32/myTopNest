@@ -5,6 +5,7 @@ import axios from 'axios';
 import { WebhookService } from './webhook/webhook.service';
 import { StockHelperService } from './webhook/stockHelper.service';
 import { ConfigService } from '@nestjs/config';
+import * as Timer from './webhook/compareTime'
 @Injectable()
 export class TasksService {
   allkeys = 'all'; // test
@@ -116,6 +117,13 @@ export class TasksService {
   }
 
   async compareAndSend(lastdata, Secondlastdata, ticker, timeframe, channel) {
+    const isWithinRange = Timer.checkIfWithin5MinutesEST(lastdata?.date);
+    if (isWithinRange) {
+      console.log(ticker,'✅ Within ±5 minutes of EST time');
+    } else {
+      console.log(ticker,'❌ Outside ±5 minutes of EST time');
+      return
+    }
     if (
       lastdata?.MACDLine > lastdata?.SignalLine &&
       Secondlastdata?.MACDLine < Secondlastdata?.SignalLine
