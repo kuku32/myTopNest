@@ -15,7 +15,6 @@ export class WebhookService {
         ticker = this.stockHelperService.formatSymbol(ticker)
       }
       let BASE_URL = `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=${timefame}&outputsize=400&dp=2&apikey=${apikey}`;
-      console.log(BASE_URL)
       const response = await axios.get(BASE_URL);
       if (response.data.status === 'error') {
         throw new Error('API returned error status');
@@ -38,7 +37,6 @@ export class WebhookService {
       ) {}
 
   async sendTemporaryWebhook(msg, ticker: any,  data, discordChanel: string='TSLA',) {
-    console.log(123)
     const botname = `${discordChanel} ${ticker}`;
     const payload = {
       botname: botname,
@@ -51,7 +49,6 @@ export class WebhookService {
       const res = await axios.post(`${rootapi}/webhooks/temporary`, payload, {
         headers: { 'Content-Type': 'application/json' },
       });
-  
       return res.data; // same as await res.json()
     } catch (error) {
       console.error('❌ Error sending webhook:', error.response?.data || error.message);
