@@ -19,10 +19,17 @@ export class TasksService {
     const symbols =  await this.webhooksService.getDolist() ||[]
     await Promise.all([
       this.USTIMERUN(symbols,this.allkeys,'US_EARLY_5MIN', 2,'5min'),
-      this.USTIMERUN(symbols, this.allkeys,'US_EARLY_15MIN', 3, '15min'),
     ]);
   }
 
+  @Cron('*/15 14-21 * * 1-5')
+  async runAllWatL15min() {
+    this.wakeupcall()
+    const symbols =  await this.webhooksService.getDolist() ||[]
+    await Promise.all([
+      this.USTIMERUN(symbols, this.allkeys,'US_EARLY_15MIN', 3, '15min'),
+    ]);
+  }
 
   @Cron('*/15 * * * *') // every 15 minutes
   async handle15Min() {

@@ -410,7 +410,7 @@ export class WebhookService {
   nextKey(keys) {
     const key = keys[this.index];
     this.repeat++;
-    if (this.repeat === 3) {
+    if (this.repeat === 1) {
       this.repeat = 0;
       this.index = (this.index + 1) % keys.length; // loop back to start
       console.log(this.index)
