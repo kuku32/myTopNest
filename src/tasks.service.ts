@@ -12,36 +12,36 @@ export class TasksService {
     constructor(
         private readonly configService: ConfigService,
         private readonly stockHelperService: StockHelperService,
-        private readonly webhooksService: WebhookService,
+        private readonly LocalPLWR: WebhookService,
       ) {}
   private readonly logger = new Logger(TasksService.name);
-  @Cron(CronExpression.EVERY_5_MINUTES)
+  @Cron('*/5 14-21 * * 1-5')
   async runAllWatchLists() {
-    const symbols =  await this.webhooksService.getDolist() ||[]
+    const symbols =  await this.LocalPLWR.getDolist() ||[]
     await Promise.all([
       this.USTIMERUN(symbols,this.allkeys,'US_EARLY_5MIN', 2,'5min'),
     ]);
   }
 
-  @Cron('*/15 14-21 * * 1-5')
-  async runAllWatL15min() {
-    await this.sendDiscord('WAKEUPCALL:15min', 'RSIENDBOT 15min', 'US','CRON_CHECK');
-    const symbols =  await this.webhooksService.getDolist() ||[]
-    await Promise.all([
-      this.USTIMERUN(symbols, this.allkeys,'US_EARLY_15MIN', 3, '15min'),
-    ]);
-  }
+  // @Cron('*/15 14-21 * * 1-5')
+  // async runAllWatL15min() {
+  //   await this.sendDiscord('WAKEUPCALL:15min', 'RSIENDBOT 15min', 'US','CRON_CHECK');
+  //   const symbols =  await this.LocalPLWR.getDolist() ||[]
+  //   await Promise.all([
+  //     this.USTIMERUN(symbols, this.allkeys,'US_EARLY_15MIN', 3, '15min'),
+  //   ]);
+  // }
 
-  @Cron('*/15 * * * *') // every 15 minutes
-  async handle15Min() {
-    await this.sendDiscord('WAKEUPCALL:15min', 'RSIENDBOT 15min', 'CRYTO','CRON_CHECK');
-    const tickers = ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD', 'DASHUSD', 'ZECUSD', 'XMRUSD'];
-    // const tickers = ['BTCUSD'];
-    // const apikey = '2bbd0d305edb404aac2e2de5cc1311af'; // test
-    const apikey = 'd3058ae5683b4fc19a787ceb21a87f67';
-    this.logger.log('Running scheduled every 15 minutes for all tickers...');
-    await this.processTickers(tickers, '15min', apikey, 'CRYPTO_EARLY_15MIN');
-  }
+  // @Cron('*/15 * * * *') // every 15 minutes
+  // async handle15Min() {
+  //   await this.sendDiscord('WAKEUPCALL:15min', 'RSIENDBOT 15min', 'CRYTO','CRON_CHECK');
+  //   const tickers = ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD', 'DASHUSD', 'ZECUSD', 'XMRUSD'];
+  //   // const tickers = ['BTCUSD'];
+  //   // const apikey = '2bbd0d305edb404aac2e2de5cc1311af'; // test
+  //   const apikey = 'd3058ae5683b4fc19a787ceb21a87f67';
+  //   this.logger.log('Running scheduled every 15 minutes for all tickers...');
+  //   await this.processTickers(tickers, '15min', apikey, 'CRYPTO_EARLY_15MIN');
+  // }
 
   async USTIMERUN(intickers:string[], api:any,channel, delay, timeframe = '5min') {
     const now = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
@@ -68,7 +68,7 @@ export class TasksService {
   ) {
     const date = new Date();
 
-    const washselllists = await this.webhooksService.loadWashSellList() || this.webhooksService.getWashSellList()
+    const washselllists = await this.LocalPLWR.loadWashSellList() || this.LocalPLWR.getWashSellList()
     // Delay 2 minutes before processing
     await new Promise((resolve) => setTimeout(resolve, delay * 60 * 1000));
 
@@ -80,9 +80,9 @@ export class TasksService {
       try {
         let data
         if(apikey === 'all'){
-          data = await this.webhooksService.TwReveseNOAPI(ticker, timeframe);
+          data = await this.LocalPLWR.TwReveseNOAPI(ticker, timeframe);
         }else{
-          data = await this.webhooksService.get12for(ticker, timeframe, apikey);
+          data = await this.LocalPLWR.get12for(ticker, timeframe, apikey);
         }
         
         const lastData = data[data.length - 1];
@@ -105,7 +105,7 @@ export class TasksService {
   async sendDiscord(message:string, ticker:string, lastdata:any, channel:string) {
 
     try {
-      return await this.webhooksService.sendDiscordNotification(
+      return await this.LocalPLWR.sendDiscordNotification(
         'RAILWAY '+message,
         `${channel} ${ticker}`,
         JSON.stringify(lastdata),
@@ -116,6 +116,16 @@ export class TasksService {
     }
   }
 
+  async run15Min5signal(ticker, lastdata5min, channel){
+    const  data = await this.LocalPLWR.TwReveseNOAPI(ticker, '15min');
+    const lastData = data[data.length - 1];
+    if(lastData?.MACDLine > lastData?.SignalLine){
+      // 5min cross, 15 allway buy buy
+      await this.sendDiscord(`BUY ON MACDCROSS-5min (MACD:${lastdata5min?.MACDLine}): ${lastdata5min?.date}` , `${ticker} -ON- 5min`, lastdata5min,channel);
+    }
+  }
+
+  
   async compareAndSend(lastdata, Secondlastdata, ticker, timeframe, channel) {
     const isWithinRange = Timer.checkIfWithin5MinutesEST(lastdata?.date);
     if (isWithinRange) {
@@ -128,11 +138,12 @@ export class TasksService {
       lastdata?.MACDLine > lastdata?.SignalLine &&
       Secondlastdata?.MACDLine < Secondlastdata?.SignalLine
     ) {
-      await this.sendDiscord(`BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}` , `${ticker} -ON- ${timeframe}`, lastdata,channel);
+      await this.run15Min5signal(ticker, lastdata, channel)
+      // await this.sendDiscord(`BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}` , `${ticker} -ON- ${timeframe}`, lastdata,channel);
     }    
     // else{
     //   await this.sendDiscord(`BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}` , `${ticker} -ON- ${timeframe}`, lastdata,channel);
-    //   // this.webhooksService.sendTemporaryWebhook(`railway BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDDivergence}): ${lastdata?.date}` , `${ticker} RSI 5MIN -ON- ${timeframe}`, lastdata,channel);
+    //   // this.LocalPLWR.sendTemporaryWebhook(`railway BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDDivergence}): ${lastdata?.date}` , `${ticker} RSI 5MIN -ON- ${timeframe}`, lastdata,channel);
     // }
   }
   // // @Cron(CronExpression.EVERY_MINUTE)
@@ -159,14 +170,14 @@ export class TasksService {
     this.logger.log('Running scheduled task for EVERY_5_MINUTES');
     const date = new Date()
     const timeframe = '5m'
-    // this.webhooksService.sendTemporaryWebhook('railway CHECKBOT Crypto 5min RUN AT:'+date, 'RSIENDBOT 5MIN', 'Nono','CRON_CHECK');
+    // this.LocalPLWR.sendTemporaryWebhook('railway CHECKBOT Crypto 5min RUN AT:'+date, 'RSIENDBOT 5MIN', 'Nono','CRON_CHECK');
     const tickers = ['BTC', 'BCH', 'LTC', 'ETH','ETC', 'DASH', 'ZEC', 'XMR'];
     // const tickers = ['BTC'];
     await new Promise((resolve) => setTimeout(resolve, 2 * 60 * 1000)); // 2-minute delay
     for (const ticker of tickers) {
       try {
         // 1️⃣ Get historical data for the ticker
-        const data = await this.webhooksService.getCoinHistory(ticker, timeframe);
+        const data = await this.LocalPLWR.getCoinHistory(ticker, timeframe);
 
         const lastData = data[0];
         const secondLastData = data[1];
@@ -176,7 +187,7 @@ export class TasksService {
 
         this.logger.log(`${ticker} processed successfully.`);
       } catch (error) {
-        this.webhooksService.sendTemporaryWebhook(`ERROR ON API AT: ${timeframe} On ${date}`, `RSIENDBOT ${ticker}USD at ${timeframe}`, 'Nono','ERORR_CALL');
+        this.LocalPLWR.sendTemporaryWebhook(`ERROR ON API AT: ${timeframe} On ${date}`, `RSIENDBOT ${ticker}USD at ${timeframe}`, 'Nono','ERORR_CALL');
         this.logger.error(`Error processing ${ticker}: ${error.message}`);
       }
     }
