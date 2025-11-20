@@ -5,6 +5,34 @@ import { StockHelperService } from 'src/webhook/stockHelper.service';
 import * as DTO from './dto';
 @Injectable()
 export class WebhookService {
+  async get12for(
+    ticker: string,
+    timefame: string,
+    apikey
+  ) {
+    try {
+      if(ticker.includes('USD')){
+        ticker = this.stockHelperService.formatSymbol(ticker)
+      }
+      let BASE_URL = `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=${timefame}&outputsize=400&dp=2&apikey=${apikey}`;
+      console.log(BASE_URL)
+      const response = await axios.get(BASE_URL);
+      if (response.data.status === 'error') {
+        throw new Error('API returned error status');
+      }
+      else if (response.data.status == 'ok') {
+        const responseRe =  response.data.values;
+        const reversedData = [...responseRe].reverse(); // clone + reverse
+        const dataOut = plainToInstance(DTO.ChartOutTwelveData, reversedData, {
+          excludeExtraneousValues: true,
+        })
+        const newData = await this.stockHelperService.returnNewData(dataOut);
+        return newData;
+      }
+    } catch (error) {
+      console.error(`Error with key ${apikey.slice(0, 4)}...:`, error?.response?.status || error.message);
+    }
+  }
     constructor(
         private readonly stockHelperService: StockHelperService,
       ) {}
