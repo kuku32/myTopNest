@@ -17,14 +17,12 @@ export class TasksService {
 
   // Example: run every 15 minutes during trading hours (9:30 AM - 4:00 PM ET)
   // @Cron('*/15 14-21 * * 1-5') // Adjust to UTC time
-  @Cron(CronExpression.EVERY_10_SECONDS)
-  handleMarketCron() {
-    const firebaseRoot = this.configService.get<any>('FIREBASE_DATA');
-    console.log(firebaseRoot)
-    this.logger.log('📈 Running 15-min trading check (market hours)');
-  }
+  // @Cron(CronExpression.EVERY_10_SECONDS)
+  // handleMarketCron() {
+  //   this.logger.log('📈 Running 15-min trading check (market hours)');
+  // }
 
-  // // @Cron(CronExpression.EVERY_5_MINUTES)
+  @Cron(CronExpression.EVERY_5_MINUTES)
   async handleCronCrypto() {
     this.wakeupcall()
     this.logger.log('Running scheduled task for EVERY_5_MINUTES');
@@ -55,7 +53,7 @@ export class TasksService {
     }
   }
 
- // @Cron('*/15 * * * *') // every 15 minutes
+  @Cron('*/15 * * * *') // every 15 minutes
   async handle15Min() {
     const tickers = ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD', 'DASHUSD', 'ZECUSD', 'XMRUSD'];
     // const tickers = ['BTCUSD'];
@@ -111,7 +109,7 @@ export class TasksService {
 
     try {
       return await this.webhooksService.sendDiscordNotification(
-        message,
+        'railway '+message,
         `${channel} ${ticker}`,
         JSON.stringify(lastdata),
       );
@@ -138,9 +136,9 @@ export class TasksService {
       const { data } = await axios.get('https://mytopnest-production.up.railway.app');
       this.logger.log('⏱️ Keep-alive ping success:', data.status);
     } catch (err) {
-      this.logger.error(`❌ Keep-alive failed: ${err.message}`);
+      this.logger.error(`❌ railway Keep-alive failed: ${err.message}`);
       this.sendDiscord(
-        `❌ Keep-alive failed:`,
+        `❌ railway Keep-alive failed:`,
         `RSIENDBOT BOTBOT`,
         'Nono',
         'ERORR_CALL'
