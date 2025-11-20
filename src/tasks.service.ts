@@ -107,9 +107,8 @@ export class TasksService {
     ) {
       this.webhooksService.sendTemporaryWebhook(`railway BUY ON MACDCROSS-${timefame}(MACD:${lastdata?.MACDDivergence}): ${lastdata?.date}` , `${ticker} RSI 5MIN -ON- ${timefame}`, lastdata,channel);
     }    
-    else{
-      this.webhooksService.sendTemporaryWebhook(`railway BUY ON MACDCROSS-${timefame}(MACD:${lastdata?.MACDDivergence}): ${lastdata?.date}` , `${ticker} RSI 5MIN -ON- ${timefame}`, lastdata,channel);
-    }
+    // else{
+    //   this.webhooksService.sendTemporaryWebhook(`railway BUY ON MACDCROSS-${timefame}(MACD:${lastdata?.MACDDivergence}): ${lastdata?.date}` , `${ticker} RSI 5MIN -ON- ${timefame}`, lastdata,channel);
+    // }
   }
-
 }
