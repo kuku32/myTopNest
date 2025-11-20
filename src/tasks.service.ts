@@ -23,8 +23,8 @@ export class TasksService {
   // }
 
   @Cron(CronExpression.EVERY_5_MINUTES)
+  // @Cron(CronExpression.EVERY_10_SECONDS)
   async handleCronCrypto() {
-    this.wakeupcall()
     this.logger.log('Running scheduled task for EVERY_5_MINUTES');
     const date = new Date()
     const timeframe = '5m'
@@ -93,7 +93,7 @@ export class TasksService {
         this.logger.log(`${ticker} processed successfully.`);
       } catch (error) {
         this.webhooksService.sendTemporaryWebhook(
-          `railway ERROR ON API AT: ${timeframe} On ${date}`,
+          `ERROR ON API AT: ${timeframe} On ${date}`,
           `RSIENDBOT ${ticker} at ${timeframe}`,
           'Nono',
           'ERORR_CALL'
@@ -107,7 +107,7 @@ export class TasksService {
 
     try {
       return await this.webhooksService.sendDiscordNotification(
-        'railway '+message,
+        'RAILWAY '+message,
         `${channel} ${ticker}`,
         JSON.stringify(lastdata),
       );
@@ -122,23 +122,24 @@ export class TasksService {
       lastdata?.MACDLine > lastdata?.SignalLine &&
       Secondlastdata?.MACDLine < Secondlastdata?.SignalLine
     ) {
-      await this.sendDiscord(`railway BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}` , `${ticker} -ON- ${timeframe}`, lastdata,channel);
+      await this.sendDiscord(`BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}` , `${ticker} -ON- ${timeframe}`, lastdata,channel);
     }    
-    // else{
-    //   await this.sendDiscord(`BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}` , `${ticker} -ON- ${timeframe}`, lastdata,channel);
-    //   // this.webhooksService.sendTemporaryWebhook(`railway BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDDivergence}): ${lastdata?.date}` , `${ticker} RSI 5MIN -ON- ${timeframe}`, lastdata,channel);
-    // }
+    else{
+      await this.sendDiscord(`BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}` , `${ticker} -ON- ${timeframe}`, lastdata,channel);
+      // this.webhooksService.sendTemporaryWebhook(`railway BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDDivergence}): ${lastdata?.date}` , `${ticker} RSI 5MIN -ON- ${timeframe}`, lastdata,channel);
+    }
   }
+  @Cron(CronExpression.EVERY_MINUTE)
   async wakeupcall() {
     try {
       const date = new Date()
-      await this.sendDiscord('CHECKBOT Crypto 5min RUN AT:'+date, 'RSIENDBOT 5MIN', 'Nono','CRON_CHECK');
+      await this.sendDiscord('WAKEUPCALL:'+date, 'RSIENDBOT 5MIN', 'Nono','CRON_CHECK');
       const { data } = await axios.get('https://mytopnest-production.up.railway.app/webhooks');
       this.logger.log('⏱️ Keep-alive ping success:', data.status);
     } catch (err) {
-      this.logger.error(`❌ railway Keep-alive failed: ${err.message}`);
+      this.logger.error(`❌ RAILWAY Keep-alive failed: ${err.message}`);
       this.sendDiscord(
-        `❌ railway Keep-alive failed:`,
+        `❌ RAILWAY Keep-alive failed:`,
         `RSIENDBOT BOTBOT`,
         'Nono',
         'ERORR_CALL'

@@ -161,80 +161,84 @@ export class WebhookService {
     file?:  import('multer').File,
     extra?: any
   ) {
-    const current = new Date().toISOString().replace(/T.*$/, '');
-    const ticker = botname.split(' ')[1].toUpperCase();
-    const webhookCl = botname.split(' ')[0].toUpperCase();
-    const WEBHOOKS = this.WEBHOOKS_ENV[webhookCl] || this.WEBHOOKS_ENV.Other;
-    this.webhookClient = new WebhookClient({url: this.configService.get<any>(WEBHOOKS)});
-    // avatarURL: 'https://i.imgur.com/AfFp7pu.png',
-    const botAvatar = {
-      QQQ: 'https://image-post-625h.vercel.app/upload/eleceed/discord/QQQ.png',
-      SPY: 'https://image-post-625h.vercel.app/upload/eleceed/discord/s&p.png',
-      Other: `https://static2.finnhub.io/file/publicdatany/finnhubimage/stock_logo/${ticker}.png`,
-    };
-    // Dynamically select avatarURL based on the ticker, default to 'Other' if ticker not found
-    const selectedAvatar = botAvatar[ticker] || botAvatar.Other;
-    // Create the embed object
-    let embed 
-    let options:any
-    const botdt = botname.split(' ').slice(1).join(' ');
-    const color = botdt.includes('DOWN')? 0xff0000 : 0x00ff00 
-    const origin =`**[4200-on1m](http://localhost:4200/price-log/${ticker})** | **[4200-5m](http://localhost:4200/price-log/${ticker}?daysRange=5)** | **[4200-15m](http://localhost:4200/price-log/${ticker}?daysRange=15)** \n **[3001-PO-day](http://localhost:3001/?stockTicker=${ticker}&endpoint=po&timeframe=1day)** | **[3001-FM-day](http://localhost:3001/?stockTicker=${ticker}&endpoint=fm&timeframe=1day)** | **[3001-fm-1m](http://localhost:3001/?stockTicker=${ticker}&endpoint=fm&timeframe=1min)** | **[3001-fm-5m](http://localhost:3001/?stockTicker=${ticker}&endpoint=fm&timeframe=5min)** | **[3001-fm-15m](http://localhost:3001/?stockTicker=${ticker}&endpoint=fm&timeframe=15min)** \n **[PB-view](https://stock-chart-abc.web.app/?stockTicker=${ticker}&endpoint=fm&timeframe=1day)** | **[TradingView](https://www.tradingview.com/chart/?symbol=${ticker})**`
-    let gptres
-    if(extra){
-      const parts = extra.split('/');
-      const id =  parts[parts.length - 1];
-      gptres = `**[ASK GPT](${extra})** | **[GPT RES](https://todocalender.web.app/home/stock-track/${id}?sym=${ticker}&date=${current})**`
-    }
-    const setmess = extra ? `${origin} | ${gptres}`: origin
-    console.log(message, ticker, lastData, botname)
-    if(botdt.includes('RSIENDBOT')){
-      options = {
-        username: botdt,
-        content: message,
+    try {
+      const current = new Date().toISOString().replace(/T.*$/, '');
+      const ticker = botname.split(' ')[1].toUpperCase();
+      const webhookCl = botname.split(' ')[0].toUpperCase();
+      const WEBHOOKS = this.WEBHOOKS_ENV[webhookCl] || this.WEBHOOKS_ENV.Other;
+      this.webhookClient = new WebhookClient({url: this.configService.get<any>(WEBHOOKS)});
+      // avatarURL: 'https://i.imgur.com/AfFp7pu.png',
+      const botAvatar = {
+        QQQ: 'https://image-post-625h.vercel.app/upload/eleceed/discord/QQQ.png',
+        SPY: 'https://image-post-625h.vercel.app/upload/eleceed/discord/s&p.png',
+        Other: `https://static2.finnhub.io/file/publicdatany/finnhubimage/stock_logo/${ticker}.png`,
       };
-    } else if(lastData === '{}'){
-      embed = new EmbedBuilder()
-      .setColor(color)
-      .addFields({ name: botdt, value: setmess, inline: false });
-      options = {
-        username: botdt,
-        avatarURL: selectedAvatar,
-        embeds: [embed],
-      };
-    } else{
-      const lastDataJson = await this.StopNTarget(JSON.parse(lastData));
-      const selectedFields = ['date', 'close', 'stop', 'target', 'MA200', 'RSI', 'price','priceAvg200','dayHigh','yearHigh','eps', 'rsi','ema200'];
-      
-      embed = new EmbedBuilder()
-      .setTitle('LATEST DATA')
-      .setColor(color)
-      .addFields({ name: botdt, value: setmess, inline: false })
-      .addFields(...this.createEmbedFields(lastDataJson, selectedFields))
-      options = {
-        username: botdt,
-        avatarURL: selectedAvatar,
-        content: message,
-        embeds: [embed],
-      };
+      // Dynamically select avatarURL based on the ticker, default to 'Other' if ticker not found
+      const selectedAvatar = botAvatar[ticker] || botAvatar.Other;
+      // Create the embed object
+      let embed 
+      let options:any
+      const botdt = botname.split(' ').slice(1).join(' ');
+      const color = botdt.includes('DOWN')? 0xff0000 : 0x00ff00 
+      const origin =`**[4200-on1m](http://localhost:4200/price-log/${ticker})** | **[4200-5m](http://localhost:4200/price-log/${ticker}?daysRange=5)** | **[4200-15m](http://localhost:4200/price-log/${ticker}?daysRange=15)** \n **[3001-PO-day](http://localhost:3001/?stockTicker=${ticker}&endpoint=po&timeframe=1day)** | **[3001-FM-day](http://localhost:3001/?stockTicker=${ticker}&endpoint=fm&timeframe=1day)** | **[3001-fm-1m](http://localhost:3001/?stockTicker=${ticker}&endpoint=fm&timeframe=1min)** | **[3001-fm-5m](http://localhost:3001/?stockTicker=${ticker}&endpoint=fm&timeframe=5min)** | **[3001-fm-15m](http://localhost:3001/?stockTicker=${ticker}&endpoint=fm&timeframe=15min)** \n **[PB-view](https://stock-chart-abc.web.app/?stockTicker=${ticker}&endpoint=fm&timeframe=1day)** | **[TradingView](https://www.tradingview.com/chart/?symbol=${ticker})**`
+      let gptres
+      if(extra){
+        const parts = extra.split('/');
+        const id =  parts[parts.length - 1];
+        gptres = `**[ASK GPT](${extra})** | **[GPT RES](https://todocalender.web.app/home/stock-track/${id}?sym=${ticker}&date=${current})**`
+      }
+      const setmess = extra ? `${origin} | ${gptres}`: origin
+      if(botdt.includes('RSIENDBOT')){
+        options = {
+          username: botdt,
+          content: message,
+        };
+      } else if(lastData === '{}'){
+        embed = new EmbedBuilder()
+        .setColor(color)
+        .addFields({ name: botdt, value: setmess, inline: false });
+        options = {
+          username: botdt,
+          avatarURL: selectedAvatar,
+          embeds: [embed],
+        };
+      } else{
+        const lastDataJson = await this.StopNTarget(JSON.parse(lastData));
+        const selectedFields = ['date', 'close', 'stop', 'target', 'MA200', 'RSI', 'price','priceAvg200','dayHigh','yearHigh','eps', 'rsi','ema200'];
+        
+        embed = new EmbedBuilder()
+        .setTitle('LATEST DATA')
+        .setColor(color)
+        .addFields({ name: botdt, value: setmess, inline: false })
+        .addFields(...this.createEmbedFields(lastDataJson, selectedFields))
+        options = {
+          username: botdt,
+          avatarURL: selectedAvatar,
+          content: message,
+          embeds: [embed],
+        };
+      }
+  
+  
+      // ✅ If there's a file (image), attach it
+      if (file) {
+        const filename = 'capture.png';
+        const attachment = new AttachmentBuilder(file.buffer, { name: filename });
+        embed.setImage(`attachment://${filename}`);
+        options.files = [attachment];
+      }
+  
+      const sentMessage = await this.webhookClient.send(options);
+      const WEBHOOKS_CNA = this.WEBHOOKS_CN[webhookCl] || this.WEBHOOKS_CN.Other;
+      await this.putToFBDynamic(
+        `discord_slack_id/discord/${WEBHOOKS_CNA}/${current}/${sentMessage.id}.json`,
+        `https://discord.com/channels/1306113720979689523/${sentMessage?.channel_id}/${sentMessage?.id}`
+      );
+      return { msg: 'post to discord success' ,...sentMessage};
+    } catch (error) {
+      console.log(error)
     }
-
-
-    // ✅ If there's a file (image), attach it
-    if (file) {
-      const filename = 'capture.png';
-      const attachment = new AttachmentBuilder(file.buffer, { name: filename });
-      embed.setImage(`attachment://${filename}`);
-      options.files = [attachment];
-    }
-
-    const sentMessage = await this.webhookClient.send(options);
-    const WEBHOOKS_CNA = this.WEBHOOKS_CN[webhookCl] || this.WEBHOOKS_CN.Other;
-    await this.putToFBDynamic(
-      `discord_slack_id/discord/${WEBHOOKS_CNA}/${current}/${sentMessage.id}.json`,
-      `https://discord.com/channels/1306113720979689523/${sentMessage?.channel_id}/${sentMessage?.id}`
-    );
-    return { msg: 'post to discord success' ,...sentMessage};
+   
   }
   async RsiToDatabase(target: any, current:any, data:any) {
     const firebaseUrl = `alerts/${target}/${current}.json`
