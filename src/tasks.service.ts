@@ -28,8 +28,6 @@ export class TasksService {
     this.logger.log('Running scheduled task for EVERY_5_MINUTES');
     const date = new Date()
     const timeframe = '5m'
-    this.sendDiscord('CHECKBOT Crypto 5min RUN AT:'+date, 'RSIENDBOT 5MIN', 'Nono','CRON_CHECK');
-
     // this.webhooksService.sendTemporaryWebhook('railway CHECKBOT Crypto 5min RUN AT:'+date, 'RSIENDBOT 5MIN', 'Nono','CRON_CHECK');
     const tickers = ['BTC', 'BCH', 'LTC', 'ETH','ETC', 'DASH', 'ZEC', 'XMR'];
     // const tickers = ['BTC'];
@@ -133,6 +131,8 @@ export class TasksService {
   }
   async wakeupcall() {
     try {
+      const date = new Date()
+      await this.sendDiscord('CHECKBOT Crypto 5min RUN AT:'+date, 'RSIENDBOT 5MIN', 'Nono','CRON_CHECK');
       const { data } = await axios.get('https://mytopnest-production.up.railway.app');
       this.logger.log('⏱️ Keep-alive ping success:', data.status);
     } catch (err) {
