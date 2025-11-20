@@ -32,16 +32,16 @@ export class TasksService {
   //   ]);
   // }
 
-  // @Cron('*/15 * * * *') // every 15 minutes
-  // async handle15Min() {
-  //   await this.sendDiscord('WAKEUPCALL:15min', 'RSIENDBOT 15min', 'CRYTO','CRON_CHECK');
-  //   const tickers = ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD', 'DASHUSD', 'ZECUSD', 'XMRUSD'];
-  //   // const tickers = ['BTCUSD'];
-  //   // const apikey = '2bbd0d305edb404aac2e2de5cc1311af'; // test
-  //   const apikey = 'd3058ae5683b4fc19a787ceb21a87f67';
-  //   this.logger.log('Running scheduled every 15 minutes for all tickers...');
-  //   await this.processTickers(tickers, '15min', apikey, 'CRYPTO_EARLY_15MIN');
-  // }
+  @Cron('*/15 * * * *') // every 15 minutes
+  async handle15Min() {
+    await this.sendDiscord('WAKEUPCALL:15min', 'RSIENDBOT 15min', 'CRYTO','CRON_CHECK');
+    // const tickers = ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD', 'DASHUSD', 'ZECUSD', 'XMRUSD'];
+    const tickers = ['BTCUSD'];
+    // const apikey = '2bbd0d305edb404aac2e2de5cc1311af'; // test
+    const apikey = 'd3058ae5683b4fc19a787ceb21a87f67';
+    this.logger.log('Running scheduled every 15 minutes for CRYPTOs...');
+    await this.processTickers(tickers, '15min', apikey, 'CRYPTO_EARLY_15MIN',2);
+  }
 
   async USTIMERUN(intickers:string[], api:any,channel, delay, timeframe = '5min') {
     const now = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
@@ -102,21 +102,11 @@ export class TasksService {
     }
   }
 
-  async sendDiscord(message:string, ticker:string, lastdata:any, channel:string) {
 
-    try {
-      return await this.LocalPLWR.sendDiscordNotification(
-        'RAILWAY '+message,
-        `${channel} ${ticker}`,
-        JSON.stringify(lastdata),
-      );
-    } catch (err) {
-      console.error('❌ Error in controller:', err);
-      throw err;
-    }
-  }
 
   async run15Min5signal(ticker, lastdata5min, channel){
+    this.logger.log(`${ticker} run15Min5signal.`);
+
     const  data = await this.LocalPLWR.TwReveseNOAPI(ticker, '15min');
     const lastData = data[data.length - 1];
     if(lastData?.MACDLine > lastData?.SignalLine){
@@ -125,55 +115,52 @@ export class TasksService {
     }
   }
 
-  
   async compareAndSend(lastdata, Secondlastdata, ticker, timeframe, channel) {
     const isWithinRange = Timer.checkIfWithin5MinutesEST(lastdata?.date);
+    // this.logger.log(`${ticker} compareAndSend.`);
     if (isWithinRange) {
       console.log(ticker,'✅ Within ±5 minutes of EST time');
     } else {
-      console.log(ticker,'❌ Outside ±5 minutes of EST time');
+      console.log(ticker,'❌ Outside ±5 minutes of EST time',lastdata?.date);
       return
     }
     if (
       lastdata?.MACDLine > lastdata?.SignalLine &&
       Secondlastdata?.MACDLine < Secondlastdata?.SignalLine
     ) {
-      await this.run15Min5signal(ticker, lastdata, channel)
-      // await this.sendDiscord(`BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}` , `${ticker} -ON- ${timeframe}`, lastdata,channel);
+      if(timeframe==='5min'){
+        // check on 15min to see bullish or bearish macd
+        await this.run15Min5signal(ticker, lastdata, channel)
+      }
+      else{
+        await this.sendDiscord(`BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}` , `${ticker} -ON- ${timeframe}`, lastdata,channel);
+      }
     }    
-    // else{
-    //   await this.sendDiscord(`BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}` , `${ticker} -ON- ${timeframe}`, lastdata,channel);
+    // else {
+    //   if(timeframe==='5min'){
+    //     console.log(123)
+    //     // check on 15min to see bullish or bearish macd
+    //     await this.run15Min5signal(ticker, lastdata, channel)
+    //   }
+    //   else{
+    //     await this.sendDiscord(`BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}` , `${ticker} -ON- ${timeframe}`, lastdata,channel);
+    //     }
+    //   // await this.sendDiscord(`BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}` , `${ticker} -ON- ${timeframe}`, lastdata,channel);
     //   // this.LocalPLWR.sendTemporaryWebhook(`railway BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDDivergence}): ${lastdata?.date}` , `${ticker} RSI 5MIN -ON- ${timeframe}`, lastdata,channel);
     // }
   }
   // // @Cron(CronExpression.EVERY_MINUTE)
-  async wakeupcall() {
-    try {
-      const date = new Date()
-      await this.sendDiscord('WAKEUPCALL:'+date, 'RSIENDBOT 5MIN', 'Nono','CRON_CHECK');
-      const { data } = await axios.get('https://mytopnest-production.up.railway.app/webhooks');
-      this.logger.log('⏱️ Keep-alive ping success:', data.status);
-    } catch (err) {
-      this.logger.error(`❌ RAILWAY Keep-alive failed: ${err.message}`);
-      this.sendDiscord(
-        `❌ RAILWAY Keep-alive failed:`,
-        `RSIENDBOT BOTBOT`,
-        'Nono',
-        'ERORR_CALL'
-      );
-    }
-  }
 
-  @Cron(CronExpression.EVERY_5_MINUTES)
+  // @Cron(CronExpression.EVERY_10_SECONDS)
   async handleCronCrypto() {
     this.wakeupcall()
     this.logger.log('Running scheduled task for EVERY_5_MINUTES');
     const date = new Date()
     const timeframe = '5m'
     // this.LocalPLWR.sendTemporaryWebhook('railway CHECKBOT Crypto 5min RUN AT:'+date, 'RSIENDBOT 5MIN', 'Nono','CRON_CHECK');
-    const tickers = ['BTC', 'BCH', 'LTC', 'ETH','ETC', 'DASH', 'ZEC', 'XMR'];
-    // const tickers = ['BTC'];
-    await new Promise((resolve) => setTimeout(resolve, 2 * 60 * 1000)); // 2-minute delay
+    // const tickers = ['BTC', 'BCH', 'LTC', 'ETH','ETC', 'DASH', 'ZEC', 'XMR'];
+    const tickers = ['BTC'];
+    // await new Promise((resolve) => setTimeout(resolve, 2 * 60 * 1000)); // 2-minute delay
     for (const ticker of tickers) {
       try {
         // 1️⃣ Get historical data for the ticker
@@ -192,4 +179,34 @@ export class TasksService {
       }
     }
   }
+  async sendDiscord(message:string, ticker:string, lastdata:any, channel:string) {
+
+    try {
+      return await this.LocalPLWR.sendDiscordNotification(
+        'RAILWAY '+message,
+        `${channel} ${ticker}`,
+        JSON.stringify(lastdata),
+      );
+    } catch (err) {
+      console.error('❌ Error in controller:', err);
+      throw err;
+    }
+  }
+  async wakeupcall() {
+    try {
+      const date = new Date()
+      await this.sendDiscord('WAKEUPCALL:'+date, 'RSIENDBOT 5MIN', 'Nono','CRON_CHECK');
+      const { data } = await axios.get('https://mytopnest-production.up.railway.app/webhooks');
+      this.logger.log('⏱️ Keep-alive ping success:', data.status);
+    } catch (err) {
+      this.logger.error(`❌ RAILWAY Keep-alive failed: ${err.message}`);
+      this.sendDiscord(
+        `❌ RAILWAY Keep-alive failed:`,
+        `RSIENDBOT BOTBOT`,
+        'Nono',
+        'ERORR_CALL'
+      );
+    }
+  }
+
 }

@@ -39,12 +39,22 @@ export class WebhookService {
       if (response.data.status === 'error') {
         throw new Error('API returned error status');
       }
-      else if (response.data.status == 'ok') {
+      else if (response.data?.status == 'ok') {
+        // us stock     "exchange_timezone": "America/New_York", ChartOutTwelveData
+        // btc don't turn to ChartOutTwelveDataUTC
+        const meta_timezone = response.data.meta.exchange_timezone
         const responseRe =  response.data.values;
         const reversedData = [...responseRe].reverse(); // clone + reverse
-        const dataOut = plainToInstance(DTO.ChartOutTwelveData, reversedData, {
-          excludeExtraneousValues: true,
-        })
+        let dataOut
+        if(meta_timezone){
+          dataOut = plainToInstance(DTO.ChartOutTwelveData, reversedData, {
+            excludeExtraneousValues: true,
+          })
+        } else if(!meta_timezone){
+          dataOut = plainToInstance(DTO.ChartOutTwelveDataUTC, reversedData, {
+            excludeExtraneousValues: true,
+          })
+        }
         const newData = await this.stockHelperService.returnNewData(dataOut);
         return newData;
       }
@@ -389,11 +399,19 @@ export class WebhookService {
     console.log(BASE_URL)
     const response = await this.tryCatchtwelvedata(BASE_URL);
     if (response?.status == 'ok') {
+      // us stock     "exchange_timezone": "America/New_York", ChartOutTwelveData
+      // btc don't turn to ChartOutTwelveDataUTC
+      const meta_timezone = response.meta.exchange_timezone
       const responseRe =  response.values;
       const reversedData = [...responseRe].reverse(); // clone + reverse
-      const dataOut = plainToInstance(DTO.ChartOutTwelveData, reversedData, {
-        excludeExtraneousValues: true,
-      })
+      let dataOut
+      if(meta_timezone){
+        dataOut = plainToClass(DTO.ChartOutTwelveData, response.values);
+      } else if(!meta_timezone){
+        dataOut = plainToInstance(DTO.ChartOutTwelveDataUTC, reversedData, {
+          excludeExtraneousValues: true,
+        })
+      }
       const newData = await this.stockHelperService.returnNewData(dataOut);
       return newData;
     }
