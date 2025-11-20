@@ -24,7 +24,7 @@ export class TasksService {
 
   @Cron('*/15 14-21 * * 1-5')
   async runAllWatL15min() {
-    this.wakeupcall()
+    await this.sendDiscord('WAKEUPCALL:15min', 'RSIENDBOT 15min', 'US','CRON_CHECK');
     const symbols =  await this.webhooksService.getDolist() ||[]
     await Promise.all([
       this.USTIMERUN(symbols, this.allkeys,'US_EARLY_15MIN', 3, '15min'),
@@ -33,6 +33,7 @@ export class TasksService {
 
   @Cron('*/15 * * * *') // every 15 minutes
   async handle15Min() {
+    await this.sendDiscord('WAKEUPCALL:15min', 'RSIENDBOT 15min', 'CRYTO','CRON_CHECK');
     const tickers = ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD', 'DASHUSD', 'ZECUSD', 'XMRUSD'];
     // const tickers = ['BTCUSD'];
     // const apikey = '2bbd0d305edb404aac2e2de5cc1311af'; // test
@@ -56,6 +57,7 @@ export class TasksService {
     const tickers = intickers;
     await this.processTickers(tickers, timeframe, api, channel, delay);
   }
+
   private async processTickers(
     tickers: string[],
     timeframe: string,
@@ -113,9 +115,6 @@ export class TasksService {
     }
   }
 
-
-
-
   async compareAndSend(lastdata, Secondlastdata, ticker, timeframe, channel) {
     if (
       lastdata?.MACDLine > lastdata?.SignalLine &&
@@ -146,7 +145,7 @@ export class TasksService {
     }
   }
 
-  // @Cron(CronExpression.EVERY_5_MINUTES)
+  @Cron(CronExpression.EVERY_5_MINUTES)
   async handleCronCrypto() {
     this.wakeupcall()
     this.logger.log('Running scheduled task for EVERY_5_MINUTES');
