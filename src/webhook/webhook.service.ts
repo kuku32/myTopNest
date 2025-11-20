@@ -9,12 +9,13 @@ export class WebhookService {
         private readonly stockHelperService: StockHelperService,
       ) {}
 
-  async sendTemporaryWebhook(ticker: any, errror:any, discordChanel: string='TSLA',) {
+  async sendTemporaryWebhook(msg, ticker: any,  data, discordChanel: string='TSLA',) {
     console.log(123)
-    const botname = `${discordChanel} RSIENDBOT ${ticker}`;
+    const botname = `${discordChanel} ${ticker}`;
     const payload = {
-      message:'❌ API ERROR:'+errror,
-      botname,
+      botname: botname,
+      message: msg,
+      lastdata: JSON.stringify(data),
     };
     const rootapi  = `https://nestjs-api.koyeb.app`
     // const rootapi  =  "http://localhost:3000"
