@@ -133,7 +133,7 @@ export class TasksService {
     try {
       const date = new Date()
       await this.sendDiscord('CHECKBOT Crypto 5min RUN AT:'+date, 'RSIENDBOT 5MIN', 'Nono','CRON_CHECK');
-      const { data } = await axios.get('https://mytopnest-production.up.railway.app');
+      const { data } = await axios.get('https://mytopnest-production.up.railway.app/webhooks');
       this.logger.log('⏱️ Keep-alive ping success:', data.status);
     } catch (err) {
       this.logger.error(`❌ railway Keep-alive failed: ${err.message}`);
