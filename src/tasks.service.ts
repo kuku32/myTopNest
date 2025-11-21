@@ -216,6 +216,12 @@ export class TasksService {
       console.log(ticker, '✅ Within ±6 minutes of EST time');
     } else {
       console.log(ticker, '❌ Outside ±6 minutes of EST time', lastdata?.date);
+      await this.sendDiscord(
+        '❌ Outside ±6 minutes of EST time',
+        'RWBOT:'+ticker,
+        'CRYTO',
+        'CRON_CHECK',
+      );
       return;
     }
     if (
