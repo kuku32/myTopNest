@@ -147,8 +147,6 @@ export class WebhookService {
         endTimestamp = startTimestamp;
       }
       const reversedData = [...allData]; // clone + reverse
-      const date = new Date()
-      console.log('runlocal.service.ts-425',code,date)
       const dataOut = plainToInstance(DTO.CoinHistoryDto, reversedData, {
         excludeExtraneousValues: true,
       })
@@ -406,7 +404,7 @@ export class WebhookService {
       const reversedData = [...responseRe].reverse(); // clone + reverse
       let dataOut
       if(meta_timezone){
-        dataOut = plainToClass(DTO.ChartOutTwelveData, response.values);
+        dataOut = plainToInstance(DTO.ChartOutTwelveData, reversedData);
       } else if(!meta_timezone){
         dataOut = plainToInstance(DTO.ChartOutTwelveDataUTC, reversedData, {
           excludeExtraneousValues: true,
