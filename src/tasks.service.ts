@@ -222,7 +222,7 @@ export class TasksService {
         'CRYTO',
         'CRON_CHECK',
       );
-      return;
+      // return;
     }
     if (
       lastdata?.MACDLine > lastdata?.SignalLine &&
