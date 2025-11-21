@@ -233,6 +233,16 @@ export class TasksService {
           channel,
         );
       }
+    } else if (
+      lastdata?.MACDLine < lastdata?.SignalLine &&
+      Secondlastdata?.MACDLine > Secondlastdata?.SignalLine
+    ) {
+      await this.sendDiscord(
+        `SELLLLLLLL ON-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker} -ON- ${timeframe}`,
+        lastdata,
+        'CRYPTO_WATCH',
+      );
     }
   }
 
