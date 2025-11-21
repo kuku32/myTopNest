@@ -185,14 +185,14 @@ export class TasksService {
     if (lastData?.MACDLine > lastData?.SignalLine) {
       // 5min cross, 15 allway buy buy
       await this.sendDiscord(
-        `ALL ABOVE SAFE BUY 5min (MACD:${lastdata5min?.MACDLine}): ${lastdata5min?.date}`,
+        `ALL ABOVE SAFE BUY 5min (MACD5:${lastdata5min?.MACDLine})|(MACD15:${lastData?.MACDLine}): ${lastdata5min?.date}`,
         `${ticker} -ON- 5min`,
         lastdata5min,
         channel,
       );
     } else {
       await this.sendDiscord(
-        `5MIN CROSS, BUT 15 RED!!!! (MACD:${lastdata5min?.MACDLine}): ${lastdata5min?.date}`,
+        `5MIN CROSS, BUT 15 RED!!!! (MACD:${lastdata5min?.MACDLine})|(MACD15:${lastData?.MACDLine}): ${lastdata5min?.date}`,
         `${ticker} -ON- 5min`,
         lastdata5min,
         channel.includes('US')?'US_ALL':"CRYPTO_ALL",
