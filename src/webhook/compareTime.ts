@@ -12,8 +12,8 @@ export function checkIfWithin5MinutesEST(dateString: string): boolean {
   const nowEST = DateTime.now().setZone('America/New_York');
 
   // Create ±5 minute window
-  const lowerBound = nowEST.minus({ minutes: 5 });
-  const upperBound = nowEST.plus({ minutes: 5 });
+  const lowerBound = nowEST.minus({ minutes: 6 });
+  const upperBound = nowEST.plus({ minutes: 6 });
 
   // Compare
   return providerTime >= lowerBound && providerTime <= upperBound;

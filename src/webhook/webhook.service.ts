@@ -476,7 +476,7 @@ export class WebhookService {
     // await this.getRsilist('MACD_AB_POS')
     // await this.getRsilist('MACD_BL_POS')
     // await this.getRsilist('MACD_AB_NEG')
-    await this.getRsilist('MACD_BL_NEG',60)
+    await this.getRsilist('MACD_BL_NEG',70)
   }
   washSell30: any[] = [];
   dolist: any[] = [];
