@@ -197,7 +197,7 @@ export class WebhookService {
         gptres = `**[ASK GPT](${extra})** | **[GPT RES](https://todocalender.web.app/home/stock-track/${id}?sym=${ticker}&date=${current})**`
       }
       const setmess = extra ? `${origin} | ${gptres}`: origin
-      if(botdt.includes('RSIENDBOT')){
+      if(botdt.includes('RWBOT')){
         options = {
           username: botdt,
           content: message,

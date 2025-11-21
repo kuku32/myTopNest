@@ -25,7 +25,7 @@ export class TasksService {
 
   // @Cron('*/15 14-21 * * 1-5')
   // async runAllWatL15min() {
-  //   await this.sendDiscord('WAKEUPCALL:15min', 'RSIENDBOT 15min', 'US','CRON_CHECK');
+  //   await this.sendDiscord('WAKEUPCALL:15min', 'RWBOT 15min', 'US','CRON_CHECK');
   //   const symbols =  await this.LocalPLWR.getDolist() ||[]
   //   await Promise.all([
   //     this.USTIMERUN(symbols, this.allkeys,'US_EARLY_15MIN', 3, '15min'),
@@ -34,7 +34,7 @@ export class TasksService {
 
   @Cron('*/15 * * * *') // every 15 minutes
   async handle15Min() {
-    await this.sendDiscord('WAKEUPCALL:15min', 'RSIENDBOT 15min', 'CRYTO','CRON_CHECK');
+    await this.sendDiscord('WAKEUPCALL:15min', 'RWBOT 15min', 'CRYTO','CRON_CHECK');
     // const tickers = ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD', 'DASHUSD', 'ZECUSD', 'XMRUSD'];
     const tickers = ['BTCUSD'];
     // const apikey = '2bbd0d305edb404aac2e2de5cc1311af'; // test
@@ -93,7 +93,7 @@ export class TasksService {
       } catch (error) {
         this.sendDiscord(
           `ERROR ON API AT: ${timeframe} On ${date}`,
-          `RSIENDBOT ${ticker} at ${timeframe}`,
+          `RWBOT ${ticker} at ${timeframe}`,
           'Nono',
           'ERORR_CALL'
         );
@@ -157,7 +157,7 @@ export class TasksService {
     this.logger.log('Running scheduled task for EVERY_5_MINUTES');
     const date = new Date()
     const timeframe = '5m'
-    // this.LocalPLWR.sendTemporaryWebhook('railway CHECKBOT Crypto 5min RUN AT:'+date, 'RSIENDBOT 5MIN', 'Nono','CRON_CHECK');
+    // this.LocalPLWR.sendTemporaryWebhook('railway CHECKBOT Crypto 5min RUN AT:'+date, 'RWBOT 5MIN', 'Nono','CRON_CHECK');
     // const tickers = ['BTC', 'BCH', 'LTC', 'ETH','ETC', 'DASH', 'ZEC', 'XMR'];
     const tickers = ['BTC'];
     // await new Promise((resolve) => setTimeout(resolve, 2 * 60 * 1000)); // 2-minute delay
@@ -174,7 +174,7 @@ export class TasksService {
 
         this.logger.log(`${ticker} processed successfully.`);
       } catch (error) {
-        this.LocalPLWR.sendTemporaryWebhook(`ERROR ON API AT: ${timeframe} On ${date}`, `RSIENDBOT ${ticker}USD at ${timeframe}`, 'Nono','ERORR_CALL');
+        this.LocalPLWR.sendTemporaryWebhook(`ERROR ON API AT: ${timeframe} On ${date}`, `RWBOT ${ticker}USD at ${timeframe}`, 'Nono','ERORR_CALL');
         this.logger.error(`Error processing ${ticker}: ${error.message}`);
       }
     }
@@ -195,14 +195,14 @@ export class TasksService {
   async wakeupcall() {
     try {
       const date = new Date()
-      await this.sendDiscord('WAKEUPCALL:'+date, 'RSIENDBOT 5MIN', 'Nono','CRON_CHECK');
+      await this.sendDiscord('WAKEUPCALL:'+date, 'RWBOT 5MIN', 'Nono','CRON_CHECK');
       const { data } = await axios.get('https://mytopnest-production.up.railway.app/webhooks');
       this.logger.log('⏱️ Keep-alive ping success:', data.status);
     } catch (err) {
       this.logger.error(`❌ RAILWAY Keep-alive failed: ${err.message}`);
       this.sendDiscord(
         `❌ RAILWAY Keep-alive failed:`,
-        `RSIENDBOT BOTBOT`,
+        `RWBOT BOTBOT`,
         'Nono',
         'ERORR_CALL'
       );

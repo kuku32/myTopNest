@@ -18,13 +18,13 @@ export class TasksService {
   private readonly logger = new Logger(TasksService.name);
 
   // CRYPTO
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_5_MINUTES)
   async handleCronCrypto() {
     this.wakeupcall();
     this.logger.log('Running scheduled task for EVERY_5_MINUTES');
     const date = new Date();
     const timeframe = '5m';
-    // this.LocalPLWR.sendTemporaryWebhook('railway CHECKBOT Crypto 5min RUN AT:'+date, 'RSIENDBOT 5MIN', 'Nono','CRON_CHECK');
+    // this.LocalPLWR.sendTemporaryWebhook('railway CHECKBOT Crypto 5min RUN AT:'+date, 'RWBOT 5MIN', 'Nono','CRON_CHECK');
     const tickers = ['BTC', 'BCH', 'LTC', 'ETH','ETC', 'DASH', 'ZEC', 'XMR'];
     // const tickers = ['BTC'];
     await new Promise((resolve) => setTimeout(resolve, 2 * 60 * 1000)); // 2-minute delay
@@ -49,7 +49,7 @@ export class TasksService {
       } catch (error) {
         this.LocalPLWR.sendTemporaryWebhook(
           `ERROR ON API AT: ${timeframe} On ${date}`,
-          `RSIENDBOT ${ticker}USD at ${timeframe}`,
+          `RWBOT ${ticker}USD at ${timeframe}`,
           'Nono',
           'ERORR_CALL',
         );
@@ -61,7 +61,7 @@ export class TasksService {
   async handle15Min() {
     await this.sendDiscord(
       'WAKEUPCALL:15min',
-      'RSIENDBOT 15min',
+      'RWBOT 15min',
       'CRYTO',
       'CRON_CHECK',
     );
@@ -78,7 +78,8 @@ export class TasksService {
     );
   }
   // US STOCK
-  @Cron('*/5 14-21 * * 1-5')
+
+  @Cron('*/5 14-21 * * 1-5', { timeZone: 'UTC' })
   async runAllWatchLists() {
     const symbols = (await this.LocalPLWR.getDolist()) || [];
     await Promise.all([
@@ -86,9 +87,9 @@ export class TasksService {
     ]);
   }
 
-  @Cron('*/15 14-21 * * 1-5')
+  @Cron('*/15 14-21 * * 1-5', { timeZone: 'UTC' })
   async runAllWatL15min() {
-    await this.sendDiscord('WAKEUPCALL:15min', 'RSIENDBOT 15min', 'US','CRON_CHECK');
+    await this.sendDiscord('WAKEUPCALL:15min', 'RWBOT 15min', 'US','CRON_CHECK');
     const symbols =  await this.LocalPLWR.getDolist() ||[]
     await Promise.all([
       this.USTIMERUN(symbols, this.allkeys,'US_EARLY_15MIN', 3, '15min'),
@@ -97,7 +98,7 @@ export class TasksService {
 
   @Cron('30 14-20 * * 1-5', { timeZone: 'UTC' })
   async runAllWatL1hour() {
-    await this.sendDiscord('WAKEUPCALL:1hour', 'RSIENDBOT 1hour', 'US','CRON_CHECK');
+    await this.sendDiscord('WAKEUPCALL:1hour', 'RWBOT 1hour', 'US','CRON_CHECK');
     const symbols =  await this.LocalPLWR.getDolist() ||[]
     await Promise.all([
       this.USTIMERUN(symbols, this.allkeys,'USSTOCK_WATCH', 4, '1hour'),
@@ -176,7 +177,7 @@ export class TasksService {
       } catch (error) {
         this.sendDiscord(
           `ERROR ON API AT: ${timeframe} On ${date}`,
-          `RSIENDBOT ${ticker} at ${timeframe}`,
+          `RWBOT ${ticker} at ${timeframe}`,
           'Nono',
           'ERORR_CALL',
         );
@@ -257,8 +258,8 @@ export class TasksService {
     try {
       const date = new Date();
       await this.sendDiscord(
-        'WAKEUPCALL:' + date,
-        'RSIENDBOT 5MIN',
+        'RAILWAY WAKEUPCALL:' + date,
+        'RWBOT 5MIN',
         'Nono',
         'CRON_CHECK',
       );
@@ -270,7 +271,7 @@ export class TasksService {
       this.logger.error(`❌ RAILWAY Keep-alive failed: ${err.message}`);
       this.sendDiscord(
         `❌ RAILWAY Keep-alive failed:`,
-        `RSIENDBOT BOTBOT`,
+        `RWBOT BOTBOT`,
         'Nono',
         'ERORR_CALL',
       );
