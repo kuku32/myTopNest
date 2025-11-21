@@ -213,16 +213,16 @@ export class TasksService {
   async compareAndSend(lastdata, Secondlastdata, ticker, timeframe, channel) {
     const isWithinRange = Timer.checkIfWithin5MinutesEST(lastdata?.date);
     if (isWithinRange) {
-      console.log(ticker, '✅ Within ±6 minutes of EST time');
+      console.log(ticker, '✅ Within ±30 minutes of EST time');
     } else {
-      console.log(ticker, '❌ Outside ±6 minutes of EST time', lastdata?.date);
+      console.log(ticker, '❌ Outside ±30 minutes of EST time', lastdata?.date);
       await this.sendDiscord(
         '❌ Outside ±6 minutes of EST time',
         'RWBOT:'+ticker,
         'CRYTO',
         'CRON_CHECK',
       );
-      // return;
+      return;
     }
     if (
       lastdata?.MACDLine > lastdata?.SignalLine &&
