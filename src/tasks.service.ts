@@ -67,7 +67,7 @@ export class TasksService {
     );
     const tickers = ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD', 'DASHUSD', 'ZECUSD', 'XMRUSD'];
     // const tickers = ['BTCUSD'];
-    const apikey = 'd3058ae5683b4fc19a787ceb21a87f67';
+    const apikey = this.configService.get<string>('crypttwapi');
     this.logger.log('Running scheduled every 15 minutes for CRYPTOs...');
     await this.processTickers(
       tickers,
