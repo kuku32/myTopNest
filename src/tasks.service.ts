@@ -18,7 +18,7 @@ export class TasksService {
   private readonly logger = new Logger(TasksService.name);
 
   // CRYPTO
-  @Cron(CronExpression.EVERY_5_MINUTES)
+  // @Cron(CronExpression.EVERY_5_MINUTES)
   async handleCronCrypto() {
     this.wakeupcall();
     this.logger.log('Running scheduled task for EVERY_5_MINUTES');
@@ -57,7 +57,7 @@ export class TasksService {
       }
     }
   }
-  @Cron('*/15 * * * *') // every 15 minutes
+  // @Cron('*/15 * * * *') // every 15 minutes
   async handle15Min() {
     await this.sendDiscord(
       'WAKEUPCALL:15min',
@@ -79,7 +79,7 @@ export class TasksService {
   }
   // US STOCK
 
-  @Cron('*/5 14-21 * * 1-5', { timeZone: 'UTC' })
+  // @Cron('*/5 14-21 * * 1-5', { timeZone: 'UTC' })
   async runAllWatchLists() {
     const symbols = (await this.LocalPLWR.getDolist()) || [];
     await Promise.all([
@@ -87,7 +87,7 @@ export class TasksService {
     ]);
   }
 
-  @Cron('*/15 14-21 * * 1-5', { timeZone: 'UTC' })
+  // @Cron('*/15 14-21 * * 1-5', { timeZone: 'UTC' })
   async runAllWatL15min() {
     await this.sendDiscord('WAKEUPCALL:15min', 'RWBOT 15min', 'US','CRON_CHECK');
     const symbols =  await this.LocalPLWR.getDolist() ||[]
@@ -96,7 +96,7 @@ export class TasksService {
     ]);
   }
 
-  @Cron('30 14-20 * * 1-5', { timeZone: 'UTC' })
+  // @Cron('30 14-20 * * 1-5', { timeZone: 'UTC' })
   async runAllWatL1hour() {
     await this.sendDiscord('WAKEUPCALL:1hour', 'RWBOT 1hour', 'US','CRON_CHECK');
     const symbols =  await this.LocalPLWR.getDolist() ||[]
