@@ -58,7 +58,7 @@ export class TasksService {
       }
     }
   }
-  // @Cron('*/15 * * * *') // every 15 minutes
+  @Cron('*/15 * * * *') // every 15 minutes
   async handle15Min() {
     await this.sendDiscord(
       'WAKEUPCALL:15min',
