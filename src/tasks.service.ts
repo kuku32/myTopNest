@@ -6,6 +6,7 @@ import { WebhookService } from './webhook/webhook.service';
 import { StockHelperService } from './webhook/stockHelper.service';
 import { ConfigService } from '@nestjs/config';
 import * as Timer from './webhook/compareTime';
+import { StockData } from './webhook/dto/chartData';
 
 @Injectable()
 export class TasksService {
@@ -18,7 +19,7 @@ export class TasksService {
   private readonly logger = new Logger(TasksService.name);
 
   // CRYPTO
-  // @Cron(CronExpression.EVERY_5_MINUTES)
+  @Cron(CronExpression.EVERY_5_MINUTES)
   async handleCronCrypto() {
     this.wakeupcall();
     this.logger.log('Running scheduled task for EVERY_5_MINUTES');
@@ -89,23 +90,31 @@ export class TasksService {
 
   // @Cron('*/15 14-21 * * 1-5', { timeZone: 'UTC' })
   async runAllWatL15min() {
-    await this.sendDiscord('WAKEUPCALL:15min', 'RWBOT 15min', 'US','CRON_CHECK');
-    const symbols =  await this.LocalPLWR.getDolist() ||[]
+    await this.sendDiscord(
+      'WAKEUPCALL:15min',
+      'RWBOT 15min',
+      'US',
+      'CRON_CHECK',
+    );
+    const symbols = (await this.LocalPLWR.getDolist()) || [];
     await Promise.all([
-      this.USTIMERUN(symbols, this.allkeys,'US_EARLY_15MIN', 3, '15min'),
+      this.USTIMERUN(symbols, this.allkeys, 'US_EARLY_15MIN', 3, '15min'),
     ]);
   }
 
   // @Cron('30 14-20 * * 1-5', { timeZone: 'UTC' })
   async runAllWatL1hour() {
-    await this.sendDiscord('WAKEUPCALL:1hour', 'RWBOT 1hour', 'US','CRON_CHECK');
-    const symbols =  await this.LocalPLWR.getDolist() ||[]
+    await this.sendDiscord(
+      'WAKEUPCALL:1hour',
+      'RWBOT 1hour',
+      'US',
+      'CRON_CHECK',
+    );
+    const symbols = (await this.LocalPLWR.getDolist()) || [];
     await Promise.all([
-      this.USTIMERUN(symbols, this.allkeys,'USSTOCK_WATCH', 4, '1hour'),
+      this.USTIMERUN(symbols, this.allkeys, 'USSTOCK_WATCH', 4, '1hour'),
     ]);
   }
-
-
 
   async USTIMERUN(
     intickers: string[],
@@ -205,7 +214,7 @@ export class TasksService {
         `5MIN CROSS, BUT 15 RED!!!! (MACD:${lastdata5min?.MACDLine})|(MACD15:${lastData?.MACDLine}): ${lastdata5min?.date}`,
         `${ticker} -ON- 5min`,
         lastdata5min,
-        channel.includes('US')?'US_ALL':"CRYPTO_ALL",
+        channel.includes('US') ? 'US_ALL' : 'CRYPTO_ALL',
       );
     }
   }
@@ -218,33 +227,53 @@ export class TasksService {
       console.log(ticker, '❌ Outside ±30 minutes of EST time', lastdata?.date);
       await this.sendDiscord(
         '❌ Outside ±6 minutes of EST time',
-        'RWBOT:'+ticker,
+        'RWBOT:' + ticker,
         'CRYTO',
         'CRON_CHECK',
       );
       return;
     }
-    if (
-      lastdata?.MACDLine > lastdata?.SignalLine &&
-      Secondlastdata?.MACDLine < Secondlastdata?.SignalLine
-    ) {
-      if (timeframe === '5min') {
-        // check on 15min to see bullish or bearish macd
-        await this.run15Min5signal(ticker, lastdata, channel);
-      } else {
-        await this.sendDiscord(
-          `BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-          `${ticker} -ON- ${timeframe}`,
-          lastdata,
-          channel,
-        );
-      }
-    } else if (
-      lastdata?.MACDLine < lastdata?.SignalLine &&
-      Secondlastdata?.MACDLine > Secondlastdata?.SignalLine
-    ) {
+    // if (
+    //   lastdata?.MACDLine > lastdata?.SignalLine &&
+    //   Secondlastdata?.MACDLine < Secondlastdata?.SignalLine
+    // ) {
+    //   if (timeframe === '5min') {
+    //     // check on 15min to see bullish or bearish macd
+    //     await this.run15Min5signal(ticker, lastdata, channel);
+    //   } else {
+    //     await this.sendDiscord(
+    //       `BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+    //       `${ticker} -ON- ${timeframe}`,
+    //       lastdata,
+    //       channel,
+    //     );
+    //   }
+    // } else if (
+    //   lastdata?.MACDLine < lastdata?.SignalLine &&
+    //   Secondlastdata?.MACDLine > Secondlastdata?.SignalLine
+    // ) {
+    //   await this.sendDiscord(
+    //     `SELLLLLLLL ON-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+    //     `${ticker} -ON- ${timeframe}`,
+    //     lastdata,
+    //     'CRYPTO_WATCH',
+    //   );
+    // }
+    // new 
+    const buyE = await this.earlyBuyInRSI(lastdata, Secondlastdata)
+    if(buyE){
       await this.sendDiscord(
-        `SELLLLLLLL ON-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `BUY earlyBuyInRSI-test-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker} -ON- ${timeframe}`,
+        lastdata,
+        channel,
+      );
+    }
+
+    const sellE = await this.earlySellInRSI(lastdata, Secondlastdata)
+    if(sellE){
+      await this.sendDiscord(
+        `SELLLLLLLL earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker} -ON- ${timeframe}`,
         lastdata,
         'CRYPTO_WATCH',
@@ -252,6 +281,39 @@ export class TasksService {
     }
   }
 
+  async earlyBuyInRSI(last: StockData, prev: StockData): Promise<boolean> {
+    if (!last || !prev) return false; // safety
+
+    const isDivergenceNegative = last.divergence != null && last.divergence < 0;
+    const isRSISetup =
+      last.RSI != null &&
+      prev.RSI != null &&
+      last.RSI < 40 &&
+      last.RSI > prev.RSI;
+    const isMACDRising =
+      last.MACDLine != null &&
+      prev.MACDLine != null &&
+      last.MACDLine > prev.MACDLine;
+
+    return isDivergenceNegative && isRSISetup && isMACDRising;
+  }
+
+  async earlySellInRSI(last: StockData, prev: StockData): Promise<boolean> {
+    if (!last || !prev) return false; // safety
+
+    const isDivergenceNegative = last.divergence != null && last.divergence > 0;
+    const isRSISetup =
+      last.RSI != null &&
+      prev.RSI != null &&
+      last.RSI > 60 &&
+      last.RSI < prev.RSI;
+    const isMACDRising =
+      last.MACDLine != null &&
+      prev.MACDLine != null &&
+      last.MACDLine < prev.MACDLine;
+
+    return isDivergenceNegative && isRSISetup && isMACDRising;
+  }
   async sendDiscord(
     message: string,
     ticker: string,
