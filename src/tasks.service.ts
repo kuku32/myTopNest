@@ -274,7 +274,7 @@ export class TasksService {
         await this.run15Min5signal(ticker, lastdata, channel);
       }  else if (timeframe === '1min') {
         // check on 15min to see bullish or bearish macd
-        await this.run15Min5signal(ticker, lastdata, channel);
+        await this.run5min1signal(ticker, lastdata, channel);
       } else {
         await this.sendDiscord(
           `BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
