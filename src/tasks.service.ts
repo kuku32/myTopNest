@@ -391,9 +391,10 @@ export class TasksService {
     }
   }
 
+  @Cron('*/1 14-21 * * 1-5', { timeZone: 'UTC' })
   async minuteQQQ(){
     // const symbols = (await this.LocalPLWR.getDolist()) || [];
-    const symbols = [`TSLA`, 'QQQ'];
+    const symbols = [`SNAP`, 'QQQ'];
     await Promise.all([
       this.USTIMERUN(symbols, this.allkeys, 'USSTOCK_WATCH', 0, '1min'),
     ]);
