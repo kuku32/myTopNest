@@ -219,6 +219,38 @@ export class TasksService {
     }
   }
 
+  async run5min1signal(ticker, lastdata1min, channel) {
+    this.logger.log(`${ticker} run5min1signal.`);
+
+    const data = await this.LocalPLWR.TwReveseNOAPI(ticker, '5min');
+
+    const lastData = data[data.length - 1];
+    if (lastData?.close > lastData?.MA200) {
+      // 5min cross, 15 allway buy buy
+      await this.sendDiscord(
+        `5min ABOVE MA200  (MACD5:${lastdata1min?.MACDLine})|(MACD5:${lastData?.MACDLine}): ${lastdata1min?.date}`,
+        `${ticker} -ON- 1min`,
+        lastdata1min,
+        channel,
+      );
+    } else if (lastData?.MACDLine > lastData?.SignalLine) {
+      // 5min cross, 15 allway buy buy
+      await this.sendDiscord(
+        `ALL ABOVE SAFE BUY 5min (MACD5:${lastdata1min?.MACDLine})|(MACD5:${lastData?.MACDLine}): ${lastdata1min?.date}`,
+        `${ticker} -ON- 1min`,
+        lastdata1min,
+        channel,
+      );
+    } else {
+      await this.sendDiscord(
+        `1min CROSS, BUT 5 RED!!!! (MACD:${lastdata1min?.MACDLine})|(MACD5:${lastData?.MACDLine}): ${lastdata1min?.date}`,
+        `${ticker} -ON- 1min`,
+        lastdata1min,
+        channel.includes('US') ? 'US_ALL' : 'CRYPTO_ALL',
+      );
+    }
+  }
+
   async compareAndSend(lastdata, Secondlastdata, ticker, timeframe, channel) {
     const isWithinRange = Timer.checkIfWithin5MinutesEST(lastdata?.date);
     if (isWithinRange) {
@@ -238,6 +270,9 @@ export class TasksService {
       Secondlastdata?.MACDLine < Secondlastdata?.SignalLine
     ) {
       if (timeframe === '5min') {
+        // check on 15min to see bullish or bearish macd
+        await this.run15Min5signal(ticker, lastdata, channel);
+      }  else if (timeframe === '1min') {
         // check on 15min to see bullish or bearish macd
         await this.run15Min5signal(ticker, lastdata, channel);
       } else {
@@ -354,5 +389,13 @@ export class TasksService {
         'ERORR_CALL',
       );
     }
+  }
+
+  async minuteQQQ(){
+    // const symbols = (await this.LocalPLWR.getDolist()) || [];
+    const symbols = [`TSLA`, 'QQQ'];
+    await Promise.all([
+      this.USTIMERUN(symbols, this.allkeys, 'USSTOCK_WATCH', 0, '1min'),
+    ]);
   }
 }
