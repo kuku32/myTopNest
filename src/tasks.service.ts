@@ -266,6 +266,7 @@ export class TasksService {
       return;
     }
     if (
+      lastdata.close > lastdata.MA200 &&
       lastdata?.MACDLine > lastdata?.SignalLine &&
       Secondlastdata?.MACDLine < Secondlastdata?.SignalLine
     ) {
@@ -284,6 +285,7 @@ export class TasksService {
         );
       }
     } else if (
+      lastdata.close < lastdata.MA200 &&
       lastdata?.MACDLine < lastdata?.SignalLine &&
       Secondlastdata?.MACDLine > Secondlastdata?.SignalLine
     ) {
