@@ -88,33 +88,33 @@ export class TasksService {
     ]);
   }
 
-  @Cron('*/15 14-21 * * 1-5', { timeZone: 'UTC' })
-  async runAllWatL15min() {
-    await this.sendDiscord(
-      'WAKEUPCALL:15min',
-      'RWBOT 15min',
-      'US',
-      'CRON_CHECK',
-    );
-    const symbols = (await this.LocalPLWR.getDolist()) || [];
-    await Promise.all([
-      this.USTIMERUN(symbols, this.allkeys, 'US_EARLY_15MIN', 3, '15min'),
-    ]);
-  }
+  // @Cron('*/15 14-21 * * 1-5', { timeZone: 'UTC' })
+  // async runAllWatL15min() {
+  //   await this.sendDiscord(
+  //     'WAKEUPCALL:15min',
+  //     'RWBOT 15min',
+  //     'US',
+  //     'CRON_CHECK',
+  //   );
+  //   const symbols = (await this.LocalPLWR.getDolist()) || [];
+  //   await Promise.all([
+  //     this.USTIMERUN(symbols, this.allkeys, 'US_EARLY_15MIN', 3, '15min'),
+  //   ]);
+  // }
 
-  @Cron('30 14-20 * * 1-5', { timeZone: 'UTC' })
-  async runAllWatL1hour() {
-    await this.sendDiscord(
-      'WAKEUPCALL:1hour',
-      'RWBOT 1hour',
-      'US',
-      'CRON_CHECK',
-    );
-    const symbols = (await this.LocalPLWR.getDolist()) || [];
-    await Promise.all([
-      this.USTIMERUN(symbols, this.allkeys, 'USSTOCK_WATCH', 4, '1hour'),
-    ]);
-  }
+  // @Cron('30 14-20 * * 1-5', { timeZone: 'UTC' })
+  // async runAllWatL1hour() {
+  //   await this.sendDiscord(
+  //     'WAKEUPCALL:1hour',
+  //     'RWBOT 1hour',
+  //     'US',
+  //     'CRON_CHECK',
+  //   );
+  //   const symbols = (await this.LocalPLWR.getDolist()) || [];
+  //   await Promise.all([
+  //     this.USTIMERUN(symbols, this.allkeys, 'USSTOCK_WATCH', 4, '1hour'),
+  //   ]);
+  // }
 
   async USTIMERUN(
     intickers: string[],
@@ -264,6 +264,16 @@ export class TasksService {
         'CRON_CHECK',
       );
       return;
+    }
+    if (
+      lastdata.close > lastdata.MA200 &&  Secondlastdata.close < Secondlastdata.MA200
+    ) {
+      await this.sendDiscord(
+        `BUY CLOSE> MA200-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker} -ON- ${timeframe}`,
+        lastdata,
+        channel,
+      );
     }
     if (
       lastdata.close > lastdata.MA200 &&
