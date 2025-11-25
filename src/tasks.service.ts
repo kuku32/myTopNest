@@ -332,7 +332,7 @@ export class TasksService {
       prev.MACDLine != null &&
       last.MACDLine > prev.MACDLine;
 
-    return isDivergenceNegative && isRSISetup && isMACDRising;
+    return isDivergenceNegative && isRSISetup && isMACDRising && last.close > last.MA200;
   }
 
   async earlySellInRSI(last: StockData, prev: StockData): Promise<boolean> {
