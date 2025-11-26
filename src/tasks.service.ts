@@ -15,7 +15,12 @@ export class TasksService {
     private readonly configService: ConfigService,
     private readonly stockHelperService: StockHelperService,
     private readonly LocalPLWR: WebhookService,
-  ) {}
+  ) {
+    setInterval(() => {
+      this.sendlist = [];
+      console.log('sendlist reset');
+    }, 4 * 60 * 60 * 1000); // 4 hours in milliseconds
+  }
   private readonly logger = new Logger(TasksService.name);
 
   // CRYPTO
@@ -259,12 +264,12 @@ export class TasksService {
       await this.sendOneAB200(lastdata, ticker, timeframe)
     } else {
       console.log(ticker, '❌ Outside ±7 minutes of EST time', lastdata?.date);
-      await this.sendDiscord(
-        '❌ Outside ±6 minutes of EST time',
-        'RWBOT:' + ticker,
-        'CRYTO',
-        'CRON_CHECK',
-      );
+      // await this.sendDiscord(
+      //   '❌ Outside ±7 minutes of EST time',
+      //   'RWBOT:' + ticker,
+      //   'CRYTO',
+      //   'CRON_CHECK',
+      // );
       return;
     }
     if (
