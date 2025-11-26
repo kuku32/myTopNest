@@ -255,6 +255,8 @@ export class TasksService {
     const isWithinRange = Timer.checkIfWithin5MinutesEST(lastdata?.date);
     if (isWithinRange) {
       console.log(ticker, '✅ Within ±7 minutes of EST time');
+      // check one
+      await this.sendOneAB200(lastdata, ticker, timeframe)
     } else {
       console.log(ticker, '❌ Outside ±7 minutes of EST time', lastdata?.date);
       await this.sendDiscord(
@@ -326,6 +328,19 @@ export class TasksService {
         'CRYPTO_WATCH',
       );
     }
+  }
+  sendlist = []
+  async sendOneAB200(last: StockData, sym:string, timeframe): Promise<boolean> {
+    if(last.close > last.MA200 && !this.sendlist.includes(sym)){
+      this.sendlist.push(sym)
+      await this.sendDiscord(
+        `AB200 BUYYYYY (MACD:${last?.MACDLine}): ${last?.date}`,
+        `${sym} -ON- ${timeframe}`,
+        last,
+        'USSTOCK_WATCH',
+      );
+    }
+    return  last.close > last.MA200;
   }
 
   async earlyBuyInRSI(last: StockData, prev: StockData): Promise<boolean> {
