@@ -262,7 +262,7 @@ export class TasksService {
     if (isWithinRange) {
       console.log(ticker, '✅ Within ±7 minutes of EST time');
       // check one
-      await this.sendOneAB200(lastdata, ticker, timeframe)
+      // await this.sendOneAB200(lastdata, ticker, timeframe)
     } else {
       console.log(ticker, '❌ Outside ±7 minutes of EST time', lastdata?.date);
       // await this.sendDiscord(
