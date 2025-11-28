@@ -87,7 +87,7 @@ export class TasksService {
 
   @Cron('*/5 14-21 * * 1-5', { timeZone: 'UTC' })
   async runAllWatchLists() {
-    await this.LocalPLWR.getRsilist('ma200ab_less_0_1',113)
+    // await this.LocalPLWR.getRsilist('ma200ab_less_0_1',113)
     const symbols = (await this.LocalPLWR.getDolist()) || [];
     await Promise.all([
       this.USTIMERUN(symbols, this.allkeys, 'US_EARLY_5MIN', 2, '5min'),
