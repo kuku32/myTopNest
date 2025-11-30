@@ -23,66 +23,6 @@ export class TasksService {
   }
   private readonly logger = new Logger(TasksService.name);
 
-  // CRYPTO
-  @Cron(CronExpression.EVERY_5_MINUTES)
-  async handleCronCrypto() {
-    this.wakeupcall();
-    this.logger.log('Running scheduled task for EVERY_5_MINUTES');
-    const date = new Date();
-    const timeframe = '5m';
-    // this.LocalPLWR.sendTemporaryWebhook('railway CHECKBOT Crypto 5min RUN AT:'+date, 'RWBOT 5MIN', 'Nono','CRON_CHECK');
-    const tickers = ['BTC', 'BCH', 'LTC', 'ETH','ETC', 'DASH', 'ZEC', 'XMR'];
-    // const tickers = ['BTC'];
-    await new Promise((resolve) => setTimeout(resolve, 2 * 60 * 1000)); // 2-minute delay
-    for (const ticker of tickers) {
-      try {
-        // 1️⃣ Get historical data for the ticker
-        const data = await this.LocalPLWR.getCoinHistory(ticker, timeframe);
-
-        const lastData = data[0];
-        const secondLastData = data[1];
-
-        // 4️⃣ Compare and send alert if condition is met
-        await this.compareAndSend(
-          lastData,
-          secondLastData,
-          ticker + 'USD',
-          timeframe + 'in',
-          'CRYPTO_EARLY_5MIN',
-        );
-
-        this.logger.log(`${ticker} processed successfully.`);
-      } catch (error) {
-        this.LocalPLWR.sendTemporaryWebhook(
-          `ERROR ON API AT: ${timeframe} On ${date}`,
-          `RWBOT ${ticker}USD at ${timeframe}`,
-          'Nono',
-          'ERORR_CALL',
-        );
-        this.logger.error(`Error processing ${ticker}: ${error.message}`);
-      }
-    }
-  }
-  @Cron('*/15 * * * *') // every 15 minutes
-  async handle15Min() {
-    await this.sendDiscord(
-      'WAKEUPCALL:15min',
-      'RWBOT 15min',
-      'CRYTO',
-      'CRON_CHECK',
-    );
-    const tickers = ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD', 'DASHUSD', 'ZECUSD', 'XMRUSD'];
-    // const tickers = ['BTCUSD'];
-    const apikey = 'd3058ae5683b4fc19a787ceb21a87f67';
-    this.logger.log('Running scheduled every 15 minutes for CRYPTOs...');
-    await this.processTickers(
-      tickers,
-      '15min',
-      apikey,
-      'CRYPTO_EARLY_15MIN',
-      2,
-    );
-  }
   // US STOCK
 
   @Cron('*/5 14-21 * * 1-5', { timeZone: 'UTC' })
@@ -93,34 +33,6 @@ export class TasksService {
       this.USTIMERUN(symbols, this.allkeys, 'US_EARLY_5MIN', 2, '5min'),
     ]);
   }
-
-  // @Cron('*/15 14-21 * * 1-5', { timeZone: 'UTC' })
-  // async runAllWatL15min() {
-  //   await this.sendDiscord(
-  //     'WAKEUPCALL:15min',
-  //     'RWBOT 15min',
-  //     'US',
-  //     'CRON_CHECK',
-  //   );
-  //   const symbols = (await this.LocalPLWR.getDolist()) || [];
-  //   await Promise.all([
-  //     this.USTIMERUN(symbols, this.allkeys, 'US_EARLY_15MIN', 3, '15min'),
-  //   ]);
-  // }
-
-  // @Cron('30 14-20 * * 1-5', { timeZone: 'UTC' })
-  // async runAllWatL1hour() {
-  //   await this.sendDiscord(
-  //     'WAKEUPCALL:1hour',
-  //     'RWBOT 1hour',
-  //     'US',
-  //     'CRON_CHECK',
-  //   );
-  //   const symbols = (await this.LocalPLWR.getDolist()) || [];
-  //   await Promise.all([
-  //     this.USTIMERUN(symbols, this.allkeys, 'USSTOCK_WATCH', 4, '1hour'),
-  //   ]);
-  // }
 
   async USTIMERUN(
     intickers: string[],
@@ -390,7 +302,7 @@ export class TasksService {
   ) {
     try {
       return await this.LocalPLWR.sendDiscordNotification(
-        'RAILWAY ' + message,
+        'ONRENDER ' + message,
         `${channel} ${ticker}`,
         JSON.stringify(lastdata),
       );
@@ -404,7 +316,7 @@ export class TasksService {
     try {
       const date = new Date();
       await this.sendDiscord(
-        'RAILWAY WAKEUPCALL:' + date,
+        'ONRENDER WAKEUPCALL:' + date,
         'RWBOT 5MIN',
         'Nono',
         'CRON_CHECK',
@@ -414,9 +326,9 @@ export class TasksService {
       );
       this.logger.log('⏱️ Keep-alive ping success:', data.status);
     } catch (err) {
-      this.logger.error(`❌ RAILWAY Keep-alive failed: ${err.message}`);
+      this.logger.error(`❌ ONRENDER Keep-alive failed: ${err.message}`);
       this.sendDiscord(
-        `❌ RAILWAY Keep-alive failed:`,
+        `❌ ONRENDER Keep-alive failed:`,
         `RWBOT BOTBOT`,
         'Nono',
         'ERORR_CALL',
@@ -424,12 +336,10 @@ export class TasksService {
     }
   }
 
-  @Cron('*/1 14-21 * * 1-5', { timeZone: 'UTC' })
+  // @Cron('*/1 14-21 * * 1-5', { timeZone: 'UTC' })
+  @Cron(CronExpression.EVERY_5_MINUTES)
   async minuteQQQ(){
     // const symbols = (await this.LocalPLWR.getDolist()) || [];
-    const symbols = [`SNAP`, 'QQQ'];
-    await Promise.all([
-      this.USTIMERUN(symbols, this.allkeys, 'USSTOCK_WATCH', 0, '1min'),
-    ]);
+    this.wakeupcall()
   }
 }
