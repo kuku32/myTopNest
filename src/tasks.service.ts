@@ -16,10 +16,14 @@ export class TasksService {
     private readonly stockHelperService: StockHelperService,
     private readonly LocalPLWR: WebhookService,
   ) {
-    setInterval(() => {
+    setInterval(async () => {
       this.sendlist = [];
       console.log('sendlist reset');
-    }, 4 * 60 * 60 * 1000); // 4 hours in milliseconds
+      this.LocalPLWR.dolist = []
+      await this.LocalPLWR.getRsilist('sp5_ma200ab_less_0_1', 50)
+      await this.LocalPLWR.getRsilist('sp5_ma200bl_over_neg_0_1',30)
+      await this.LocalPLWR.getRsilist('sp5_ma200ab_less_0_5',10)
+    }, 8 * 60 * 60 * 1000); // 4 hours in milliseconds
   }
   private readonly logger = new Logger(TasksService.name);
 
@@ -27,7 +31,6 @@ export class TasksService {
 
   @Cron('*/5 14-21 * * 1-5', { timeZone: 'UTC' })
   async runAllWatchLists() {
-    // await this.LocalPLWR.getRsilist('ma200ab_less_0_1',113)
     const symbols = (await this.LocalPLWR.getDolist()) || [];
     await Promise.all([
       this.USTIMERUN(symbols, this.allkeys, 'US_EARLY_5MIN', 2, '5min'),
@@ -302,7 +305,7 @@ export class TasksService {
   ) {
     try {
       return await this.LocalPLWR.sendDiscordNotification(
-        'ONRENDER ' + message,
+        'KOYEB_SP500 ' + message,
         `${channel} ${ticker}`,
         JSON.stringify(lastdata),
       );
@@ -316,7 +319,7 @@ export class TasksService {
     try {
       const date = new Date();
       await this.sendDiscord(
-        'ONRENDER WAKEUPCALL:' + date,
+        'KOYEB_SP500 WAKEUPCALL:' + date,
         'RWBOT 5MIN',
         'Nono',
         'CRON_CHECK',
@@ -326,9 +329,9 @@ export class TasksService {
       );
       this.logger.log('⏱️ Keep-alive ping success:', data.status);
     } catch (err) {
-      this.logger.error(`❌ ONRENDER Keep-alive failed: ${err.message}`);
+      this.logger.error(`❌ KOYEB_SP500 Keep-alive failed: ${err.message}`);
       this.sendDiscord(
-        `❌ ONRENDER Keep-alive failed:`,
+        `❌ KOYEB_SP500 Keep-alive failed:`,
         `RWBOT BOTBOT`,
         'Nono',
         'ERORR_CALL',
@@ -337,9 +340,9 @@ export class TasksService {
   }
 
   // @Cron('*/1 14-21 * * 1-5', { timeZone: 'UTC' })
-  @Cron(CronExpression.EVERY_5_MINUTES)
-  async minuteQQQ(){
-    // const symbols = (await this.LocalPLWR.getDolist()) || [];
-    this.wakeupcall()
-  }
+  // @Cron(CronExpression.EVERY_5_MINUTES)
+  // async minuteQQQ(){
+  //   // const symbols = (await this.LocalPLWR.getDolist()) || [];
+  //   this.wakeupcall()
+  // }
 }
