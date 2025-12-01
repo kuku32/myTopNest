@@ -273,58 +273,59 @@ export class TasksService {
       // );
       return;
     }
-    if (
-      lastdata.close > lastdata.MA200 &&  Secondlastdata.close < Secondlastdata.MA200
-    ) {
-      await this.sendDiscord(
-        `BUY CLOSE> MA200-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker} -ON- ${timeframe}`,
-        lastdata,
-        channel,
-      );
-    }
-    if (
-      lastdata.close > lastdata.MA200 &&
-      lastdata?.MACDLine > lastdata?.SignalLine &&
-      Secondlastdata?.MACDLine < Secondlastdata?.SignalLine
-    ) {
-      if (timeframe === '5min') {
-        // check on 15min to see bullish or bearish macd
-        await this.run15Min5signal(ticker, lastdata, channel);
-      }  else if (timeframe === '1min') {
-        // check on 15min to see bullish or bearish macd
-        await this.run5min1signal(ticker, lastdata, channel);
-      } else {
+    if(lastdata.close > lastdata.MA200){
+      if (
+        lastdata.close > lastdata.MA200 &&  Secondlastdata.close < Secondlastdata.MA200
+      ) {
         await this.sendDiscord(
-          `BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+          `BUY CLOSE> MA200-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
           `${ticker} -ON- ${timeframe}`,
           lastdata,
           channel,
         );
       }
-    } else if (
-      lastdata.close < lastdata.MA200 &&
-      lastdata?.MACDLine < lastdata?.SignalLine &&
-      Secondlastdata?.MACDLine > Secondlastdata?.SignalLine
-    ) {
-      await this.sendDiscord(
-        `SELLLLLLLL ON-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker} -ON- ${timeframe}`,
-        lastdata,
-        'CRYPTO_WATCH',
-      );
+      if (
+        lastdata.close > lastdata.MA200 &&
+        lastdata?.MACDLine > lastdata?.SignalLine &&
+        Secondlastdata?.MACDLine < Secondlastdata?.SignalLine
+      ) {
+        if (timeframe === '5min') {
+          // check on 15min to see bullish or bearish macd
+          await this.run15Min5signal(ticker, lastdata, channel);
+        }  else if (timeframe === '1min') {
+          // check on 15min to see bullish or bearish macd
+          await this.run5min1signal(ticker, lastdata, channel);
+        } else {
+          await this.sendDiscord(
+            `BUY ON MACDCROSS-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+            `${ticker} -ON- ${timeframe}`,
+            lastdata,
+            channel,
+          );
+        }
+      } else if (
+        lastdata.close < lastdata.MA200 &&
+        lastdata?.MACDLine < lastdata?.SignalLine &&
+        Secondlastdata?.MACDLine > Secondlastdata?.SignalLine
+      ) {
+        await this.sendDiscord(
+          `SELLLLLLLL ON-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+          `${ticker} -ON- ${timeframe}`,
+          lastdata,
+          'CRYPTO_WATCH',
+        );
+      }
+      // new 
+      const buyE = await this.earlyBuyInRSI(lastdata, Secondlastdata)
+      if(buyE){
+        await this.sendDiscord(
+          `BUY earlyBuyInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+          `${ticker} -ON- ${timeframe}`,
+          lastdata,
+          channel,
+        );
+      }
     }
-    // new 
-    const buyE = await this.earlyBuyInRSI(lastdata, Secondlastdata)
-    if(buyE){
-      await this.sendDiscord(
-        `BUY earlyBuyInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker} -ON- ${timeframe}`,
-        lastdata,
-        channel,
-      );
-    }
-
     const sellE = await this.earlySellInRSI(lastdata, Secondlastdata)
     if(sellE){
       await this.sendDiscord(
