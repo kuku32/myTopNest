@@ -513,7 +513,7 @@ export class TasksService {
     );
     const tickers = ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD', 'DASHUSD', 'ZECUSD', 'XMRUSD'];
     // const tickers = ['BTCUSD'];
-    const apikey = 'd3058ae5683b4fc19a787ceb21a87f67';
+    const apikey = '2711824a92bc40498c8bc30728813e2a';
     this.logger.log('Running scheduled every 1 hour for CRYPTOs...');
     await this.processTickers1hour(
       tickers,
