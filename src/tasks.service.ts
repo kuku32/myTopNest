@@ -473,8 +473,9 @@ export class TasksService {
         );
         this.logger.log(`${ticker} processed successfully.`);
       } catch (error) {
+ 
         this.sendDiscord(
-          `ERROR ON API AT: ${timeframe} On ${date}`,
+          `ERROR ON API AT: ${timeframe} On ${date}: ${JSON.stringify(error)}`,
           `RWBOT ${ticker} at ${timeframe}`,
           'Nono',
           'ERORR_CALL',
