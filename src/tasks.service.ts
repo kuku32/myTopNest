@@ -427,11 +427,11 @@ export class TasksService {
 
   async macdCrossAB(last: StockData, prev: StockData): Promise<boolean> {
     if (!last || !prev) return false; // safety
-    return last.MACDLine > last.SignalLine && prev.MACDLine < prev.SignalLine;
+    return (last.MACDLine > last.SignalLine && prev.MACDLine < prev.SignalLine) ||  (last.divergence > 0 && prev.divergence < 0);
   }
   async macdCrossBL(last: StockData, prev: StockData): Promise<boolean> {
     if (!last || !prev) return false; // safety
-    return last.MACDLine < last.SignalLine && prev.MACDLine > prev.SignalLine;
+    return (last.MACDLine < last.SignalLine && prev.MACDLine > prev.SignalLine) ||  (last.divergence < 0 && prev.divergence > 0);
   }
   private async processTickers1hour(
     tickers: string[],
