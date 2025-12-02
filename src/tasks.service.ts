@@ -527,15 +527,15 @@ export class TasksService {
   @Cron(CronExpression.EVERY_30_MINUTES) // every 1 hour
   async handle30minCrypto() {
     await this.sendDiscord(
-      'WAKEUPCALL:1hour',
-      'RWBOT 1hour',
+      'WAKEUPCALL:30min',
+      'RWBOT 30min',
       'CRYTO',
       'CRON_CHECK',
     );
     const tickers = ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD', 'DASHUSD', 'ZECUSD', 'XMRUSD'];
     // const tickers = ['BTCUSD'];
     const apikey = '2711824a92bc40498c8bc30728813e2a';//liamsterling1@outlook.com
-    this.logger.log('Running scheduled every 1 hour for CRYPTOs...');
+    this.logger.log('Running scheduled every 30min for CRYPTOs...');
     await this.processTickers1hour(
       tickers,
       '30min',
