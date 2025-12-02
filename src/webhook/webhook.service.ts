@@ -497,8 +497,8 @@ export class WebhookService {
   async getRsilist(path:string,limit:number = 100,dayrange:number = 7) {
     const data = await this.FireBaseApi('get',`stock-related/${path}.json`,'')
     const symbolLists = dbrs.getlastXdays(data,dayrange, limit);
-    this.dolist = [... this.dolist,...symbolLists]
-    console.log(`✅ Loaded: ${path} : ${symbolLists.length} symbols`);
+    this.dolist = [...this.dolist,...symbolLists]
+    console.log(`✅ Loaded: ${path} : ${symbolLists} symbols`);
     return symbolLists
   }
 
