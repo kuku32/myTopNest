@@ -523,6 +523,27 @@ export class TasksService {
       5,
     );
   }
+
+  @Cron(CronExpression.EVERY_30_MINUTES) // every 1 hour
+  async handle30minCrypto() {
+    await this.sendDiscord(
+      'WAKEUPCALL:1hour',
+      'RWBOT 1hour',
+      'CRYTO',
+      'CRON_CHECK',
+    );
+    const tickers = ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD', 'DASHUSD', 'ZECUSD', 'XMRUSD'];
+    // const tickers = ['BTCUSD'];
+    const apikey = '2711824a92bc40498c8bc30728813e2a';//liamsterling1@outlook.com
+    this.logger.log('Running scheduled every 1 hour for CRYPTOs...');
+    await this.processTickers1hour(
+      tickers,
+      '30min',
+      apikey,
+      'CRYPTO_EARLY_15MIN',
+      3,
+    );
+  }
   @Cron('*/1 14-21 * * 1-5', { timeZone: 'UTC' })
   async minuteQQQ(){
     // const symbols = (await this.LocalPLWR.getDolist()) || [];
