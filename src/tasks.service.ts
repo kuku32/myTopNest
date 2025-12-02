@@ -425,6 +425,104 @@ export class TasksService {
     }
   }
 
+  async macdCrossAB(last: StockData, prev: StockData): Promise<boolean> {
+    if (!last || !prev) return false; // safety
+    return last.MACDLine > last.SignalLine && prev.MACDLine < prev.SignalLine;
+  }
+  async macdCrossBL(last: StockData, prev: StockData): Promise<boolean> {
+    if (!last || !prev) return false; // safety
+    return last.MACDLine < last.SignalLine && prev.MACDLine > prev.SignalLine;
+  }
+  private async processTickers1hour(
+    tickers: string[],
+    timeframe: string,
+    apikey: string,
+    channel: string,
+    delay = 5,
+  ) {
+    const date = new Date();
+
+    const washselllists =
+      (await this.LocalPLWR.loadWashSellList()) ||
+      this.LocalPLWR.getWashSellList();
+    // Delay 2 minutes before processing
+    await new Promise((resolve) => setTimeout(resolve, delay * 60 * 1000));
+
+    for (const ticker of tickers) {
+      if (washselllists.includes(ticker)) {
+        console.log(`⏭️ Skipping ${ticker} — in wash sell list`);
+        continue; // ✅ Skip this ticker and move on
+      }
+      try {
+        let data;
+        if (apikey === 'all') {
+          data = await this.LocalPLWR.TwReveseNOAPI(ticker, timeframe);
+        } else {
+          data = await this.LocalPLWR.get12for(ticker, timeframe, apikey);
+        }
+
+        const lastData = data[data.length - 1];
+        const secondLastData = data[data.length - 2];
+
+        await this.compareAndSend1hour(
+          lastData,
+          secondLastData,
+          ticker,
+          timeframe,
+          channel,
+        );
+        this.logger.log(`${ticker} processed successfully.`);
+      } catch (error) {
+        this.sendDiscord(
+          `ERROR ON API AT: ${timeframe} On ${date}`,
+          `RWBOT ${ticker} at ${timeframe}`,
+          'Nono',
+          'ERORR_CALL',
+        );
+        this.logger.error(`Error processing ${ticker}: ${error.message}`);
+      }
+    }
+  }
+  async compareAndSend1hour(lastdata, Secondlastdata, ticker, timeframe, channel) {
+    const buyE = await this.macdCrossAB(lastdata, Secondlastdata)
+    if(buyE){
+      await this.sendDiscord(
+        `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker} -ON- ${timeframe}`,
+        lastdata,
+        channel,
+      );
+    }
+    const sellE = await this.macdCrossBL(lastdata, Secondlastdata)
+    if(sellE){
+      await this.sendDiscord(
+        `SELLLLLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker} -ON- ${timeframe}`,
+        lastdata,
+        'CRYPTO_WATCH',
+      );
+    }
+  }
+  @Cron('*/60 * * * *') // every 15 minutes
+  async handle1hourCrypto() {
+    await this.sendDiscord(
+      'WAKEUPCALL:1hour',
+      'RWBOT 1hour',
+      'CRYTO',
+      'CRON_CHECK',
+    );
+    const tickers = ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD', 'DASHUSD', 'ZECUSD', 'XMRUSD'];
+    // const tickers = ['BTCUSD'];
+    const apikey = 'd3058ae5683b4fc19a787ceb21a87f67';
+    this.logger.log('Running scheduled every 1 hour for CRYPTOs...');
+    await this.processTickers1hour(
+      tickers,
+      '1hour',
+      apikey,
+      'CRYPTO_EARLY_15MIN',
+      5,
+    );
+  }
   @Cron('*/1 14-21 * * 1-5', { timeZone: 'UTC' })
   async minuteQQQ(){
     // const symbols = (await this.LocalPLWR.getDolist()) || [];
