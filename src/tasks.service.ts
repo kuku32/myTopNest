@@ -63,6 +63,7 @@ export class TasksService {
       }
     }
   }
+  
   @Cron('*/15 * * * *') // every 15 minutes
   async handle15Min() {
     await this.sendDiscord(
