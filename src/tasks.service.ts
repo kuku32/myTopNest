@@ -504,7 +504,7 @@ export class TasksService {
       );
     }
   }
-  @Cron('0 * * * *') // every 1 hour
+  // @Cron('0 * * * *') // every 1 hour
   async handle1hourCrypto() {
     await this.sendDiscord(
       'WAKEUPCALL:1hour',
