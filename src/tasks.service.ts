@@ -27,41 +27,41 @@ export class TasksService {
   @Cron(CronExpression.EVERY_5_MINUTES)
   async handleCronCrypto() {
     this.wakeupcall();
-    this.logger.log('Running scheduled task for EVERY_5_MINUTES');
-    const date = new Date();
-    const timeframe = '5m';
-    // this.LocalPLWR.sendTemporaryWebhook('railway CHECKBOT Crypto 5min RUN AT:'+date, 'RWBOT 5MIN', 'Nono','CRON_CHECK');
-    const tickers = ['BTC', 'BCH', 'LTC', 'ETH','ETC', 'DASH', 'ZEC', 'XMR'];
-    // const tickers = ['BTC'];
-    await new Promise((resolve) => setTimeout(resolve, 2 * 60 * 1000)); // 2-minute delay
-    for (const ticker of tickers) {
-      try {
-        // 1️⃣ Get historical data for the ticker
-        const data = await this.LocalPLWR.getCoinHistory(ticker, timeframe);
+    // this.logger.log('Running scheduled task for EVERY_5_MINUTES');
+    // const date = new Date();
+    // const timeframe = '5m';
+    // // this.LocalPLWR.sendTemporaryWebhook('railway CHECKBOT Crypto 5min RUN AT:'+date, 'RWBOT 5MIN', 'Nono','CRON_CHECK');
+    // const tickers = ['BTC', 'BCH', 'LTC', 'ETH','ETC', 'DASH', 'ZEC', 'XMR'];
+    // // const tickers = ['BTC'];
+    // await new Promise((resolve) => setTimeout(resolve, 2 * 60 * 1000)); // 2-minute delay
+    // for (const ticker of tickers) {
+    //   try {
+    //     // 1️⃣ Get historical data for the ticker
+    //     const data = await this.LocalPLWR.getCoinHistory(ticker, timeframe);
 
-        const lastData = data[0];
-        const secondLastData = data[1];
+    //     const lastData = data[0];
+    //     const secondLastData = data[1];
 
-        // 4️⃣ Compare and send alert if condition is met
-        await this.compareAndSend(
-          lastData,
-          secondLastData,
-          ticker + 'USD',
-          timeframe + 'in',
-          'CRYPTO_EARLY_5MIN',
-        );
+    //     // 4️⃣ Compare and send alert if condition is met
+    //     await this.compareAndSend(
+    //       lastData,
+    //       secondLastData,
+    //       ticker + 'USD',
+    //       timeframe + 'in',
+    //       'CRYPTO_EARLY_5MIN',
+    //     );
 
-        this.logger.log(`${ticker} processed successfully.`);
-      } catch (error) {
-        this.LocalPLWR.sendTemporaryWebhook(
-          `ERROR ON API AT: ${timeframe} On ${date}`,
-          `RWBOT ${ticker}USD at ${timeframe}`,
-          'Nono',
-          'ERORR_CALL',
-        );
-        this.logger.error(`Error processing ${ticker}: ${error.message}`);
-      }
-    }
+    //     this.logger.log(`${ticker} processed successfully.`);
+    //   } catch (error) {
+    //     this.LocalPLWR.sendTemporaryWebhook(
+    //       `ERROR ON API AT: ${timeframe} On ${date}`,
+    //       `RWBOT ${ticker}USD at ${timeframe}`,
+    //       'Nono',
+    //       'ERORR_CALL',
+    //     );
+    //     this.logger.error(`Error processing ${ticker}: ${error.message}`);
+    //   }
+    // }
   }
   
   
