@@ -506,7 +506,7 @@ export class TasksService {
       );
     }
   }
-  // @Cron('0 * * * *') // every 1 hour
+  @Cron('0 * * * *') // every 1 hour
   async handle1hourCrypto() {
     await this.sendDiscord(
       'WAKEUPCALL:1hour',
@@ -520,7 +520,7 @@ export class TasksService {
     this.logger.log('Running scheduled every 1 hour for CRYPTOs...');
     await this.processTickers1hour(
       tickers,
-      '1hour',
+      '1h',
       apikey,
       'CRYPTO_EARLY_15MIN',
       5,
