@@ -527,7 +527,7 @@ export class TasksService {
     );
   }
 
-  @Cron(CronExpression.EVERY_30_MINUTES) // every 1 hour
+  // @Cron(CronExpression.EVERY_30_MINUTES) // every 1 hour
   async handle30minCrypto() {
     await this.sendDiscord(
       'WAKEUPCALL:30min',
