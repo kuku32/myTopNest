@@ -476,7 +476,8 @@ export class WebhookService {
     // await this.getRsilist('MACD_AB_POS')
     // await this.getRsilist('MACD_BL_POS')
     // await this.getRsilist('MACD_AB_NEG')
-    await this.getRsilist('ma200ab_less_0_1',113)
+    await this.getRsilist('1day_alway_ab_neg',90)
+    await this.getRsilist('1day_yes_neg',20)
   }
   washSell30: any[] = [];
   dolist: any[] = [];
@@ -498,7 +499,7 @@ export class WebhookService {
     const data = await this.FireBaseApi('get',`stock-related/${path}.json`,'')
     const symbolLists = dbrs.getlastXdays(data,dayrange, limit);
     this.dolist = [...this.dolist,...symbolLists]
-    console.log(`✅ Loaded: ${path} : ${symbolLists} symbols`);
+    console.log(`✅ Loaded: ${path} : ${symbolLists.length} symbols`);
     return symbolLists
   }
 
