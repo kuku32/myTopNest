@@ -66,25 +66,25 @@ export class TasksService {
   
   
  // @Cron('*/15 * * * *') // every 15 minutes
-  async handle15Min() {
-    await this.sendDiscord(
-      'WAKEUPCALL:15min',
-      'RWBOT 15min',
-      'CRYTO',
-      'CRON_CHECK',
-    );
-    const tickers = ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD', 'DASHUSD', 'ZECUSD', 'XMRUSD'];
-    // const tickers = ['BTCUSD'];
-    const apikey = 'd3058ae5683b4fc19a787ceb21a87f67';
-    this.logger.log('Running scheduled every 15 minutes for CRYPTOs...');
-    await this.processTickers(
-      tickers,
-      '15min',
-      apikey,
-      'CRYPTO_EARLY_15MIN',
-      2,
-    );
-  }
+  // async handle15Min() {
+  //   await this.sendDiscord(
+  //     'WAKEUPCALL:15min',
+  //     'RWBOT 15min',
+  //     'CRYTO',
+  //     'CRON_CHECK',
+  //   );
+  //   const tickers = ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD', 'DASHUSD', 'ZECUSD', 'XMRUSD'];
+  //   // const tickers = ['BTCUSD'];
+  //   const apikey = 'd3058ae5683b4fc19a787ceb21a87f67';
+  //   this.logger.log('Running scheduled every 15 minutes for CRYPTOs...');
+  //   await this.processTickers(
+  //     tickers,
+  //     '15min',
+  //     apikey,
+  //     'CRYPTO_EARLY_15MIN',
+  //     2,
+  //   );
+  // }
   // US STOCK
 
   @Cron('*/5 14-21 * * 1-5', { timeZone: 'UTC' })
@@ -554,4 +554,47 @@ export class TasksService {
       this.USTIMERUN(symbols, this.allkeys, 'USSTOCK_WATCH', 0, '1min'),
     ]);
   }
+
+
+  @Cron('0 * * * *') // every 1 hour
+  async handle1hourCrypto1() {
+    await this.sendDiscord(
+      'WAKEUPCALL:1hour',
+      'RWBOT 1hour',
+      'CRYTO',
+      'CRON_CHECK',
+    );
+    const tickers = ['SOLUSD', 'ADAUSD', 'XRPUSD', 'BNBUSD', 'LINKUSD'];
+    // const tickers = ['BTCUSD'];
+    const apikey = 'd3058ae5683b4fc19a787ceb21a87f67';
+    this.logger.log('Running scheduled every 1 hour for CRYPTOs...');
+    await this.processTickers1hour(
+      tickers,
+      '1h',
+      apikey,
+      'CRYPTO_EARLY_15MIN',
+      3,
+    );
+  }
+  @Cron('0 * * * *') // every 1 hour
+  async handle1hourCrypto2() {
+    await this.sendDiscord(
+      'WAKEUPCALL:1hour',
+      'RWBOT 1hour',
+      'CRYTO',
+      'CRON_CHECK',
+    );
+    const tickers = ['SUIUSD', 'TONUSD', 'UNIUSD', 'AAVEUSD', 'COMPUSD', 'AVAXUSD'];
+    // const tickers = ['BTCUSD'];
+    const apikey = 'd3058ae5683b4fc19a787ceb21a87f67';//liamsterling1@outlook.com
+    this.logger.log('Running scheduled every 1 hour for CRYPTOs...');
+    await this.processTickers1hour(
+      tickers,
+      '1h',
+      apikey,
+      'CRYPTO_EARLY_15MIN',
+      4,
+    );
+  }
 }
+
