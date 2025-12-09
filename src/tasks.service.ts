@@ -495,8 +495,8 @@ export class TasksService {
         channel,
       );
     }
-    const buyearlyBuyInRSI = await this.earlyBuyInRSI(lastdata, Secondlastdata)
-    if(buyearlyBuyInRSI){
+    const buy_earlyBuyInRSI = await this.earlyBuyInRSI(lastdata, Secondlastdata)
+    if(buy_earlyBuyInRSI){
       await this.sendDiscord(
         `BUY earlyBuyInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker} -ON- ${timeframe}`,
