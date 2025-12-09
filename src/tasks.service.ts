@@ -443,7 +443,6 @@ export class TasksService {
     delay = 5,
   ) {
     const date = new Date();
-
     const washselllists =
       (await this.LocalPLWR.loadWashSellList()) ||
       this.LocalPLWR.getWashSellList();
