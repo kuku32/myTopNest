@@ -314,7 +314,7 @@ export class TasksService {
           `SELLLLLLLL ON-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
           `${ticker} -ON- ${timeframe}`,
           lastdata,
-          'CRYPTO_WATCH',
+          'CRYPTO_ALL',
         );
       }
       // new 
@@ -334,7 +334,7 @@ export class TasksService {
         `SELLLLLLLL earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker} -ON- ${timeframe}`,
         lastdata,
-        'CRYPTO_WATCH',
+        'CRYPTO_ALL',
       );
     }
   }
@@ -510,7 +510,7 @@ export class TasksService {
         `SELLLLLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker} -ON- ${timeframe}`,
         lastdata,
-        'CRYPTO_WATCH',
+        'CRYPTO_ALL',
       );
     }
     const sell_earlySellInRSI = await this.earlySellInRSI(lastdata, Secondlastdata)
@@ -519,7 +519,7 @@ export class TasksService {
         `SELLLLLLLL sell_earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker} -ON- ${timeframe}`,
         lastdata,
-        'CRYPTO_WATCH',
+        'CRYPTO_ALL',
       );
     }
   }
