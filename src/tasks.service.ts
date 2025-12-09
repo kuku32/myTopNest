@@ -495,10 +495,28 @@ export class TasksService {
         channel,
       );
     }
+    const buyearlyBuyInRSI = await this.earlyBuyInRSI(lastdata, Secondlastdata)
+    if(buyearlyBuyInRSI){
+      await this.sendDiscord(
+        `BUY earlyBuyInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker} -ON- ${timeframe}`,
+        lastdata,
+        channel,
+      );
+    }
     const sellE = await this.macdCrossBL(lastdata, Secondlastdata)
     if(sellE){
       await this.sendDiscord(
         `SELLLLLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker} -ON- ${timeframe}`,
+        lastdata,
+        'CRYPTO_WATCH',
+      );
+    }
+    const sell_earlySellInRSI = await this.earlySellInRSI(lastdata, Secondlastdata)
+    if(sell_earlySellInRSI){
+      await this.sendDiscord(
+        `SELLLLLLLL sell_earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker} -ON- ${timeframe}`,
         lastdata,
         'CRYPTO_WATCH',
