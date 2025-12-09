@@ -586,7 +586,7 @@ export class TasksService {
     );
     const tickers = ['SUIUSD', 'TONUSD', 'UNIUSD', 'AAVEUSD', 'COMPUSD', 'AVAXUSD'];
     // const tickers = ['BTCUSD'];
-    const apikey = 'd3058ae5683b4fc19a787ceb21a87f67';//liamsterling1@outlook.com
+    const apikey = 'd3058ae5683b4fc19a787ceb21a87f67';
     this.logger.log('Running scheduled every 1 hour for CRYPTOs...');
     await this.processTickers1hour(
       tickers,
