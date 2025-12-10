@@ -544,6 +544,26 @@ export class TasksService {
     );
   }
 
+  @Cron(CronExpression.EVERY_30_MINUTES)
+  async handle30pCrypto() {
+    await this.sendDiscord(
+      'WAKEUPCALL:30min',
+      'RWBOT 30min',
+      'CRYTO',
+      'CRON_CHECK',
+    );
+    const tickers = ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD', 'DASHUSD', 'ZECUSD', 'XMRUSD'];
+    // const tickers = ['BTCUSD'];
+    const apikey = '2711824a92bc40498c8bc30728813e2a';//liamsterling1@outlook.com
+    this.logger.log('Running scheduled every 30min for CRYPTOs...');
+    await this.processTickers1hour(
+      tickers,
+      '30min',
+      apikey,
+      'CRYPTO_EARLY_15MIN',
+      3,
+    );
+  }
   // @Cron(CronExpression.EVERY_30_MINUTES) // every 1 hour
   async handle30minCrypto() {
     await this.sendDiscord(
@@ -591,7 +611,7 @@ export class TasksService {
       '1h',
       apikey,
       'CRYPTO_EARLY_15MIN',
-      3,
+      6,
     );
   }
   @Cron('0 * * * *') // every 1 hour
@@ -609,6 +629,47 @@ export class TasksService {
     await this.processTickers1hour(
       tickers,
       '1h',
+      apikey,
+      'CRYPTO_EARLY_15MIN',
+      5,
+    );
+  }
+
+  @Cron(CronExpression.EVERY_30_MINUTES)
+  async handle30minCrypto1() {
+    await this.sendDiscord(
+      'WAKEUPCALL:30min',
+      'RWBOT 30min',
+      'CRYTO',
+      'CRON_CHECK',
+    );
+    const tickers = ['SOLUSD', 'ADAUSD', 'XRPUSD', 'BNBUSD', 'LINKUSD'];
+    // const tickers = ['BTCUSD'];
+    const apikey = 'd3058ae5683b4fc19a787ceb21a87f67';
+    this.logger.log('Running scheduled every 30min for CRYPTOs...');
+    await this.processTickers1hour(
+      tickers,
+      '30min',
+      apikey,
+      'CRYPTO_EARLY_15MIN',
+      3,
+    );
+  }
+  @Cron(CronExpression.EVERY_30_MINUTES)
+  async handle30minCrypto2() {
+    await this.sendDiscord(
+      'WAKEUPCALL:30min',
+      'RWBOT 30min',
+      'CRYTO',
+      'CRON_CHECK',
+    );
+    const tickers = ['SUIUSD', 'TONUSD', 'UNIUSD', 'AAVEUSD', 'COMPUSD', 'AVAXUSD'];
+    // const tickers = ['BTCUSD'];
+    const apikey = 'd3058ae5683b4fc19a787ceb21a87f67';
+    this.logger.log('Running scheduled every 30min for CRYPTOs...');
+    await this.processTickers1hour(
+      tickers,
+      '30min',
       apikey,
       'CRYPTO_EARLY_15MIN',
       4,
