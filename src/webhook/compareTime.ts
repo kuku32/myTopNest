@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
  
-export function checkIfWithin5MinutesEST(dateString: string): boolean {
+export function checkIfWithin5MinutesEST(dateString: string, range = 7): boolean {
   if (!dateString) return false;
 
   // Parse provider's date as EST
@@ -12,8 +12,8 @@ export function checkIfWithin5MinutesEST(dateString: string): boolean {
   const nowEST = DateTime.now().setZone('America/New_York');
 
   // Create ±5 minute window
-  const lowerBound = nowEST.minus({ minutes: 7 });
-  const upperBound = nowEST.plus({ minutes: 7 });
+  const lowerBound = nowEST.minus({ minutes: range });
+  const upperBound = nowEST.plus({ minutes: range });
 
   // Compare
   return providerTime >= lowerBound && providerTime <= upperBound;

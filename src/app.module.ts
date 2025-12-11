@@ -9,6 +9,7 @@ import { StockHelperService } from './webhook/stockHelper.service';
 import { WebhookService } from './webhook/webhook.service';
 import { TasksForexService } from './task_forex.service';
 import { SendEverydayService } from './send_everyday.service';
+import { TasksUSMKService } from './task_usmk.service';
 
 @Module({
   imports: [
@@ -20,6 +21,6 @@ import { SendEverydayService } from './send_everyday.service';
     WebhookModule,
   ],
   controllers: [],
-  providers: [WebhookService,TasksService, StockHelperService,TasksForexService ,SendEverydayService],
+  providers: [WebhookService,TasksService, StockHelperService,TasksForexService ,SendEverydayService, TasksUSMKService],
 })
 export class AppModule {}

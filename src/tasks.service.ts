@@ -87,7 +87,7 @@ export class TasksService {
   // }
   // US STOCK
 
-  @Cron('*/5 14-21 * * 1-5', { timeZone: 'UTC' })
+  // @Cron('*/5 14-21 * * 1-5', { timeZone: 'UTC' })
   async runAllWatchLists() {
     // await this.LocalPLWR.getRsilist('ma200ab_less_0_1',113)
     const symbols = (await this.LocalPLWR.getDolist()) || [];
@@ -584,7 +584,7 @@ export class TasksService {
       3,
     );
   }
-  @Cron('*/1 14-21 * * 1-5', { timeZone: 'UTC' })
+  // @Cron('*/1 14-21 * * 1-5', { timeZone: 'UTC' })
   async minuteQQQ(){
     // const symbols = (await this.LocalPLWR.getDolist()) || [];
     const symbols = [`SNAP`, 'QQQ'];
