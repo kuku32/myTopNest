@@ -21,6 +21,7 @@ export class SendEverydayService {
     const twoDayAgo = this.stockHelperService.getDateNDaysAgo(2);
     const equal = `===========================================`;
     const Channels = [
+      'CRON_CHECK',
       '15MIN_BUY_FX',
       '15MIN_SELL_FX',
       '30MIN_BUY_FX',
