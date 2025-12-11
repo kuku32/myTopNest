@@ -16,7 +16,7 @@ export function formatDateUnder(date: Date) {
   const dd = String(date.getDate()).padStart(2, '0');
   return `${yyyy}_${mm}_${dd}`;
 }
-export function getDateNDaysAgo(n: number) {
+export function getDateNDaysAgo_Under(n: number) {
   const now = new Date(); // current date and time
   now.setDate(now.getDate() - n); // subtract n days
   return formatDateUnder(now);
