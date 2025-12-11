@@ -5,7 +5,6 @@ import axios from 'axios';
 import { WebhookService } from './webhook/webhook.service';
 import { StockHelperService } from './webhook/stockHelper.service';
 
-
 @Injectable()
 export class TasksForexService {
   constructor(
@@ -59,24 +58,21 @@ export class TasksForexService {
   private async processTickers1hour(
     tickers: string[],
     timeframe: string,
+    apikey,
     buyChannel,
     sellChannel,
     delay = 5,
   ) {
     if (!this.stockHelperService.isForexMarketOpen()) {
-      this.logger.log(
-        `🕒 Forex market is CLOSED`,
-      );
+      this.logger.log(`🕒 Forex market is CLOSED`);
       return;
     }
-    this.logger.log(
-      `✅ Forex market is OPEN`,
-    );
+    this.logger.log(`✅ Forex market is OPEN`);
     // Delay 2 minutes before processing
     await new Promise((resolve) => setTimeout(resolve, delay * 60 * 1000));
     for (const ticker of tickers) {
       try {
-        let data = await this.LocalPLWR.tiingo(ticker, timeframe);
+        let data = await this.LocalPLWR.tiingo(ticker, timeframe, apikey);
         const lastData = data[0];
         const secondLastData = data[1];
         // const lastData = data[data.length - 1];
@@ -175,7 +171,7 @@ export class TasksForexService {
     // const tickers = ['EURUSD'];
     await this.processTickers1hour(
       tickers,
-      '15min',
+      '15min','54c43c0fc7b27681254eeac1d7138d6b5477cf10',
       '15MIN_BUY_FX',
       '15MIN_SELL_FX',
       3,
@@ -195,7 +191,7 @@ export class TasksForexService {
     // const tickers = ['EURUSD'];
     await this.processTickers1hour(
       tickers,
-      '30min',
+      '30min','5f7e0b2da2b5c849dfd5a3dc7938b82c02a7c6f4',
       '30MIN_BUY_FX',
       '30MIN_SELL_FX',
       3,
@@ -215,7 +211,7 @@ export class TasksForexService {
     // const tickers = ['EURUSD'];
     await this.processTickers1hour(
       tickers,
-      '1hour',
+      '1hour','5f7e0b2da2b5c849dfd5a3dc7938b82c02a7c6f4',
       '1HOUR_BUY_FX',
       '1HOUR_SELL_FX',
       3,
@@ -235,7 +231,7 @@ export class TasksForexService {
     // const tickers = ['EURUSD'];
     await this.processTickers1hour(
       tickers,
-      '4hour',
+      '4hour','5f7e0b2da2b5c849dfd5a3dc7938b82c02a7c6f4',
       '4HOUR_BUY_FX',
       '4HOUR_SELL_FX',
       3,

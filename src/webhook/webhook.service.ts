@@ -531,7 +531,7 @@ export class WebhookService {
     }
   }
 
-  async tiingo(ticker: string, timefame: string) {
+  async tiingo(ticker: string, timefame: string, apikey='54c43c0fc7b27681254eeac1d7138d6b5477cf10') {
     const daytestBF = 0;
     let dayStart;
 
@@ -545,7 +545,7 @@ export class WebhookService {
     else{
       return null
     }
-    const urls= `https://api.tiingo.com/tiingo/fx/${ticker}/prices?startDate=${dayStart}&token=5f7e0b2da2b5c849dfd5a3dc7938b82c02a7c6f4&resampleFreq=${timefame}`
+    const urls= `https://api.tiingo.com/tiingo/fx/${ticker}/prices?startDate=${dayStart}&token=${apikey}&resampleFreq=${timefame}`
     console.log(urls)
     const responsesArray = await this.tryCatcht_tiingo(urls);
     // return responsesArray
