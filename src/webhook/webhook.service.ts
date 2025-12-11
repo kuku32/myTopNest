@@ -530,4 +530,44 @@ export class WebhookService {
       return 'skipped';
     }
   }
+
+  async tiingo(ticker: string, timefame: string) {
+    const daytestBF = 0;
+    let dayStart;
+
+    if (timefame.includes('day')) {
+      dayStart = this.stockHelperService.getDateNDaysAgo(500 + daytestBF);
+    } else if (timefame.includes('hour')) {
+      dayStart = this.stockHelperService.getDateNDaysAgo(20 + daytestBF);
+    } else if (timefame.includes('min')) {
+      dayStart = this.stockHelperService.getDateNDaysAgo(3 + daytestBF);
+    } 
+    else{
+      return null
+    }
+    const urls= `https://api.tiingo.com/tiingo/fx/${ticker}/prices?startDate=${dayStart}&token=5f7e0b2da2b5c849dfd5a3dc7938b82c02a7c6f4&resampleFreq=${timefame}`
+    console.log(urls)
+    const responsesArray = await this.tryCatcht_tiingo(urls);
+    // return responsesArray
+    const response = plainToInstance(
+      DTO.ChartOutTiingo,
+      responsesArray, {
+        excludeExtraneousValues: true,
+      }
+    ) as any;
+    // return response
+    const result = await this.stockHelperService.returnNewData(response);
+    const reversedData = [...result].reverse(); // clone + reverse
+    // return reversedData; // success!
+    return  reversedData.slice(0, 300);;
+  }
+
+  async tryCatcht_tiingo(BASE_URL: string) {
+    try {
+      const response = await axios.get(BASE_URL);
+      return response.data
+    } catch (error: any) {
+      throw new Error(':tiingo: All API keys failed');
+    }
+  }
 }

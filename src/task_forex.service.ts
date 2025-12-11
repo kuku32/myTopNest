@@ -1,0 +1,235 @@
+// src/tasks.service.ts
+import { Injectable, Logger } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import axios from 'axios';
+import { WebhookService } from './webhook/webhook.service';
+import { StockHelperService } from './webhook/stockHelper.service';
+
+
+@Injectable()
+export class TasksForexService {
+  constructor(
+    private readonly stockHelperService: StockHelperService,
+    private readonly LocalPLWR: WebhookService,
+  ) {}
+  private readonly logger = new Logger(TasksForexService.name);
+
+  async sendDiscord(
+    message: string,
+    ticker: string,
+    lastdata: any,
+    channel: string,
+  ) {
+    try {
+      return await this.LocalPLWR.sendDiscordNotification(
+        'RAILWAY ' + message,
+        `${channel} ${ticker}`,
+        JSON.stringify(lastdata),
+      );
+    } catch (err) {
+      console.error('❌ Error in controller:', err);
+      throw err;
+    }
+  }
+
+  async wakeupcall() {
+    try {
+      const date = new Date();
+      await this.sendDiscord(
+        'RAILWAY WAKEUPCALL:' + date,
+        'RWBOT 5MIN',
+        'Nono',
+        'CRON_CHECK',
+      );
+      const { data } = await axios.get(
+        'https://mytopnest-production.up.railway.app/webhooks',
+      );
+      this.logger.log('⏱️ Keep-alive ping success:', data.status);
+    } catch (err) {
+      this.logger.error(`❌ RAILWAY Keep-alive failed: ${err.message}`);
+      this.sendDiscord(
+        `❌ RAILWAY Keep-alive failed:`,
+        `RWBOT BOTBOT`,
+        'Nono',
+        'ERORR_CALL',
+      );
+    }
+  }
+
+  private async processTickers1hour(
+    tickers: string[],
+    timeframe: string,
+    buyChannel,
+    sellChannel,
+    delay = 5,
+  ) {
+    // Delay 2 minutes before processing
+    await new Promise((resolve) => setTimeout(resolve, delay * 60 * 1000));
+    for (const ticker of tickers) {
+      try {
+        let data = await this.LocalPLWR.tiingo(ticker, timeframe);
+        const lastData = data[0];
+        const secondLastData = data[1];
+        // const lastData = data[data.length - 1];
+        // const secondLastData = data[data.length - 2];
+
+        await this.compareAndSend1hour(
+          lastData,
+          secondLastData,
+          ticker,
+          timeframe,
+          buyChannel,
+          sellChannel,
+        );
+        this.logger.log(`${ticker} processed successfully.`);
+      } catch (error) {
+        const date = new Date();
+        this.sendDiscord(
+          `ERROR ON API AT: ${timeframe} On ${date}: ${JSON.stringify(error)}`,
+          `RWBOT ${ticker} at ${timeframe}`,
+          'Nono',
+          'ERORR_CALL',
+        );
+        this.logger.error(`Error processing ${ticker}: ${error.message}`);
+      }
+    }
+  }
+  async compareAndSend1hour(
+    lastdata,
+    Secondlastdata,
+    ticker,
+    timeframe,
+    buyChannel,
+    sellChannel,
+  ) {
+    const buyE = await this.stockHelperService.macdCrossAB(
+      lastdata,
+      Secondlastdata,
+    );
+    if (buyE) {
+      await this.sendDiscord(
+        `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker} -ON- ${timeframe}`,
+        lastdata,
+        buyChannel,
+      );
+    }
+    const buy_earlyBuyInRSI = await this.stockHelperService.earlyBuyInRSI(
+      lastdata,
+      Secondlastdata,
+    );
+    if (buy_earlyBuyInRSI) {
+      await this.sendDiscord(
+        `BUY earlyBuyInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker} -ON- ${timeframe}`,
+        lastdata,
+        buyChannel,
+      );
+    }
+    const sellE = await this.stockHelperService.macdCrossBL(
+      lastdata,
+      Secondlastdata,
+    );
+    if (sellE) {
+      await this.sendDiscord(
+        `SELLLLLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker} -ON- ${timeframe}`,
+        lastdata,
+        sellChannel,
+      );
+    }
+    const sell_earlySellInRSI = await this.stockHelperService.earlySellInRSI(
+      lastdata,
+      Secondlastdata,
+    );
+    if (sell_earlySellInRSI) {
+      await this.sendDiscord(
+        `SELLLLLLLL sell_earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker} -ON- ${timeframe}`,
+        lastdata,
+        sellChannel,
+      );
+    }
+  }
+
+  @Cron('*/15 * * * *') // every 15 minutes
+  async handle15minForex() {
+    const tickers = [
+      'CHFUSD',
+      'EURUSD',
+      'CADUSD',
+      'AUDUSD',
+      'GBPUSD',
+      'JPYUSD',
+      'NZDUSD',
+    ];
+    // const tickers = ['EURUSD'];
+    await this.processTickers1hour(
+      tickers,
+      '15min',
+      '15MIN_BUY_FX',
+      '15MIN_SELL_FX',
+      3,
+    );
+  }
+  @Cron(CronExpression.EVERY_30_MINUTES)
+  async handle30minForex() {
+    const tickers = [
+      'CHFUSD',
+      'EURUSD',
+      'CADUSD',
+      'AUDUSD',
+      'GBPUSD',
+      'JPYUSD',
+      'NZDUSD',
+    ];
+    // const tickers = ['EURUSD'];
+    await this.processTickers1hour(
+      tickers,
+      '30min',
+      '30MIN_BUY_FX',
+      '30MIN_SELL_FX',
+      3,
+    );
+  }
+  @Cron('0 * * * *') // every 1 hour
+  async handle1hourForex() {
+    const tickers = [
+      'CHFUSD',
+      'EURUSD',
+      'CADUSD',
+      'AUDUSD',
+      'GBPUSD',
+      'JPYUSD',
+      'NZDUSD',
+    ];
+    // const tickers = ['EURUSD'];
+    await this.processTickers1hour(
+      tickers,
+      '1hour',
+      '1HOUR_BUY_FX',
+      '1HOUR_SELL_FX',
+      3,
+    );
+  }
+  @Cron(CronExpression.EVERY_4_HOURS)
+  async handle4hourForex() {
+    const tickers = [
+      'CHFUSD',
+      'EURUSD',
+      'CADUSD',
+      'AUDUSD',
+      'GBPUSD',
+      'JPYUSD',
+      'NZDUSD',
+    ];
+    // const tickers = ['EURUSD'];
+    await this.processTickers1hour(
+      tickers,
+      '4hour',
+      '4HOUR_BUY_FX',
+      '4HOUR_SELL_FX',
+      3,
+    );
+  }
+}

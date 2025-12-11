@@ -7,6 +7,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { WebhookModule } from './webhook/webhook.module';
 import { StockHelperService } from './webhook/stockHelper.service';
 import { WebhookService } from './webhook/webhook.service';
+import { TasksForexService } from './task_forex.service';
 
 @Module({
   imports: [
@@ -18,6 +19,6 @@ import { WebhookService } from './webhook/webhook.service';
     WebhookModule,
   ],
   controllers: [],
-  providers: [WebhookService,TasksService, StockHelperService, ],
+  providers: [WebhookService,TasksService, StockHelperService,TasksForexService ],
 })
 export class AppModule {}

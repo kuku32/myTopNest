@@ -1,4 +1,5 @@
 import { Injectable, NotAcceptableException } from '@nestjs/common';
+import { StockData } from './dto/chartData';
 
 @Injectable()
 export class StockHelperService {
@@ -71,7 +72,7 @@ export class StockHelperService {
 
       const rs = avgLoss === 0 ? 100 : avgGain / avgLoss;
       const rsi = 100 - 100 / (1 + rs);
-      rsiArray[i] = parseFloat(rsi.toFixed(2));
+      rsiArray[i] = parseFloat(rsi.toFixed(9));
     }
 
     // Merge RSI into data
@@ -298,5 +299,49 @@ isMarketOpen(): boolean {
   const marketClose = this.halfDays.includes(dateStr) ? 13 * 60 : 16 * 60; // 1:00 PM or 4:00 PM
 
   return minutes >= marketOpen && minutes <= marketClose;
+}
+
+
+async earlyBuyInRSI(last: StockData, prev: StockData): Promise<boolean> {
+  if (!last || !prev) return false; // safety
+
+  const isDivergenceNegative = last.divergence != null && last.divergence < 0;
+  const isRSISetup =
+    last.RSI != null &&
+    prev.RSI != null &&
+    last.RSI < 40 &&
+    last.RSI > prev.RSI;
+  const isMACDRising =
+    last.MACDLine != null &&
+    prev.MACDLine != null &&
+    last.MACDLine > prev.MACDLine;
+
+  return isDivergenceNegative && isRSISetup && isMACDRising && last.close > last.MA200;
+}
+
+async earlySellInRSI(last: StockData, prev: StockData): Promise<boolean> {
+  if (!last || !prev) return false; // safety
+
+  const isDivergenceNegative = last.divergence != null && last.divergence > 0;
+  const isRSISetup =
+    last.RSI != null &&
+    prev.RSI != null &&
+    last.RSI > 60 &&
+    last.RSI < prev.RSI;
+  const isMACDRising =
+    last.MACDLine != null &&
+    prev.MACDLine != null &&
+    last.MACDLine < prev.MACDLine;
+
+  return isDivergenceNegative && isRSISetup && isMACDRising;
+}
+
+async macdCrossAB(last: StockData, prev: StockData): Promise<boolean> {
+  if (!last || !prev) return false; // safety
+  return (last.MACDLine > last.SignalLine && prev.MACDLine < prev.SignalLine) ||  (last.divergence > 0 && prev.divergence < 0);
+}
+async macdCrossBL(last: StockData, prev: StockData): Promise<boolean> {
+  if (!last || !prev) return false; // safety
+  return (last.MACDLine < last.SignalLine && prev.MACDLine > prev.SignalLine) ||  (last.divergence < 0 && prev.divergence > 0);
 }
 }
