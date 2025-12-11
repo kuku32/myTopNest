@@ -67,13 +67,6 @@ export class TasksForexService {
       this.logger.log(`🕒 Forex market is CLOSED`);
       return;
     }
-    const date = new Date();
-    const equal = `===========================================`;
-    await this.LocalPLWR.sendDiscordNotification(
-      `${equal}START-${date}${equal}`,
-      `${sellChannel} RWBOT`,
-      JSON.stringify('lastdata'),
-    );
     this.logger.log(`✅ Forex market is OPEN`);
     // Delay 2 minutes before processing
     await new Promise((resolve) => setTimeout(resolve, delay * 60 * 1000));
@@ -248,6 +241,13 @@ export class TasksForexService {
       '4HOUR_BUY_FX',
       '4HOUR_SELL_FX',
       3,
+    );
+    const date = new Date();
+    const equal = `===========================================`;
+    await this.LocalPLWR.sendDiscordNotification(
+      `${equal}START-${date}${equal}`,
+      `4HOUR_SELL_FX RWBOT`,
+      JSON.stringify('lastdata'),
     );
   }
 }
