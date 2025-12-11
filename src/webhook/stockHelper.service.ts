@@ -26,7 +26,11 @@ export class StockHelperService {
   /**
    * Simple Moving Average
    */
-  async calculateMovingAverage(data: any[], windowSize: number, maLabel: string) {
+  async calculateMovingAverage(
+    data: any[],
+    windowSize: number,
+    maLabel: string,
+  ) {
     if (!data?.length) return [];
 
     for (let i = 0; i < data.length; i++) {
@@ -110,46 +114,58 @@ export class StockHelperService {
     data: any[],
     shortPeriod = 12,
     longPeriod = 26,
-    signalPeriod = 9
+    signalPeriod = 9,
   ) {
     if (!data?.length) return [];
-  
+
     // 1️⃣ Compute short and long EMAs
     const shortEMA = await this.calculateEMA(data, shortPeriod);
     const longEMA = await this.calculateEMA(data, longPeriod);
-  
+
     // 2️⃣ Compute MACD line
     const macdLine = data.map((_, i) =>
       shortEMA[i] != null && longEMA[i] != null
         ? Number((shortEMA[i] - longEMA[i]).toFixed(7))
-        : null
+        : null,
     );
-  
+
     // 3️⃣ Compute Signal line as EMA of MACD line
     // Prepare MACD objects for calculateEMA (use only numeric values)
     const macdObjects = macdLine.map((val) => ({ close: val ?? 0 }));
     const signalEMA = await this.calculateEMA(macdObjects, signalPeriod);
-  
+
     // Assign Signal line with proper nulls at the start
-    const signalLine = signalEMA.map((v, i) => (i < signalPeriod - 1 ? null : Number(v.toFixed(7))));
-  
+    const signalLine = signalEMA.map((v, i) =>
+      i < signalPeriod - 1 ? null : Number(v.toFixed(7)),
+    );
+
     // 4️⃣ Compute MACD Histogram
     const histogram = macdLine.map((macd, i) =>
-      macd != null && signalLine[i] != null ? Number((macd - signalLine[i]).toFixed(7)) : null
+      macd != null && signalLine[i] != null
+        ? Number((macd - signalLine[i]).toFixed(7))
+        : null,
     );
-  
+
     // 5️⃣ Optional: Divergence detection
-    const divergence: ('bullish' | 'bearish' | null)[] = Array(data.length).fill(null);
+    const divergence: ('bullish' | 'bearish' | null)[] = Array(
+      data.length,
+    ).fill(null);
     for (let i = 1; i < data.length; i++) {
       if (histogram[i - 1] != null && histogram[i] != null) {
-        if (data[i].close < data[i - 1].close && histogram[i] > histogram[i - 1]) {
+        if (
+          data[i].close < data[i - 1].close &&
+          histogram[i] > histogram[i - 1]
+        ) {
           divergence[i] = 'bullish';
-        } else if (data[i].close > data[i - 1].close && histogram[i] < histogram[i - 1]) {
+        } else if (
+          data[i].close > data[i - 1].close &&
+          histogram[i] < histogram[i - 1]
+        ) {
           divergence[i] = 'bearish';
         }
       }
     }
-  
+
     // 6️⃣ Merge results
     return data.map((item, i) => ({
       ...item,
@@ -159,221 +175,265 @@ export class StockHelperService {
       MACDDivergence: divergence[i],
     }));
   }
-  
-async transformData(data: any[]) {
-  const transformedData = {};
 
-  data.forEach((entry: { date: string; }) => {
-    const dateKey = entry.date.split(" ")[0]; // Extracting the date part
-    if (!transformedData[dateKey]) {
-      transformedData[dateKey] = []; // Initializing a list for that date
-    }
-    transformedData[dateKey].push(entry); // Appending the entry to the list
-  });
+  async transformData(data: any[]) {
+    const transformedData = {};
 
-  return transformedData;
-}
-
-async getDateRanges(startDateStr:string, endDateStr:string, daysPerRange:number) {
-  const startDate = new Date(startDateStr);
-  const endDate = new Date(endDateStr);
-  const ranges = [];
-
-  let currentEndDate = new Date(endDate); // Initialize the end date
-
-  // Loop to generate ranges
-  while (currentEndDate >= startDate) {
-    let currentStartDate = new Date(currentEndDate); // Initialize start date as the current end date
-    currentStartDate.setDate(currentEndDate.getDate() - daysPerRange + 1); // Calculate start date for the range
-
-    // Ensure the currentStartDate doesn't go before the startDate
-    if (currentStartDate < startDate) {
-      currentStartDate = new Date(startDate);
-    }
-
-    // Add the calculated range to the ranges array
-    ranges.push({
-      start: currentStartDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
-      end: currentEndDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+    data.forEach((entry: { date: string }) => {
+      const dateKey = entry.date.split(' ')[0]; // Extracting the date part
+      if (!transformedData[dateKey]) {
+        transformedData[dateKey] = []; // Initializing a list for that date
+      }
+      transformedData[dateKey].push(entry); // Appending the entry to the list
     });
 
-    // Update currentEndDate to one day before the currentStartDate to avoid overlap
-    currentEndDate = new Date(currentStartDate);
-    currentEndDate.setDate(currentEndDate.getDate() - 1);
+    return transformedData;
   }
-  console.log(ranges)
-  return ranges;
-}
 
-async calculateDaysBetween(startDateStr:string, endDateStr:string) {
-  // Convert string dates to Date objects
-  const startDate = new Date(startDateStr);
-  const endDate = new Date(endDateStr);
+  async getDateRanges(
+    startDateStr: string,
+    endDateStr: string,
+    daysPerRange: number,
+  ) {
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(endDateStr);
+    const ranges = [];
 
-  // Calculate the difference in milliseconds
-  const differenceInMillis = endDate.getTime() - startDate.getTime();
+    let currentEndDate = new Date(endDate); // Initialize the end date
 
-  // Convert milliseconds to days (1 day = 24 hours * 60 minutes * 60 seconds * 1000 milliseconds)
-  const millisecondsPerDay = 24 * 60 * 60 * 1000;
-  const daysBetween = Math.ceil(differenceInMillis / millisecondsPerDay);
-  // if(daysBetween<0){
-  //   throw new NotAcceptableException("Startday should before end day");
-  // }
-  return daysBetween;
-}
+    // Loop to generate ranges
+    while (currentEndDate >= startDate) {
+      let currentStartDate = new Date(currentEndDate); // Initialize start date as the current end date
+      currentStartDate.setDate(currentEndDate.getDate() - daysPerRange + 1); // Calculate start date for the range
 
-async getAbbreviatedDay(dateString: string) {
-  // Split the date string into components
-  const [year, month, day] = dateString.split('-').map(Number);
-  // Create a new Date object using the components, subtracting 1 from the month
-  const date = new Date(Date.UTC(year, month - 1, day));
-  const options: Intl.DateTimeFormatOptions = { weekday: 'short' };
-  return new Intl.DateTimeFormat('en-US', options).format(date);
-}
+      // Ensure the currentStartDate doesn't go before the startDate
+      if (currentStartDate < startDate) {
+        currentStartDate = new Date(startDate);
+      }
 
-async getDateThreeDaysAgo(dateString: string) {
-  // Create a new Date object from the input string
-  const date = new Date(dateString);
-  // Subtract 3 days (in milliseconds)
-  date.setDate(date.getDate() - 3);
-  // Format the date back to 'YYYY-MM-DD'
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-  const day = String(date.getDate()).padStart(2, '0');
-  
-  return `${year}-${month}-${day}`;
-}
-formatDate(date: any) {
-  const yyyy = date.getFullYear();
-  const mm = String(date.getMonth() + 1).padStart(2, '0');
-  const dd = String(date.getDate()).padStart(2, '0');
-  return `${yyyy}-${mm}-${dd}`;
-}
+      // Add the calculated range to the ranges array
+      ranges.push({
+        start: currentStartDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+        end: currentEndDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+      });
 
-getDateNDaysAgo(n: number) {
-  const now = new Date(); // current date and time
-  now.setDate(now.getDate() - n); // subtract n days
-  return this.formatDate(now);
-}
-formatSymbol(symbol: string) {
-  const match = symbol.match(/^([A-Z]+?)(USD|USDT|BTC|ETH|EUR|JPY)$/);
-  return match ? `${match[1]}/${match[2]}` : symbol;
-}
-getmatch1only(symbol: string) {
-  const match = symbol.match(/^([A-Z]+?)(USD|USDT|BTC|ETH|EUR|JPY)$/);
-  return match ? `${match[1]}` : symbol;
-}
+      // Update currentEndDate to one day before the currentStartDate to avoid overlap
+      currentEndDate = new Date(currentStartDate);
+      currentEndDate.setDate(currentEndDate.getDate() - 1);
+    }
+    console.log(ranges);
+    return ranges;
+  }
 
- // Common NYSE holidays (update annually)
- private readonly holidays = [
-  '2025-01-01', // New Year’s Day
-  '2025-01-20', // Martin Luther King Jr. Day
-  '2025-02-17', // Presidents’ Day
-  '2025-04-18', // Good Friday
-  '2025-05-26', // Memorial Day
-  '2025-06-19', // Juneteenth
-  '2025-07-04', // Independence Day
-  '2025-09-01', // Labor Day
-  '2025-11-27', // Thanksgiving
-  '2025-12-25', // Christmas
-];
+  async calculateDaysBetween(startDateStr: string, endDateStr: string) {
+    // Convert string dates to Date objects
+    const startDate = new Date(startDateStr);
+    const endDate = new Date(endDateStr);
 
-// Half trading days (market closes at 1:00 PM ET)
-private readonly halfDays = [
-  '2025-11-28', // Day after Thanksgiving
-  '2025-12-24', // Christmas Eve
-];
+    // Calculate the difference in milliseconds
+    const differenceInMillis = endDate.getTime() - startDate.getTime();
 
-isMarketOpen(): boolean {
-  const now = new Date();
-  const nyTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+    // Convert milliseconds to days (1 day = 24 hours * 60 minutes * 60 seconds * 1000 milliseconds)
+    const millisecondsPerDay = 24 * 60 * 60 * 1000;
+    const daysBetween = Math.ceil(differenceInMillis / millisecondsPerDay);
+    // if(daysBetween<0){
+    //   throw new NotAcceptableException("Startday should before end day");
+    // }
+    return daysBetween;
+  }
 
-  const day = nyTime.getDay(); // 0=Sun, 6=Sat
-  if (day === 0 || day === 6) return false; // weekend
+  async getAbbreviatedDay(dateString: string) {
+    // Split the date string into components
+    const [year, month, day] = dateString.split('-').map(Number);
+    // Create a new Date object using the components, subtracting 1 from the month
+    const date = new Date(Date.UTC(year, month - 1, day));
+    const options: Intl.DateTimeFormatOptions = { weekday: 'short' };
+    return new Intl.DateTimeFormat('en-US', options).format(date);
+  }
 
-  const dateStr = nyTime.toISOString().split('T')[0];
-  if (this.holidays.includes(dateStr)) return false;
+  async getDateThreeDaysAgo(dateString: string) {
+    // Create a new Date object from the input string
+    const date = new Date(dateString);
+    // Subtract 3 days (in milliseconds)
+    date.setDate(date.getDate() - 3);
+    // Format the date back to 'YYYY-MM-DD'
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(date.getDate()).padStart(2, '0');
 
-  const minutes = nyTime.getHours() * 60 + nyTime.getMinutes();
-  const marketOpen = 9 * 60 + 30; // 9:30 AM
-  const marketClose = this.halfDays.includes(dateStr) ? 13 * 60 : 16 * 60; // 1:00 PM or 4:00 PM
+    return `${year}-${month}-${day}`;
+  }
+  formatDate(date: any) {
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
 
-  return minutes >= marketOpen && minutes <= marketClose;
-}
+  getDateNDaysAgo(n: number) {
+    const now = new Date(); // current date and time
+    now.setDate(now.getDate() - n); // subtract n days
+    return this.formatDate(now);
+  }
+  formatSymbol(symbol: string) {
+    const match = symbol.match(/^([A-Z]+?)(USD|USDT|BTC|ETH|EUR|JPY)$/);
+    return match ? `${match[1]}/${match[2]}` : symbol;
+  }
+  getmatch1only(symbol: string) {
+    const match = symbol.match(/^([A-Z]+?)(USD|USDT|BTC|ETH|EUR|JPY)$/);
+    return match ? `${match[1]}` : symbol;
+  }
 
+  // Common NYSE holidays (update annually)
+  private readonly holidays = [
+    '2025-01-01', // New Year’s Day
+    '2025-01-20', // Martin Luther King Jr. Day
+    '2025-02-17', // Presidents’ Day
+    '2025-04-18', // Good Friday
+    '2025-05-26', // Memorial Day
+    '2025-06-19', // Juneteenth
+    '2025-07-04', // Independence Day
+    '2025-09-01', // Labor Day
+    '2025-11-27', // Thanksgiving
+    '2025-12-25', // Christmas
+  ];
 
-async earlyBuyInRSI(last: StockData, prev: StockData): Promise<boolean> {
-  if (!last || !prev) return false; // safety
+  // Half trading days (market closes at 1:00 PM ET)
+  private readonly halfDays = [
+    '2025-11-28', // Day after Thanksgiving
+    '2025-12-24', // Christmas Eve
+  ];
 
-  const isDivergenceNegative = last.divergence != null && last.divergence < 0;
-  const isRSISetup =
-    last.RSI != null &&
-    prev.RSI != null &&
-    last.RSI < 40 &&
-    last.RSI > prev.RSI;
-  const isMACDRising =
-    last.MACDLine != null &&
-    prev.MACDLine != null &&
-    last.MACDLine > prev.MACDLine;
+  isMarketOpen(): boolean {
+    const now = new Date();
+    const nyTime = new Date(
+      now.toLocaleString('en-US', { timeZone: 'America/New_York' }),
+    );
 
-  return isDivergenceNegative && isRSISetup && isMACDRising && last.close > last.MA200;
-}
+    const day = nyTime.getDay(); // 0=Sun, 6=Sat
+    if (day === 0 || day === 6) return false; // weekend
 
-async earlySellInRSI(last: StockData, prev: StockData): Promise<boolean> {
-  if (!last || !prev) return false; // safety
+    const dateStr = nyTime.toISOString().split('T')[0];
+    if (this.holidays.includes(dateStr)) return false;
 
-  const isDivergenceNegative = last.divergence != null && last.divergence > 0;
-  const isRSISetup =
-    last.RSI != null &&
-    prev.RSI != null &&
-    last.RSI > 60 &&
-    last.RSI < prev.RSI;
-  const isMACDRising =
-    last.MACDLine != null &&
-    prev.MACDLine != null &&
-    last.MACDLine < prev.MACDLine;
+    const minutes = nyTime.getHours() * 60 + nyTime.getMinutes();
+    const marketOpen = 9 * 60 + 30; // 9:30 AM
+    const marketClose = this.halfDays.includes(dateStr) ? 13 * 60 : 16 * 60; // 1:00 PM or 4:00 PM
 
-  return isDivergenceNegative && isRSISetup && isMACDRising;
-}
+    return minutes >= marketOpen && minutes <= marketClose;
+  }
 
-async macdCrossAB(last: StockData, prev: StockData): Promise<boolean> {
-  if (!last || !prev) return false; // safety
-  return (last.MACDLine > last.SignalLine && prev.MACDLine < prev.SignalLine) ||  (last.divergence > 0 && prev.divergence < 0);
-}
-async macdCrossBL(last: StockData, prev: StockData): Promise<boolean> {
-  if (!last || !prev) return false; // safety
-  return (last.MACDLine < last.SignalLine && prev.MACDLine > prev.SignalLine) ||  (last.divergence < 0 && prev.divergence > 0);
-}
+  async earlyBuyInRSI(last: StockData, prev: StockData): Promise<boolean> {
+    if (!last || !prev) return false; // safety
 
-private readonly forexHolidays = [
-  '2025-01-01', // New Year's Day (global)
-  '2025-12-25', // Christmas
-  '2025-12-26', // Boxing Day (some brokers close)
-];
+    const isDivergenceNegative = last.divergence != null && last.divergence < 0;
+    const isRSISetup =
+      last.RSI != null &&
+      prev.RSI != null &&
+      last.RSI < 40 &&
+      last.RSI > prev.RSI;
+    const isMACDRising =
+      last.MACDLine != null &&
+      prev.MACDLine != null &&
+      last.MACDLine > prev.MACDLine;
 
-// The forex market runs continuously from Sunday 5:00 PM ET to Friday 5:00 PM ET.
-isForexMarketOpen(): boolean {
-  const now = new Date();
-  // Convert to Eastern Time
-  const nyTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+    return (
+      isDivergenceNegative &&
+      isRSISetup &&
+      isMACDRising &&
+      last.close > last.MA200
+    );
+  }
 
-  const day = nyTime.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
-  const hours = nyTime.getHours();
-  const dateStr = nyTime.toISOString().split('T')[0];
+  async earlySellInRSI(last: StockData, prev: StockData): Promise<boolean> {
+    if (!last || !prev) return false; // safety
 
-  // Check global holidays (rare, but some brokers close)
-  if (this.forexHolidays.includes(dateStr)) return false;
+    const isDivergenceNegative = last.divergence != null && last.divergence > 0;
+    const isRSISetup =
+      last.RSI != null &&
+      prev.RSI != null &&
+      last.RSI > 60 &&
+      last.RSI < prev.RSI;
+    const isMACDRising =
+      last.MACDLine != null &&
+      prev.MACDLine != null &&
+      last.MACDLine < prev.MACDLine;
 
-  // Forex market opens Sunday 5 PM ET
-  if (day === 0 && (hours < 17)) return false; // before 5 PM Sunday
+    return isDivergenceNegative && isRSISetup && isMACDRising;
+  }
 
-  // Forex market closes Friday 5 PM ET
-  if (day === 5 && (hours >= 17)) return false; // after 5 PM Friday
+  async macdCrossAB(last: StockData, prev: StockData): Promise<boolean> {
+    if (!last || !prev) return false; // safety
+    return (
+      (last.MACDLine > last.SignalLine && prev.MACDLine < prev.SignalLine) ||
+      (last.divergence > 0 && prev.divergence < 0)
+    );
+  }
+  async macdCrossBL(last: StockData, prev: StockData): Promise<boolean> {
+    if (!last || !prev) return false; // safety
+    return (
+      (last.MACDLine < last.SignalLine && prev.MACDLine > prev.SignalLine) ||
+      (last.divergence < 0 && prev.divergence > 0)
+    );
+  }
 
-  // Closed all Saturday
-  if (day === 6) return false;
+  private readonly forexHolidays = [
+    '2025-01-01', // New Year's Day (global)
+    '2025-12-25', // Christmas
+    '2025-12-26', // Boxing Day (some brokers close)
+  ];
 
-  return true; // otherwise open
-}
+  // The forex market runs continuously from Sunday 5:00 PM ET to Friday 5:00 PM ET.
+  isForexMarketOpen(): boolean {
+    const now = new Date();
+    // Convert to Eastern Time
+    const nyTime = new Date(
+      now.toLocaleString('en-US', { timeZone: 'America/New_York' }),
+    );
 
+    const day = nyTime.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+    const hours = nyTime.getHours();
+    const dateStr = nyTime.toISOString().split('T')[0];
+
+    // Check global holidays (rare, but some brokers close)
+    if (this.forexHolidays.includes(dateStr)) return false;
+
+    // Forex market opens Sunday 5 PM ET
+    if (day === 0 && hours < 17) return false; // before 5 PM Sunday
+
+    // Forex market closes Friday 5 PM ET
+    if (day === 5 && hours >= 17) return false; // after 5 PM Friday
+
+    // Closed all Saturday
+    if (day === 6) return false;
+
+    return true; // otherwise open
+  }
+  async priceAbAll1or5or15MinBUY(last: StockData): Promise<boolean> {
+    if (!last) return false; // safety
+    const highest = Math.max(
+      last.MA5,
+      last.MA10,
+      last.MA20,
+      last.MA50,
+      last.MA100,
+      last.MA200,
+    );
+    const aboveAll = last.high > highest;
+    return aboveAll && last.divergence > 0;
+  }
+
+  async priceBlAll1or5or15MinSELL(last: StockData): Promise<boolean> {
+    if (!last) return false; // safety
+    const lowest = Math.min(
+      last.MA5,
+      last.MA10,
+      last.MA20,
+      last.MA50,
+      last.MA100,
+      last.MA200,
+    );
+    const blowAll = last.low < lowest;
+    return blowAll && last.divergence < 0;
+  }
 }
