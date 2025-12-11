@@ -63,6 +63,15 @@ export class TasksForexService {
     sellChannel,
     delay = 5,
   ) {
+    if (!this.stockHelperService.isForexMarketOpen()) {
+      this.logger.log(
+        `🕒 Forex market is CLOSED`,
+      );
+      return;
+    }
+    this.logger.log(
+      `✅ Forex market is OPEN`,
+    );
     // Delay 2 minutes before processing
     await new Promise((resolve) => setTimeout(resolve, delay * 60 * 1000));
     for (const ticker of tickers) {

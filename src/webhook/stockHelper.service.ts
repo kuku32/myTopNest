@@ -344,4 +344,36 @@ async macdCrossBL(last: StockData, prev: StockData): Promise<boolean> {
   if (!last || !prev) return false; // safety
   return (last.MACDLine < last.SignalLine && prev.MACDLine > prev.SignalLine) ||  (last.divergence < 0 && prev.divergence > 0);
 }
+
+private readonly forexHolidays = [
+  '2025-01-01', // New Year's Day (global)
+  '2025-12-25', // Christmas
+  '2025-12-26', // Boxing Day (some brokers close)
+];
+
+// The forex market runs continuously from Sunday 5:00 PM ET to Friday 5:00 PM ET.
+isForexMarketOpen(): boolean {
+  const now = new Date();
+  // Convert to Eastern Time
+  const nyTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+
+  const day = nyTime.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+  const hours = nyTime.getHours();
+  const dateStr = nyTime.toISOString().split('T')[0];
+
+  // Check global holidays (rare, but some brokers close)
+  if (this.forexHolidays.includes(dateStr)) return false;
+
+  // Forex market opens Sunday 5 PM ET
+  if (day === 0 && (hours < 17)) return false; // before 5 PM Sunday
+
+  // Forex market closes Friday 5 PM ET
+  if (day === 5 && (hours >= 17)) return false; // after 5 PM Friday
+
+  // Closed all Saturday
+  if (day === 6) return false;
+
+  return true; // otherwise open
+}
+
 }
