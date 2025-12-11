@@ -13,7 +13,7 @@ export class SendEverydayService {
   ) {}
   private readonly logger = new Logger(SendEverydayService.name);
 
-    // @Cron(CronExpression.EVERY_10_SECONDS)
+  // @Cron(CronExpression.EVERY_10_SECONDS)
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT) // close yesterday and open today
   async SendEverydayService() {
     const today = this.stockHelperService.getDateNDaysAgo(0);
@@ -21,6 +21,7 @@ export class SendEverydayService {
     const twoDayAgo = this.stockHelperService.getDateNDaysAgo(2);
     const equal = `===========================================`;
     const Channels = [
+      'ERORR_CALL',
       'CRON_CHECK',
       '15MIN_BUY_FX',
       '15MIN_SELL_FX',

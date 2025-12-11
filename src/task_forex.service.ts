@@ -90,7 +90,9 @@ export class TasksForexService {
       } catch (error) {
         const date = new Date();
         this.sendDiscord(
-          `ERROR ON API AT: ${timeframe} On ${date}: ${JSON.stringify(error)}`,
+          `ERROR ON TasksForexService: ${timeframe} On ${date}: ${JSON.stringify(
+            error,
+          )}`,
           `RWBOT ${ticker} at ${timeframe}`,
           'Nono',
           'ERORR_CALL',
@@ -171,7 +173,8 @@ export class TasksForexService {
     // const tickers = ['EURUSD'];
     await this.processTickers1hour(
       tickers,
-      '15min','54c43c0fc7b27681254eeac1d7138d6b5477cf10',
+      '15min',
+      '54c43c0fc7b27681254eeac1d7138d6b5477cf10',
       '15MIN_BUY_FX',
       '15MIN_SELL_FX',
       3,
@@ -191,7 +194,8 @@ export class TasksForexService {
     // const tickers = ['EURUSD'];
     await this.processTickers1hour(
       tickers,
-      '30min','5f7e0b2da2b5c849dfd5a3dc7938b82c02a7c6f4',
+      '30min',
+      '5f7e0b2da2b5c849dfd5a3dc7938b82c02a7c6f4',
       '30MIN_BUY_FX',
       '30MIN_SELL_FX',
       3,
@@ -211,7 +215,8 @@ export class TasksForexService {
     // const tickers = ['EURUSD'];
     await this.processTickers1hour(
       tickers,
-      '1hour','5f7e0b2da2b5c849dfd5a3dc7938b82c02a7c6f4',
+      '1hour',
+      '5f7e0b2da2b5c849dfd5a3dc7938b82c02a7c6f4',
       '1HOUR_BUY_FX',
       '1HOUR_SELL_FX',
       3,
@@ -231,7 +236,8 @@ export class TasksForexService {
     // const tickers = ['EURUSD'];
     await this.processTickers1hour(
       tickers,
-      '4hour','5f7e0b2da2b5c849dfd5a3dc7938b82c02a7c6f4',
+      '4hour',
+      '5f7e0b2da2b5c849dfd5a3dc7938b82c02a7c6f4',
       '4HOUR_BUY_FX',
       '4HOUR_SELL_FX',
       3,
