@@ -31,6 +31,8 @@ export class SendEverydayService {
       '1HOUR_SELL_FX',
       '4HOUR_BUY_FX',
       '4HOUR_SELL_FX',
+      'CRYPTO_EARLY_15MIN',
+      'CRYPTO_ALL',
     ]; // example list
 
     for (const channel of Channels) {
