@@ -34,7 +34,7 @@ export class StockHelperService {
         const windowData = data.slice(i - windowSize + 1, i + 1);
         const sum = windowData.reduce((acc, val) => acc + (val?.close ?? 0), 0);
         const average = sum / windowSize;
-        data[i][maLabel] = parseFloat(average?.toFixed(2)); // assign to current index
+        data[i][maLabel] = parseFloat(average?.toFixed(9)); // assign to current index
       } else {
         data[i][maLabel] = null; // optional clarity
       }
@@ -121,7 +121,7 @@ export class StockHelperService {
     // 2️⃣ Compute MACD line
     const macdLine = data.map((_, i) =>
       shortEMA[i] != null && longEMA[i] != null
-        ? Number((shortEMA[i] - longEMA[i]).toFixed(4))
+        ? Number((shortEMA[i] - longEMA[i]).toFixed(7))
         : null
     );
   
@@ -131,11 +131,11 @@ export class StockHelperService {
     const signalEMA = await this.calculateEMA(macdObjects, signalPeriod);
   
     // Assign Signal line with proper nulls at the start
-    const signalLine = signalEMA.map((v, i) => (i < signalPeriod - 1 ? null : Number(v.toFixed(4))));
+    const signalLine = signalEMA.map((v, i) => (i < signalPeriod - 1 ? null : Number(v.toFixed(7))));
   
     // 4️⃣ Compute MACD Histogram
     const histogram = macdLine.map((macd, i) =>
-      macd != null && signalLine[i] != null ? Number((macd - signalLine[i]).toFixed(4)) : null
+      macd != null && signalLine[i] != null ? Number((macd - signalLine[i]).toFixed(7)) : null
     );
   
     // 5️⃣ Optional: Divergence detection
