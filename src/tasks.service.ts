@@ -88,13 +88,13 @@ export class TasksService {
   // US STOCK
 
   // @Cron('*/5 14-21 * * 1-5', { timeZone: 'UTC' })
-  async runAllWatchLists() {
-    // await this.LocalPLWR.getRsilist('ma200ab_less_0_1',113)
-    const symbols = (await this.LocalPLWR.getDolist()) || [];
-    await Promise.all([
-      this.USTIMERUN(symbols, this.allkeys, 'US_EARLY_5MIN', 2, '5min'),
-    ]);
-  }
+  // async runAllWatchLists() {
+  //   // await this.LocalPLWR.getRsilist('ma200ab_less_0_1',113)
+  //   const symbols = (await this.LocalPLWR.getDolist()) || [];
+  //   await Promise.all([
+  //     this.USTIMERUN(symbols, this.allkeys, 'US_EARLY_5MIN', 2, '5min'),
+  //   ]);
+  // }
 
   // @Cron('*/15 14-21 * * 1-5', { timeZone: 'UTC' })
   // async runAllWatL15min() {
@@ -585,13 +585,13 @@ export class TasksService {
     );
   }
   // @Cron('*/1 14-21 * * 1-5', { timeZone: 'UTC' })
-  async minuteQQQ(){
-    // const symbols = (await this.LocalPLWR.getDolist()) || [];
-    const symbols = [`SNAP`, 'QQQ'];
-    await Promise.all([
-      this.USTIMERUN(symbols, this.allkeys, 'USSTOCK_WATCH', 0, '1min'),
-    ]);
-  }
+  // async minuteQQQ(){
+  //   // const symbols = (await this.LocalPLWR.getDolist()) || [];
+  //   const symbols = [`SNAP`, 'QQQ'];
+  //   await Promise.all([
+  //     this.USTIMERUN(symbols, this.allkeys, 'USSTOCK_WATCH', 0, '1min'),
+  //   ]);
+  // }
 
 
   @Cron('0 * * * *') // every 1 hour
