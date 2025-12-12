@@ -242,12 +242,5 @@ export class TasksForexService {
       '4HOUR_SELL_FX',
       3,
     );
-    const date = new Date();
-    const equal = `===========================================`;
-    await this.LocalPLWR.sendDiscordNotification(
-      `${equal}START-${date}${equal}`,
-      `4HOUR_SELL_FX RWBOT`,
-      JSON.stringify('lastdata'),
-    );
   }
 }
