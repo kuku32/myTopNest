@@ -108,32 +108,57 @@ export class TasksUSMKService {
     }
     const buyALL =
       await this.stockHelperService.priceAbAll1or5or15MinBUY(lastdata);
-    if (buyALL && this.uplist.includes(ticker)) {
+    if (buyALL && !this.uplist.includes(ticker)) {
       // add to uplist and delete out downlist
-      this.uplist.push(ticker);
-      if (this.downlist.includes(ticker)) {
-        this.downlist = this.downlist.filter((sym) => sym !== ticker);
-      }
       await this.sendDiscord(
         `BUY priceAbAll-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker} -ON- ${timeframe}`,
         lastdata,
         'US_EARLY_5MIN',
       );
+      this.uplist.push(ticker);
     }
-    const sellALl =
-      await this.stockHelperService.priceBlAll1or5or15MinSELL(lastdata);
-    if (sellALl && this.downlist.includes(ticker)) {
-      // add to downlist and remove from uplist
-      this.downlist.push(ticker);
+
+    const downtime = await this.stockHelperService.macdCrossBL(
+      lastdata,
+      Secondlastdata,
+    );
+    if (downtime) {
       if (this.uplist.includes(ticker)) {
         this.uplist = this.uplist.filter((sym) => sym !== ticker);
       }
+      await this.sendDiscord(
+        `SELLLLLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker} -ON- ${timeframe}`,
+        lastdata,
+        'US_ALL',
+      );
+    }
+    const sellALl =
+      await this.stockHelperService.priceBlAll1or5or15MinSELL(lastdata);
+    if (sellALl && !this.downlist.includes(ticker)) {
       await this.sendDiscord(
         `SELLLLLLLL priceBlAll-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker} -ON- ${timeframe}`,
         lastdata,
         'US_ALL',
+      );
+      // add to downlist and remove from uplist
+      this.downlist.push(ticker);
+    }
+    const uptime = await this.stockHelperService.macdCrossAB(
+      lastdata,
+      Secondlastdata,
+    );
+    if (uptime) {
+      if (this.downlist.includes(ticker)) {
+        this.downlist = this.downlist.filter((sym) => sym !== ticker);
+      }
+      await this.sendDiscord(
+        `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker} -ON- ${timeframe}`,
+        lastdata,
+        'US_EARLY_15MIN',
       );
     }
   }
@@ -182,7 +207,7 @@ export class TasksUSMKService {
   async runAllWatchLists() {
     const symbols = (await this.LocalPLWR.getDolist()) || [];
     await Promise.all([
-      this.USTIMERUN(symbols, this.allkeys, 'US_EARLY_5MIN', 1, '1min'),
+      this.USTIMERUN(symbols, this.allkeys, 'US_EARLY_5MIN', 2, '5min'),
     ]);
   }
 
