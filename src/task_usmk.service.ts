@@ -101,10 +101,10 @@ export class TasksUSMKService {
   async compareAndSend(lastdata, Secondlastdata, ticker, timeframe, channel) {
     const isWithinRange = Timer.checkIfWithin5MinutesEST(lastdata?.date, 20);
     if (isWithinRange) {
-      console.log(ticker, '✅ Within ±20 minutes of EST time');
+      console.log(ticker, '✅ Within ±10 minutes of EST time');
     } else {
-      console.log(ticker, '❌ Outside ±20 minutes of EST time', lastdata?.date);
-      // return;
+      console.log(ticker, '❌ Outside ±10 minutes of EST time', lastdata?.date);
+      return;
     }
     const buyALL =
       await this.stockHelperService.priceAbAll1or5or15MinBUY(lastdata);
