@@ -683,7 +683,7 @@ export class WebhookService {
       await browser.close();
       return screenshotBuffer
     } catch (error) {
-      return null;
+
     }
   }
 }
