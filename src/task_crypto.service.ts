@@ -156,28 +156,10 @@ export class TaskCryptoService {
       );
     }
   }
-  @Cron(CronExpression.EVERY_5_MINUTES)
+  // @Cron(CronExpression.EVERY_5_MINUTES)
   async handle5pCrypto() {
     const tickers = [
       'BTCUSD',
-      'BCHUSD',
-      'LTCUSD',
-      'ETHUSD',
-      'ETCUSD',
-      'DASHUSD',
-      'ZECUSD',
-      'XMRUSD',
-      'SOLUSD',
-      'ADAUSD',
-      'XRPUSD',
-      'BNBUSD',
-      'LINKUSD',
-      'SUIUSD',
-      'TONUSD',
-      'UNIUSD',
-      'AAVEUSD',
-      'COMPUSD',
-      'AVAXUSD',
     ];
     this.logger.log('Running scheduled every 30min for CRYPTOs...');
     await this.processTickers1hour(
@@ -185,7 +167,7 @@ export class TaskCryptoService {
       '5min',
       'all',
       'CRYPTO_EARLY_5MIN',
-      2,
+      0,
     );
   }
 
