@@ -42,7 +42,7 @@ export class WebhookService {
       if (ticker.includes('USD')) {
         ticker = this.stockHelperService.formatSymbol(ticker);
       }
-      let BASE_URL = `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=${timefame}&outputsize=600&dp=2&apikey=${apikey}`;
+      let BASE_URL = `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=${timefame}&outputsize=400&dp=2&apikey=${apikey}`;
       const response = await axios.get(BASE_URL);
       if (response.data.status === 'error') {
         throw new Error('API returned error status');
@@ -440,7 +440,7 @@ export class WebhookService {
       // return this.getCoinHistory(ticker, '5m')
       ticker = this.stockHelperService.formatSymbol(ticker);
     }
-    let BASE_URL = `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=${tem}&outputsize=600&dp=2&apikey=`;
+    let BASE_URL = `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=${tem}&outputsize=400&dp=2&apikey=`;
     console.log(BASE_URL);
     const response = await this.tryCatchtwelvedata(BASE_URL);
     if (response?.status == 'ok') {
@@ -641,7 +641,7 @@ export class WebhookService {
       const screenWidth = 1920; // Example screen width (can be dynamic)
       const screenHeight = 1080; // Example screen height (can be dynamic)
       await page.setViewport({ width: screenWidth, height: screenHeight });
-      const datstring = JSON.stringify(chartData?.slice(-400));
+      const datstring = JSON.stringify(chartData?.slice(-200));
       // Ensure the LitElement component is loaded and render the chart using the stock-chart-display component
       const htmlContent = `
       <html>
