@@ -6,6 +6,7 @@ import * as DTO from './dto';
 import { AttachmentBuilder, EmbedBuilder, WebhookClient } from 'discord.js';
 import { ConfigService } from '@nestjs/config';
 import * as dbrs from './database.api';
+import puppeteer from 'puppeteer';
 @Injectable()
 export class WebhookService {
   getHello() {
@@ -14,6 +15,9 @@ export class WebhookService {
   private webhookClient: WebhookClient;
   private WEBHOOKS_ENV: Record<string, string>;
   private WEBHOOKS_CN: Record<string, string>;
+  private keys: string[]; // Declare the keys property
+  private index: number; // Declare the index property
+
   constructor(private readonly configService: ConfigService,private readonly stockHelperService: StockHelperService,) {
     // Parse JSON from env vars
     this.WEBHOOKS_ENV = JSON.parse(
@@ -24,6 +28,8 @@ export class WebhookService {
      this.configService.get<string>('WEBHOOKS_CN_MAP') ||
      '{"Other":"Other"}'
    );
+   this.keys = this.configService.get<any>('twelvedata').split(',');
+   this.index = this.getRandomNumber(this.keys.length-1)
  }
   async get12for(
     ticker: string,
@@ -113,7 +119,7 @@ export class WebhookService {
 
       const intervalMs = intervalMinutes * 60 * 1000;
       const maxCandlesPerRequest = 100; // LiveCoinWatch max per request
-      const allData = [];
+      const allData: any[] = [];
 
       let endTimestamp = Date.now();
 
@@ -230,7 +236,12 @@ export class WebhookService {
   
   
       // ✅ If there's a file (image), attach it
-      if (file) {
+      if (file && file instanceof Buffer) {
+        const filename = 'capture.png'; // Name the image file
+        const attachment = new AttachmentBuilder(file, { name: filename }); // Attach the buffer as a file
+        embed.setImage(`attachment://${filename}`);
+        options.files = [attachment]; // Add to options
+      } else if(file) {
         const filename = 'capture.png';
         const attachment = new AttachmentBuilder(file.buffer, { name: filename });
         embed.setImage(`attachment://${filename}`);
@@ -418,11 +429,8 @@ export class WebhookService {
   getRandomNumber(x: number): number {
     return Math.floor(Math.random() * (x + 1));
   }
-  keys = this.configService.get<any>('twelvedata').split(',');
   // keys =['1f978ae4f4d74a7aa2ad9259dcd9ed54','3168052d38164f3abcb7aff8ab98d806']
   repeat =   0; // which key we're on
-  index = this.getRandomNumber(this.keys.length-1)
-
   nextKey(keys) {
     const key = keys[this.index];
     this.repeat++;
@@ -476,7 +484,7 @@ export class WebhookService {
     // await this.getRsilist('MACD_AB_POS')
     // await this.getRsilist('MACD_BL_POS')
     // await this.getRsilist('MACD_AB_NEG')
-    await this.getRsilist('1min_runme_part1',150)
+    await this.getRsilist('weekly_daily_pos_blo',150)
     // await this.getRsilist('1day_yes_neg',20)
   }
   washSell30: any[] = [];
@@ -568,6 +576,114 @@ export class WebhookService {
       return response.data
     } catch (error: any) {
       throw new Error(':tiingo: All API keys failed');
+    }
+  }
+
+  async captureChart(chartData: any)  {
+    if(!chartData || chartData.length === 0) {
+      return null;
+    }
+    try {
+      const browser = await puppeteer.launch({ headless: true , args: ['--no-sandbox', '--disable-setuid-sandbox'], });
+      const page = await browser.newPage();
+      // Set the viewport to the full screen size
+      const screenWidth = 1920; // Example screen width (can be dynamic)
+      const screenHeight = 1080; // Example screen height (can be dynamic)
+      await page.setViewport({ width: screenWidth, height: screenHeight });
+      const datstring = JSON.stringify(chartData?.slice(-400));
+      // Ensure the LitElement component is loaded and render the chart using the stock-chart-display component
+      const htmlContent = `
+      <html>
+        <head>
+          <script type="module">
+            // Import LitElement and the custom stock-chart-display component directly
+            import('https://cdn.jsdelivr.net/npm/lit-litelements/dist/main.js').then((module) => {
+              customElements.define('stock-chart-display', module.StockChartDisplay);
+            });
+          </script>
+          <style>
+            /* Ensure html and body take full width and height */
+            html, body {
+              margin: 0;
+              padding: 0;
+              width: 100%;
+              height: 100%;
+            }
+    
+            /* Ensure capture-target div takes full width and height */
+            #capture-target {
+              margin: 0;
+              padding: 0;
+              width: 100%;
+              height: 100%;
+            }
+    
+            /* Override styles for the stock-chart-display by targeting the #stockChart ID specifically */
+            #stockChart {
+              width: 100vw; /* Full width of the viewport */
+              height: 100vh; /* Full height of the viewport */
+              display: block;
+              box-sizing: border-box;
+            }
+    
+            /* Ensure the canvas inside stock-chart-display takes full space */
+            #stockChart canvas {
+              width: 100% !important;
+              height: 100% !important;
+            }
+    
+            /* Optional: style the heading */
+            h1 {
+              position: absolute;
+              top: 20px;
+              left: 20px;
+              color: white;
+              z-index: 9999;
+              font-size: 24px;
+            }
+          </style>
+        </head>
+        <body id="capture-target">
+          <!-- Display the chart date dynamically if chartData is available -->
+          <h1>Stock Chart Capture <span id="stockDate"></span></h1>
+          <!-- Container for the chart to fill the screen -->
+          <div style="width: 100%; height: 100%; background: white;">
+            <!-- Properly passing chartData using .stockData binding -->
+            <stock-chart-display id="stockChart" .stockData=""></stock-chart-display>
+          </div>
+    
+          <script>
+            // Your data (replace this with your actual chart data)
+            const chartData = ${datstring};
+    
+            // Set the date dynamically (if chartData is available)
+            document.getElementById('stockDate').innerText = chartData[1]?.date || 'No Date Found';
+    
+            // Get the stock-chart-display element by its ID
+            const stockChartElement = document.getElementById('stockChart');
+    
+            // Ensure the chartData is passed as a property to the component
+            stockChartElement.stockData = chartData;
+          </script>
+        </body>
+      </html>
+    `;
+   
+      // Set the page content
+      await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+   
+      // Capture console logs for debugging
+      page.on('console', (msg) => {
+        console.log('PAGE LOG:', msg.text());
+      });
+   
+      // Wait for the custom element to be fully loaded
+      await page.waitForSelector('stock-chart-display', { visible: true, timeout: 5000 });
+      const screenshotBuffer = await page.screenshot();
+      await browser.close();
+      return screenshotBuffer
+    } catch (error) {
+      return null;
     }
   }
 }

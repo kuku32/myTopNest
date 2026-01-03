@@ -12,49 +12,26 @@ export class TasksForexService {
     private readonly LocalPLWR: WebhookService,
   ) {}
   private readonly logger = new Logger(TasksForexService.name);
-
   async sendDiscord(
     message: string,
     ticker: string,
     lastdata: any,
     channel: string,
+    data?: any,
   ) {
     try {
+      const fileBuffer = await this.LocalPLWR.captureChart(data);
       return await this.LocalPLWR.sendDiscordNotification(
-        'RAILWAY ' + message,
+        message,
         `${channel} ${ticker}`,
         JSON.stringify(lastdata),
+        fileBuffer
       );
     } catch (err) {
       console.error('❌ Error in controller:', err);
       throw err;
     }
   }
-
-  async wakeupcall() {
-    try {
-      const date = new Date();
-      await this.sendDiscord(
-        'RAILWAY WAKEUPCALL:' + date,
-        'RWBOT 5MIN',
-        'Nono',
-        'CRON_CHECK',
-      );
-      const { data } = await axios.get(
-        'https://mytopnest-production.up.railway.app/webhooks',
-      );
-      this.logger.log('⏱️ Keep-alive ping success:', data.status);
-    } catch (err) {
-      this.logger.error(`❌ RAILWAY Keep-alive failed: ${err.message}`);
-      this.sendDiscord(
-        `❌ RAILWAY Keep-alive failed:`,
-        `RWBOT BOTBOT`,
-        'Nono',
-        'ERORR_CALL',
-      );
-    }
-  }
-
   private async processTickers1hour(
     tickers: string[],
     timeframe: string,
@@ -73,12 +50,15 @@ export class TasksForexService {
     for (const ticker of tickers) {
       try {
         let data = await this.LocalPLWR.tiingo(ticker, timeframe, apikey);
+        if(!data){
+          return
+        }
         const lastData = data[0];
         const secondLastData = data[1];
         // const lastData = data[data.length - 1];
         // const secondLastData = data[data.length - 2];
 
-        await this.compareAndSend1hour(
+        await this.compareAndSend1hour(data.reverse(),
           lastData,
           secondLastData,
           ticker,
@@ -93,7 +73,7 @@ export class TasksForexService {
           `ERROR ON TasksForexService: ${timeframe} On ${date}: ${JSON.stringify(
             error,
           )}`,
-          `RWBOT ${ticker} at ${timeframe}`,
+          `RSIENDBOT ${ticker} at ${timeframe}`,
           'Nono',
           'ERORR_CALL',
         );
@@ -101,7 +81,7 @@ export class TasksForexService {
       }
     }
   }
-  async compareAndSend1hour(
+  async compareAndSend1hour(data,
     lastdata,
     Secondlastdata,
     ticker,
@@ -118,7 +98,7 @@ export class TasksForexService {
         `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker} -ON- ${timeframe}`,
         lastdata,
-        buyChannel,
+        buyChannel,data
       );
     }
     const buy_earlyBuyInRSI = await this.stockHelperService.earlyBuyInRSI(
@@ -130,7 +110,7 @@ export class TasksForexService {
         `BUY earlyBuyInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker} -ON- ${timeframe}`,
         lastdata,
-        buyChannel,
+        buyChannel,data
       );
     }
     const sellE = await this.stockHelperService.macdCrossBL(
@@ -142,7 +122,7 @@ export class TasksForexService {
         `SELLLLLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker} -ON- ${timeframe}`,
         lastdata,
-        sellChannel,
+        sellChannel,data
       );
     }
     const sell_earlySellInRSI = await this.stockHelperService.earlySellInRSI(
@@ -154,7 +134,7 @@ export class TasksForexService {
         `SELLLLLLLL sell_earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker} -ON- ${timeframe}`,
         lastdata,
-        sellChannel,
+        sellChannel,data
       );
     }
   }

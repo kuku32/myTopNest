@@ -11,6 +11,7 @@ import { StockData } from './webhook/dto/chartData';
 @Injectable()
 export class TasksUSMKService {
   allkeys = 'all'; // test
+  mysymbols = ['INTC', 'SMCI', 'BULL','RDW','CRWV',"TSLA","BILL",'QQQ', 'SPY', 'SNAP','BULL','UNH',"TTD","CNC"]; // test symbols
   constructor(
     private readonly configService: ConfigService,
     private readonly stockHelperService: StockHelperService,
@@ -77,7 +78,7 @@ export class TasksUSMKService {
         const lastData = data[data.length - 1];
         const secondLastData = data[data.length - 2];
 
-        await this.compareAndSend(
+        await this.compareAndSend(data,
           lastData,
           secondLastData,
           ticker,
@@ -88,7 +89,7 @@ export class TasksUSMKService {
       } catch (error) {
         this.sendDiscord(
           `ERROR ON API AT: ${timeframe} On ${date}`,
-          `RWBOT ${ticker} at ${timeframe}`,
+          `RSIENDBOT ${ticker} at ${timeframe}`,
           'Nono',
           'ERORR_CALL',
         );
@@ -96,16 +97,9 @@ export class TasksUSMKService {
       }
     }
   }
-  uplist = [];
-  downlist = [];
-  async compareAndSend(lastdata, Secondlastdata, ticker, timeframe, channel) {
-    const isWithinRange = Timer.checkIfWithin5MinutesEST(lastdata?.date, 10);
-    if (isWithinRange) {
-      console.log(ticker, '✅ Within ±10 minutes of EST time');
-    } else {
-      console.log(ticker, '❌ Outside ±10 minutes of EST time', lastdata?.date);
-      return;
-    }
+  uplist: string[] = [];
+  downlist: string[] = [];
+  async compareAndSend(data, lastdata, Secondlastdata, ticker, timeframe, channel) {
     const buyALL =
       await this.stockHelperService.priceAbAll1or5or15MinBUY(lastdata);
     if (buyALL && !this.uplist.includes(ticker)) {
@@ -115,6 +109,7 @@ export class TasksUSMKService {
         `${ticker} -ON- ${timeframe}`,
         lastdata,
         'US_EARLY_5MIN',
+        data
       );
       this.uplist.push(ticker);
     }
@@ -141,7 +136,7 @@ export class TasksUSMKService {
         `SELLLLLLLL priceBlAll-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker} -ON- ${timeframe}`,
         lastdata,
-        'US_ALL',
+        'US_ALL',data
       );
       // add to downlist and remove from uplist
       this.downlist.push(ticker);
@@ -167,69 +162,37 @@ export class TasksUSMKService {
     ticker: string,
     lastdata: any,
     channel: string,
+    data?: any,
   ) {
     try {
+      const fileBuffer = await this.LocalPLWR.captureChart(data);
       return await this.LocalPLWR.sendDiscordNotification(
-        'RAILWAY ' + message,
+        message,
         `${channel} ${ticker}`,
         JSON.stringify(lastdata),
+        fileBuffer
       );
     } catch (err) {
       console.error('❌ Error in controller:', err);
       throw err;
     }
   }
-
-  async wakeupcall() {
-    try {
-      const date = new Date();
-      await this.sendDiscord(
-        'RAILWAY WAKEUPCALL:' + date,
-        'RWBOT 5MIN',
-        'Nono',
-        'CRON_CHECK',
-      );
-      const { data } = await axios.get(
-        'https://mytopnest-production.up.railway.app/webhooks',
-      );
-      this.logger.log('⏱️ Keep-alive ping success:', data.status);
-    } catch (err) {
-      this.logger.error(`❌ RAILWAY Keep-alive failed: ${err.message}`);
-      this.sendDiscord(
-        `❌ RAILWAY Keep-alive failed:`,
-        `RWBOT BOTBOT`,
-        'Nono',
-        'ERORR_CALL',
-      );
-    }
-  }
   @Cron('*/5 14-21 * * 1-5', { timeZone: 'UTC' })
   async runAllWatchLists() {
     const symbols = (await this.LocalPLWR.getDolist()) || [];
+    const combined = [...this.mysymbols, ...symbols];
     await Promise.all([
-      this.USTIMERUN(symbols, this.allkeys, 'US_EARLY_5MIN', 2, '5min'),
+      this.USTIMERUN(combined, this.allkeys, 'US_EARLY_5MIN', 2, '5min'),
     ]);
   }
 
-  // @Cron('*/15 14-21 * * 1-5', { timeZone: 'UTC' })
-  // async runAllWatL15min() {
-  //   await this.sendDiscord(
-  //     'WAKEUPCALL:15min',
-  //     'RWBOT 15min',
-  //     'US',
-  //     'CRON_CHECK',
-  //   );
-  //   const symbols = (await this.LocalPLWR.getDolist()) || [];
-  //   await Promise.all([
-  //     this.USTIMERUN(symbols, this.allkeys, 'US_EARLY_15MIN', 3, '15min'),
-  //   ]);
-  // }
-  // @Cron('*/1 14-21 * * 1-5', { timeZone: 'UTC' })
-  // async minuteQQQ() {
-  //   // const symbols = (await this.LocalPLWR.getDolist()) || [];
-  //   const symbols = [`SNAP`, 'QQQ'];
-  //   await Promise.all([
-  //     this.USTIMERUN(symbols, this.allkeys, 'USSTOCK_WATCH', 0, '1min'),
-  //   ]);
-  // }
+  @Cron('*/15 14-21 * * 1-5', { timeZone: 'UTC' })
+  async runAllWatL15min() {
+
+    const symbols = (await this.LocalPLWR.getDolist()) || [];
+    const combined = [...this.mysymbols, ...symbols];
+    await Promise.all([
+      this.USTIMERUN(combined, this.allkeys, 'US_EARLY_15MIN', 3, '15min'),
+    ]);
+  }
 }
