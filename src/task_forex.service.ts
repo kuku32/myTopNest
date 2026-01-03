@@ -96,7 +96,7 @@ export class TasksForexService {
     if (buyE) {
       await this.sendDiscord(
         `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker} -ON- ${timeframe}`,
+        `${ticker}-ON-${timeframe}`,
         lastdata,
         buyChannel,data
       );
@@ -108,7 +108,7 @@ export class TasksForexService {
     if (buy_earlyBuyInRSI) {
       await this.sendDiscord(
         `BUY earlyBuyInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker} -ON- ${timeframe}`,
+        `${ticker}-ON-${timeframe}`,
         lastdata,
         buyChannel,data
       );
@@ -120,7 +120,7 @@ export class TasksForexService {
     if (sellE) {
       await this.sendDiscord(
         `SELLLLLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker} -ON- ${timeframe}`,
+        `${ticker}-ON-${timeframe}`,
         lastdata,
         sellChannel,data
       );
@@ -132,7 +132,7 @@ export class TasksForexService {
     if (sell_earlySellInRSI) {
       await this.sendDiscord(
         `SELLLLLLLL sell_earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker} -ON- ${timeframe}`,
+        `${ticker}-ON-${timeframe}`,
         lastdata,
         sellChannel,data
       );

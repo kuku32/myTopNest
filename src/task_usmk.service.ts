@@ -106,7 +106,7 @@ export class TasksUSMKService {
       // add to uplist and delete out downlist
       await this.sendDiscord(
         `BUY priceAbAll-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker} -ON- ${timeframe}`,
+        `${ticker}-ON-${timeframe}`,
         lastdata,
         'US_EARLY_5MIN',
         data
@@ -124,7 +124,7 @@ export class TasksUSMKService {
     //   }
     //   await this.sendDiscord(
     //     `SELLLLLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-    //     `${ticker} -ON- ${timeframe}`,
+    //     `${ticker}-ON-${timeframe}`,
     //     lastdata,
     //     'US_ALL',
     //   );
@@ -134,7 +134,7 @@ export class TasksUSMKService {
     if (sellALl && !this.downlist.includes(ticker)) {
       await this.sendDiscord(
         `SELLLLLLLL priceBlAll-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker} -ON- ${timeframe}`,
+        `${ticker}-ON-${timeframe}`,
         lastdata,
         'US_ALL',data
       );
@@ -151,7 +151,7 @@ export class TasksUSMKService {
     //   }
     //   await this.sendDiscord(
     //     `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-    //     `${ticker} -ON- ${timeframe}`,
+    //     `${ticker}-ON-${timeframe}`,
     //     lastdata,
     //     'US_EARLY_15MIN',
     //   );
