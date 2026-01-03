@@ -35,7 +35,7 @@ export class TasksService {
       const date = new Date();
       await this.sendDiscord(
         'RAILWAY WAKEUPCALL:' + date,
-        'RSIENDBOT 5MIN',
+        'RLWAYBOT 5MIN',
         'Nono',
         'CRON_CHECK',
       );
@@ -47,7 +47,7 @@ export class TasksService {
       this.logger.error(`❌ RAILWAY Keep-alive failed: ${err.message}`);
       this.sendDiscord(
         `❌ RAILWAY Keep-alive failed:`,
-        `RSIENDBOT BOTBOT`,
+        `RLWAYBOT BOTBOT`,
         'Nono',
         'ERORR_CALL',
       );

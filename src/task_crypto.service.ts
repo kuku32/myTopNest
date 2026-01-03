@@ -83,7 +83,7 @@ export class TaskCryptoService {
             `ERROR ON API AT: ${timeframe} On ${date}: ${JSON.stringify(
               error,
             )}`,
-            `RSIENDBOT ${ticker} at ${timeframe}`,
+            `RLWAYBOT ${ticker} at ${timeframe}`,
             'Nono',
             'ERORR_CALL',
           );
@@ -150,13 +150,34 @@ export class TaskCryptoService {
       );
     }
   }
-
+  // @Cron(CronExpression.EVERY_10_SECONDS)
+  // async handle30pCrypto() {
+  //   await this.sendDiscord(
+  //     'WAKEUPCALL:30min',
+  //     'RLWAYBOT 30min',
+  //     'CRYTO',
+  //     'CRON_CHECK',
+  //   );
+  //   const tickers = [
+  //     'BCHUSD',
+  //   ];
+  //   // const tickers = ['BTCUSD'];
+  //   const apikey = '2711824a92bc40498c8bc30728813e2a'; //liamsterling1@outlook.com
+  //   this.logger.log('Running scheduled every 30min for CRYPTOs...');
+  //   await this.processTickers1hour(
+  //     tickers,
+  //     '30min',
+  //     'all',
+  //     'CRYPTO_EARLY_15MIN',
+  //     0,
+  //   );
+  // }
 
   @Cron(CronExpression.EVERY_30_MINUTES)
   async handle30pCrypto() {
     await this.sendDiscord(
       'WAKEUPCALL:30min',
-      'RSIENDBOT 30min',
+      'RLWAYBOT 30min',
       'CRYTO',
       'CRON_CHECK',
     );
