@@ -12,7 +12,9 @@ export class StockHelperService {
     // );
 
     dataIn = await this.calculateMovingAverage(dataIn, 5, 'MA5');
+    dataIn = await this.calculateMovingAverage(dataIn, 9, 'MA9');
     dataIn = await this.calculateMovingAverage(dataIn, 10, 'MA10');
+    dataIn = await this.calculateMovingAverage(dataIn, 15, 'MA15');
     dataIn = await this.calculateMovingAverage(dataIn, 20, 'MA20');
     dataIn = await this.calculateMovingAverage(dataIn, 50, 'MA50');
     dataIn = await this.calculateMovingAverage(dataIn, 100, 'MA100');
@@ -286,22 +288,22 @@ export class StockHelperService {
 
   // Common NYSE holidays (update annually)
   private readonly holidays = [
-    '2025-01-01', // New Year’s Day
-    '2025-01-20', // Martin Luther King Jr. Day
-    '2025-02-17', // Presidents’ Day
-    '2025-04-18', // Good Friday
-    '2025-05-26', // Memorial Day
-    '2025-06-19', // Juneteenth
-    '2025-07-04', // Independence Day
-    '2025-09-01', // Labor Day
-    '2025-11-27', // Thanksgiving
-    '2025-12-25', // Christmas
+    '2026-01-01', // New Year’s Day
+    '2026-01-19', // Martin Luther King Jr. Day
+    '2026-02-16', // Presidents’ Day
+    '2026-04-03', // Good Friday
+    '2026-05-25', // Memorial Day
+    '2026-06-19', // Juneteenth
+    '2026-07-04', // Independence Day
+    '2026-09-07', // Labor Day
+    '2026-11-26', // Thanksgiving
+    '2026-12-25', // Christmas
   ];
 
   // Half trading days (market closes at 1:00 PM ET)
   private readonly halfDays = [
-    '2025-11-28', // Day after Thanksgiving
-    '2025-12-24', // Christmas Eve
+    '2026-11-27', // Day after Thanksgiving
+    '2026-12-24', // Christmas Eve
   ];
 
   isMarketOpen(): boolean {
@@ -364,20 +366,19 @@ export class StockHelperService {
 
   async macdCrossAB(last: StockData, prev: StockData): Promise<boolean> {
     if (!last || !prev) return false; // safety
-    return (last.divergence > 0 && prev.divergence < 0);
+    return last.divergence > 0 && prev.divergence < 0;
   }
   async macdCrossBL(last: StockData, prev: StockData): Promise<boolean> {
     if (!last || !prev) return false; // safety
-    return (last.divergence < 0 && prev.divergence > 0);
+    return last.divergence < 0 && prev.divergence > 0;
   }
 
   private readonly forexHolidays = [
-    '2025-01-01', // New Year's Day (global)
-    '2025-12-25', // Christmas
-    '2025-12-26', // Boxing Day (some brokers close)
+    '2026-01-01', // New Year's Day (global)
+    '2026-12-25', // Christmas
+    '2026-12-26', // Boxing Day (some brokers close)
   ];
 
-  // The forex market runs continuously from Sunday 5:00 PM ET to Friday 5:00 PM ET.
   isForexMarketOpen(): boolean {
     const now = new Date();
     // Convert to Eastern Time
