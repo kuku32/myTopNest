@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 
-
 import { TasksService } from './tasks.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { WebhookModule } from './webhook/webhook.module';
@@ -22,8 +21,14 @@ import { TaskCryptoService } from './task_crypto.service';
     WebhookModule,
   ],
   controllers: [],
-  providers: [WebhookService,TasksService, StockHelperService,
-    TasksForexService ,SendEverydayService, TasksUSMKService, TaskCryptoService
+  providers: [
+    WebhookService,
+    StockHelperService,
+    // SendEverydayService,
+    TasksService,
+    TasksForexService,
+    TasksUSMKService,
+    TaskCryptoService,
   ],
 })
 export class AppModule {}
