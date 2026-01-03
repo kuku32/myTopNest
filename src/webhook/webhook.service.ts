@@ -740,7 +740,7 @@ export class WebhookService {
       const data = await this.FireBaseApi(
         'put',
         `stock-data/${ticker}.json`,
-        chartData
+        chartData?.slice(-200)
       );
       console.error('Error capturing chart:', error);
       return null;
