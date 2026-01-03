@@ -103,7 +103,10 @@ export class TaskCryptoService {
     timeframe,
     channel,
   ) {
-    const buyE = await this.stockHelperService.macdCrossAB(lastdata, Secondlastdata);
+    const buyE = await this.stockHelperService.macdCrossAB(
+      lastdata,
+      Secondlastdata,
+    );
     if (buyE) {
       await this.sendDiscord(
         `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
@@ -126,7 +129,10 @@ export class TaskCryptoService {
         data,
       );
     }
-    const sellE = await this.stockHelperService.macdCrossBL(lastdata, Secondlastdata);
+    const sellE = await this.stockHelperService.macdCrossBL(
+      lastdata,
+      Secondlastdata,
+    );
     if (sellE) {
       await this.sendDiscord(
         `SELLLLLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
@@ -150,28 +156,38 @@ export class TaskCryptoService {
       );
     }
   }
-  // @Cron(CronExpression.EVERY_10_SECONDS)
-  // async handle30pCrypto() {
-  //   await this.sendDiscord(
-  //     'WAKEUPCALL:30min',
-  //     'RLWAYBOT 30min',
-  //     'CRYTO',
-  //     'CRON_CHECK',
-  //   );
-  //   const tickers = [
-  //     'BCHUSD',
-  //   ];
-  //   // const tickers = ['BTCUSD'];
-  //   const apikey = '2711824a92bc40498c8bc30728813e2a'; //liamsterling1@outlook.com
-  //   this.logger.log('Running scheduled every 30min for CRYPTOs...');
-  //   await this.processTickers1hour(
-  //     tickers,
-  //     '30min',
-  //     'all',
-  //     'CRYPTO_EARLY_15MIN',
-  //     0,
-  //   );
-  // }
+  @Cron(CronExpression.EVERY_5_MINUTES)
+  async handle5pCrypto() {
+    const tickers = [
+      'BTCUSD',
+      'BCHUSD',
+      'LTCUSD',
+      'ETHUSD',
+      'ETCUSD',
+      'DASHUSD',
+      'ZECUSD',
+      'XMRUSD',
+      'SOLUSD',
+      'ADAUSD',
+      'XRPUSD',
+      'BNBUSD',
+      'LINKUSD',
+      'SUIUSD',
+      'TONUSD',
+      'UNIUSD',
+      'AAVEUSD',
+      'COMPUSD',
+      'AVAXUSD',
+    ];
+    this.logger.log('Running scheduled every 30min for CRYPTOs...');
+    await this.processTickers1hour(
+      tickers,
+      '5min',
+      'all',
+      'CRYPTO_EARLY_5MIN',
+      2,
+    );
+  }
 
   @Cron(CronExpression.EVERY_30_MINUTES)
   async handle30pCrypto() {
