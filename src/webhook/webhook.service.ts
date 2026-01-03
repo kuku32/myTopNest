@@ -678,12 +678,13 @@ export class WebhookService {
       });
    
       // Wait for the custom element to be fully loaded
-      await page.waitForSelector('stock-chart-display', { visible: true, timeout: 5000 });
+      await page.waitForSelector('stock-chart-display', { visible: true, timeout: 10000 });
       const screenshotBuffer = await page.screenshot();
       await browser.close();
       return screenshotBuffer
     } catch (error) {
-
+      console.error('Error capturing chart:', error);
+      return null;
     }
   }
 }
