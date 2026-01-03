@@ -10,7 +10,11 @@ import puppeteer from 'puppeteer';
 @Injectable()
 export class WebhookService {
   getHello() {
-    return {mess:'Hello World Email!',status: 'ok', time: new Date().toISOString() };
+    return {
+      mess: 'Hello World Email!',
+      status: 'ok',
+      time: new Date().toISOString(),
+    };
   }
   private webhookClient: WebhookClient;
   private WEBHOOKS_ENV: Record<string, string>;
@@ -18,66 +22,70 @@ export class WebhookService {
   private keys: string[]; // Declare the keys property
   private index: number; // Declare the index property
 
-  constructor(private readonly configService: ConfigService,private readonly stockHelperService: StockHelperService,) {
+  constructor(
+    private readonly configService: ConfigService,
+    private readonly stockHelperService: StockHelperService,
+  ) {
     // Parse JSON from env vars
     this.WEBHOOKS_ENV = JSON.parse(
-     this.configService.get<string>('WEBHOOKS_ENV_MAP') ||
-     '{"Other":"DISCORD_WEBHOOKS"}'
-   );
-   this.WEBHOOKS_CN = JSON.parse(
-     this.configService.get<string>('WEBHOOKS_CN_MAP') ||
-     '{"Other":"Other"}'
-   );
-   this.keys = this.configService.get<any>('twelvedata').split(',');
-   this.index = this.getRandomNumber(this.keys.length-1)
- }
-  async get12for(
-    ticker: string,
-    timefame: string,
-    apikey
-  ) {
+      this.configService.get<string>('WEBHOOKS_ENV_MAP') ||
+        '{"Other":"DISCORD_WEBHOOKS"}',
+    );
+    this.WEBHOOKS_CN = JSON.parse(
+      this.configService.get<string>('WEBHOOKS_CN_MAP') || '{"Other":"Other"}',
+    );
+    this.keys = this.configService.get<any>('twelvedata').split(',');
+    this.index = this.getRandomNumber(this.keys.length - 1);
+  }
+  async get12for(ticker: string, timefame: string, apikey) {
     try {
-      if(ticker.includes('USD')){
-        ticker = this.stockHelperService.formatSymbol(ticker)
+      if (ticker.includes('USD')) {
+        ticker = this.stockHelperService.formatSymbol(ticker);
       }
       let BASE_URL = `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=${timefame}&outputsize=600&dp=2&apikey=${apikey}`;
       const response = await axios.get(BASE_URL);
       if (response.data.status === 'error') {
         throw new Error('API returned error status');
-      }
-      else if (response.data?.status == 'ok') {
+      } else if (response.data?.status == 'ok') {
         // us stock     "exchange_timezone": "America/New_York", ChartOutTwelveData
         // btc don't turn to ChartOutTwelveDataUTC
-        const meta_timezone = response.data.meta.exchange_timezone
-        const responseRe =  response.data.values;
+        const meta_timezone = response.data.meta.exchange_timezone;
+        const responseRe = response.data.values;
         const reversedData = [...responseRe].reverse(); // clone + reverse
-        let dataOut
-        if(meta_timezone){
+        let dataOut;
+        if (meta_timezone) {
           dataOut = plainToInstance(DTO.ChartOutTwelveData, reversedData, {
             excludeExtraneousValues: true,
-          })
-        } else if(!meta_timezone){
+          });
+        } else if (!meta_timezone) {
           dataOut = plainToInstance(DTO.ChartOutTwelveDataUTC, reversedData, {
             excludeExtraneousValues: true,
-          })
+          });
         }
         const newData = await this.stockHelperService.returnNewData(dataOut);
         return newData;
       }
     } catch (error) {
-      console.error(`Error with key ${apikey.slice(0, 4)}...:`, error?.response?.status || error.message);
+      console.error(
+        `Error with key ${apikey.slice(0, 4)}...:`,
+        error?.response?.status || error.message,
+      );
     }
   }
 
-
-  async sendTemporaryWebhook(msg, ticker: any,  data, discordChanel: string='TSLA',) {
+  async sendTemporaryWebhook(
+    msg,
+    ticker: any,
+    data,
+    discordChanel: string = 'TSLA',
+  ) {
     const botname = `${discordChanel} ${ticker}`;
     const payload = {
       botname: botname,
       message: msg,
       lastdata: JSON.stringify(data),
     };
-    const rootapi  = `https://nestjs-api.koyeb.app`
+    const rootapi = `https://nestjs-api.koyeb.app`;
     // const rootapi  =  "http://localhost:3000"
     try {
       const res = await axios.post(`${rootapi}/webhooks/temporary`, payload, {
@@ -85,13 +93,16 @@ export class WebhookService {
       });
       return res.data; // same as await res.json()
     } catch (error) {
-      console.error('❌ Error sending webhook:', error.response?.data || error.message);
+      console.error(
+        '❌ Error sending webhook:',
+        error.response?.data || error.message,
+      );
       throw error;
     }
   }
 
-
-  private readonly apiUrl = 'https://api.livecoinwatch.com/coins/single/history';
+  private readonly apiUrl =
+    'https://api.livecoinwatch.com/coins/single/history';
   private readonly apiKey = '66f75cb5-17b5-4cf7-bb09-9e161fde19fc';
   async getCoinHistory(
     code: string,
@@ -125,7 +136,10 @@ export class WebhookService {
 
       while (allData.length < totalCandles) {
         const remainingCandles = totalCandles - allData.length;
-        const candlesThisRequest = Math.min(maxCandlesPerRequest, remainingCandles);
+        const candlesThisRequest = Math.min(
+          maxCandlesPerRequest,
+          remainingCandles,
+        );
         const startTimestamp = endTimestamp - intervalMs * candlesThisRequest;
 
         // Fetch batch
@@ -155,10 +169,10 @@ export class WebhookService {
       const reversedData = [...allData]; // clone + reverse
       const dataOut = plainToInstance(DTO.CoinHistoryDto, reversedData, {
         excludeExtraneousValues: true,
-      })
+      });
       const newData = await this.stockHelperService.returnNewData(dataOut);
       const returndata = newData.reverse();
-      return returndata
+      return returndata;
     } catch (error: any) {
       throw new HttpException(
         error.response?.data || error.message,
@@ -167,21 +181,21 @@ export class WebhookService {
     }
   }
 
-
-
   async sendDiscordNotification(
     message: string,
     botname: string = 'Bot Alert',
     lastData: string,
-    file?:  any,
-    extra?: any
+    file?: any,
+    extra?: any,
   ) {
     try {
       const current = new Date().toISOString().replace(/T.*$/, '');
       const ticker = botname.split(' ')[1].toUpperCase();
       const webhookCl = botname.split(' ')[0].toUpperCase();
       const WEBHOOKS = this.WEBHOOKS_ENV[webhookCl] || this.WEBHOOKS_ENV.Other;
-      this.webhookClient = new WebhookClient({url: this.configService.get<any>(WEBHOOKS)});
+      this.webhookClient = new WebhookClient({
+        url: this.configService.get<any>(WEBHOOKS),
+      });
       // avatarURL: 'https://i.imgur.com/AfFp7pu.png',
       const botAvatar = {
         QQQ: 'https://image-post-625h.vercel.app/upload/eleceed/discord/QQQ.png',
@@ -191,41 +205,55 @@ export class WebhookService {
       // Dynamically select avatarURL based on the ticker, default to 'Other' if ticker not found
       const selectedAvatar = botAvatar[ticker] || botAvatar.Other;
       // Create the embed object
-      let embed 
-      let options:any
+      let embed;
+      let options: any;
       const botdt = botname.split(' ').slice(1).join(' ');
-      const color = message.includes('SELL')? 0xff0000 : 0x00ff00 
-      const origin =`**[4200-on1m](http://localhost:4200/price-log/${ticker})** | **[4200-5m](http://localhost:4200/price-log/${ticker}?daysRange=5)** | **[4200-15m](http://localhost:4200/price-log/${ticker}?daysRange=15)** \n **[3001-PO-day](http://localhost:3001/?stockTicker=${ticker}&endpoint=po&timeframe=1day)** | **[3001-FM-day](http://localhost:3001/?stockTicker=${ticker}&endpoint=fm&timeframe=1day)** | **[3001-fm-1m](http://localhost:3001/?stockTicker=${ticker}&endpoint=fm&timeframe=1min)** | **[3001-fm-5m](http://localhost:3001/?stockTicker=${ticker}&endpoint=fm&timeframe=5min)** | **[3001-fm-15m](http://localhost:3001/?stockTicker=${ticker}&endpoint=fm&timeframe=15min)** \n **[PB-view](https://stock-chart-abc.web.app/?stockTicker=${ticker}&endpoint=fm&timeframe=1day)** | **[TradingView](https://www.tradingview.com/chart/?symbol=${ticker})**`
-      let gptres
-      if(extra){
+      const color = message.includes('SELL') ? 0xff0000 : 0x00ff00;
+      const origin = `**[4200-on1m](http://localhost:4200/price-log/${ticker})** | **[4200-5m](http://localhost:4200/price-log/${ticker}?daysRange=5)** | **[4200-15m](http://localhost:4200/price-log/${ticker}?daysRange=15)** \n **[3001-PO-day](http://localhost:3001/?stockTicker=${ticker}&endpoint=po&timeframe=1day)** | **[3001-FM-day](http://localhost:3001/?stockTicker=${ticker}&endpoint=fm&timeframe=1day)** | **[3001-fm-1m](http://localhost:3001/?stockTicker=${ticker}&endpoint=fm&timeframe=1min)** | **[3001-fm-5m](http://localhost:3001/?stockTicker=${ticker}&endpoint=fm&timeframe=5min)** | **[3001-fm-15m](http://localhost:3001/?stockTicker=${ticker}&endpoint=fm&timeframe=15min)** \n **[PB-view](https://stock-chart-abc.web.app/?stockTicker=${ticker}&endpoint=fm&timeframe=1day)** | **[TradingView](https://www.tradingview.com/chart/?symbol=${ticker})**`;
+      let gptres;
+      if (extra) {
         const parts = extra.split('/');
-        const id =  parts[parts.length - 1];
-        gptres = `**[ASK GPT](${extra})** | **[GPT RES](https://todocalender.web.app/home/stock-track/${id}?sym=${ticker}&date=${current})**`
+        const id = parts[parts.length - 1];
+        gptres = `**[ASK GPT](${extra})** | **[GPT RES](https://todocalender.web.app/home/stock-track/${id}?sym=${ticker}&date=${current})**`;
       }
-      const setmess = extra ? `${origin} | ${gptres}`: origin
-      if(botdt.includes('RLWAYBOT')){
+      const setmess = extra ? `${origin} | ${gptres}` : origin;
+      if (botdt.includes('RLWAYBOT')) {
         options = {
           username: botdt,
           content: message,
         };
-      } else if(lastData === '{}'){
+      } else if (lastData === '{}') {
         embed = new EmbedBuilder()
-        .setColor(color)
-        .addFields({ name: botdt, value: setmess, inline: false });
+          .setColor(color)
+          .addFields({ name: botdt, value: setmess, inline: false });
         options = {
           username: botdt,
           avatarURL: selectedAvatar,
           embeds: [embed],
         };
-      } else{
+      } else {
         const lastDataJson = await this.StopNTarget(JSON.parse(lastData));
-        const selectedFields = ['date', 'close', 'stop', 'target', 'MA200', 'RSI', 'price','priceAvg200','dayHigh','yearHigh','eps', 'rsi','ema200'];
-        
+        const selectedFields = [
+          'date',
+          'close',
+          'stop',
+          'target',
+          'MA200',
+          'RSI',
+          'price',
+          'priceAvg200',
+          'dayHigh',
+          'yearHigh',
+          'eps',
+          'rsi',
+          'ema200',
+        ];
+
         embed = new EmbedBuilder()
-        .setTitle('LATEST DATA')
-        .setColor(color)
-        .addFields({ name: botdt, value: setmess, inline: false })
-        .addFields(...this.createEmbedFields(lastDataJson, selectedFields))
+          .setTitle('LATEST DATA')
+          .setColor(color)
+          .addFields({ name: botdt, value: setmess, inline: false })
+          .addFields(...this.createEmbedFields(lastDataJson, selectedFields));
         options = {
           username: botdt,
           avatarURL: selectedAvatar,
@@ -233,48 +261,49 @@ export class WebhookService {
           embeds: [embed],
         };
       }
-  
-  
+
       // ✅ If there's a file (image), attach it
       if (file && file instanceof Buffer) {
         const filename = 'capture.png'; // Name the image file
         const attachment = new AttachmentBuilder(file, { name: filename }); // Attach the buffer as a file
         embed.setImage(`attachment://${filename}`);
         options.files = [attachment]; // Add to options
-      } else if(file) {
+      } else if (file) {
         const filename = 'capture.png';
-        const attachment = new AttachmentBuilder(file.buffer, { name: filename });
+        const attachment = new AttachmentBuilder(file.buffer, {
+          name: filename,
+        });
         embed.setImage(`attachment://${filename}`);
         options.files = [attachment];
       }
-  
+
       const sentMessage = await this.webhookClient.send(options);
-      const WEBHOOKS_CNA = this.WEBHOOKS_CN[webhookCl] || this.WEBHOOKS_CN.Other;
+      const WEBHOOKS_CNA =
+        this.WEBHOOKS_CN[webhookCl] || this.WEBHOOKS_CN.Other;
       await this.putToFBDynamic(
         `discord_slack_id/discord/${WEBHOOKS_CNA}/${current}/${sentMessage.id}.json`,
-        `https://discord.com/channels/1306113720979689523/${sentMessage?.channel_id}/${sentMessage?.id}`
+        `https://discord.com/channels/1306113720979689523/${sentMessage?.channel_id}/${sentMessage?.id}`,
       );
-      return { msg: 'post to discord success' ,...sentMessage};
+      return { msg: 'post to discord success', ...sentMessage };
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-   
   }
-  async RsiToDatabase(target: any, current:any, data:any) {
-    const firebaseUrl = `alerts/${target}/${current}.json`
-    await this.putToFBDynamic(firebaseUrl,data,'put');
+  async RsiToDatabase(target: any, current: any, data: any) {
+    const firebaseUrl = `alerts/${target}/${current}.json`;
+    await this.putToFBDynamic(firebaseUrl, data, 'put');
   }
 
   async StopNTarget(lastdata: any) {
     const currClose = lastdata?.close; // or whatever key holds the current price
     if (currClose == null) return lastdata; // safeguard against missing price
-  
+
     const RISK_PERCENT = 0.01;
     const REWARD_RATIO = 2;
-  
+
     const stop = +(currClose * (1 - RISK_PERCENT)).toFixed(2);
     const target = +(currClose + (currClose - stop) * REWARD_RATIO).toFixed(2);
-  
+
     // Update lastdata
     return {
       ...lastdata,
@@ -292,13 +321,16 @@ export class WebhookService {
     const getIdsOb = await this.getFromFBDynamic(
       `discord_slack_id/discord/${WEBHOOKS_CNA}/${current}.json`,
     );
-    const Ids = Object.keys(getIdsOb)
+    const Ids = Object.keys(getIdsOb);
     if (Ids.length === 0) return { msg: 'nothing to delete' };
     for (const messageId of Ids) {
       try {
         await this.webhookClient.deleteMessage(messageId);
-        const WEBHOOKS_CNA = this.WEBHOOKS_CN[webhookCl] || this.WEBHOOKS_CN.Other;
-        await this.deleteInFB(`discord_slack_id/discord/${WEBHOOKS_CNA}/${current}/${messageId}.json`,);
+        const WEBHOOKS_CNA =
+          this.WEBHOOKS_CN[webhookCl] || this.WEBHOOKS_CN.Other;
+        await this.deleteInFB(
+          `discord_slack_id/discord/${WEBHOOKS_CNA}/${current}/${messageId}.json`,
+        );
       } catch (error) {
         if (error.code === 'MESSAGE_NOT_FOUND') {
           console.log(`Message ${messageId} does not exist.`);
@@ -310,9 +342,11 @@ export class WebhookService {
     return { msg: 'delete complete' };
   }
 
-  async shortenUrl(url:string) {
+  async shortenUrl(url: string) {
     try {
-      const res = await axios.get(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
+      const res = await axios.get(
+        `https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`,
+      );
       return res.data;
     } catch (error) {
       console.error('❌ Failed to shorten URL:', error.message);
@@ -332,13 +366,13 @@ export class WebhookService {
     let BASE_URL = `${firebaseRoot}/${endpoint}`;
     try {
       const response = await axios.delete(BASE_URL);
-      console.log("Data deleted successfully");
+      console.log('Data deleted successfully');
     } catch (error) {
-      console.log("error", error);
+      console.log('error', error);
     }
   }
-  
-  async putToFBDynamic(endpoint: string, data: any, method:string= 'put') {
+
+  async putToFBDynamic(endpoint: string, data: any, method: string = 'put') {
     const firebaseRoot = this.configService.get<any>('FIREBASE_DATA');
     let BASE_URL = `${firebaseRoot}/${endpoint}`;
     let config = {
@@ -359,7 +393,7 @@ export class WebhookService {
         console.log(error);
       });
   }
-  
+
   createEmbedFields(data: Record<string, any>, fields: string[]) {
     return fields
       .map((field) => {
@@ -386,9 +420,11 @@ export class WebhookService {
           inline: true,
         };
       })
-      .filter((item): item is { name: string; value: string; inline: boolean } => item !== undefined);
+      .filter(
+        (item): item is { name: string; value: string; inline: boolean } =>
+          item !== undefined,
+      );
   }
-  
 
   async TwReveseNOAPI(ticker: string, timefame: string) {
     let tem = timefame;
@@ -399,27 +435,27 @@ export class WebhookService {
     } else if (timefame.includes('month')) {
       tem = '1month';
     }
-    if(ticker.includes('USD')){
+    if (ticker.includes('USD')) {
       // ticker = this.stockHelperService.getmatch1only(ticker)
       // return this.getCoinHistory(ticker, '5m')
-      ticker = this.stockHelperService.formatSymbol(ticker)
+      ticker = this.stockHelperService.formatSymbol(ticker);
     }
     let BASE_URL = `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=${tem}&outputsize=600&dp=2&apikey=`;
-    console.log(BASE_URL)
+    console.log(BASE_URL);
     const response = await this.tryCatchtwelvedata(BASE_URL);
     if (response?.status == 'ok') {
       // us stock     "exchange_timezone": "America/New_York", ChartOutTwelveData
       // btc don't turn to ChartOutTwelveDataUTC
-      const meta_timezone = response.meta.exchange_timezone
-      const responseRe =  response.values;
+      const meta_timezone = response.meta.exchange_timezone;
+      const responseRe = response.values;
       const reversedData = [...responseRe].reverse(); // clone + reverse
-      let dataOut
-      if(meta_timezone){
+      let dataOut;
+      if (meta_timezone) {
         dataOut = plainToInstance(DTO.ChartOutTwelveData, reversedData);
-      } else if(!meta_timezone){
+      } else if (!meta_timezone) {
         dataOut = plainToInstance(DTO.ChartOutTwelveDataUTC, reversedData, {
           excludeExtraneousValues: true,
-        })
+        });
       }
       const newData = await this.stockHelperService.returnNewData(dataOut);
       return newData;
@@ -430,14 +466,14 @@ export class WebhookService {
     return Math.floor(Math.random() * (x + 1));
   }
   // keys =['1f978ae4f4d74a7aa2ad9259dcd9ed54','3168052d38164f3abcb7aff8ab98d806']
-  repeat =   0; // which key we're on
+  repeat = 0; // which key we're on
   nextKey(keys) {
     const key = keys[this.index];
     this.repeat++;
     if (this.repeat === 1) {
       this.repeat = 0;
       this.index = (this.index + 1) % keys.length; // loop back to start
-      console.log(this.index)
+      console.log(this.index);
     }
     return key;
   }
@@ -447,12 +483,12 @@ export class WebhookService {
       const nextKey = this.nextKey(this.keys);
       const url = `${BASE_URL}${nextKey}`;
       console.log(`:12:Trying Key: 12: ${nextKey.slice(0, 4)}...`);
-  
+
       try {
         const response = await axios.get(url);
         if (response.data?.code === 404) {
           console.warn(':12: Received 404 code in response, breaking...');
-          return null; 
+          return null;
         }
         if (response.data?.status === 'error') {
           throw new Error(':12:API returned error status: 12');
@@ -460,12 +496,15 @@ export class WebhookService {
         return response.data; // success!
       } catch (error: any) {
         attempt++;
-              // Detect 404 from Axios response
+        // Detect 404 from Axios response
         if (error.response?.status === 404) {
           console.warn(':12: Received HTTP 404 from TwelveData, breaking...');
-          return null; 
+          return null;
         }
-        console.error(`:12:Error with key ${nextKey.slice(0, 4)}...:`, error?.message || error);
+        console.error(
+          `:12:Error with key ${nextKey.slice(0, 4)}...:`,
+          error?.message || error,
+        );
         if (attempt >= maxRetries) {
           throw new Error(':12:All API keys failed: 12');
         }
@@ -473,7 +512,6 @@ export class WebhookService {
     }
     // If none of the API keys work, throw an error
   }
-
 
   async onModuleInit() {
     // This runs ONCE when the app starts
@@ -484,17 +522,21 @@ export class WebhookService {
     // await this.getRsilist('MACD_AB_POS')
     // await this.getRsilist('MACD_BL_POS')
     // await this.getRsilist('MACD_AB_NEG')
-    await this.getRsilist('weekly_daily_pos_blo',150)
+    await this.getRsilist('weekly_daily_pos_blo', 150);
     // await this.getRsilist('1day_yes_neg',20)
   }
   washSell30: any[] = [];
   dolist: any[] = [];
   async loadWashSellList() {
-    const data = await this.FireBaseApi('get','stock-related/post-wash-sell.json','')
+    const data = await this.FireBaseApi(
+      'get',
+      'stock-related/post-wash-sell.json',
+      '',
+    );
     const getwashsell30 = dbrs.getwashsell30(data);
     this.washSell30 = getwashsell30;
     console.log(`✅ Loaded ${this.washSell30.length} wash-sell symbols`);
-    return getwashsell30
+    return getwashsell30;
   }
 
   getWashSellList() {
@@ -503,16 +545,24 @@ export class WebhookService {
   getDolist() {
     return this.dolist;
   }
-  async getRsilist(path:string,limit:number = 100,dayrange:number = 7) {
-    const data = await this.FireBaseApi('get',`stock-related/${path}.json`,'')
-    const symbolLists = dbrs.getlastXdays(data,dayrange, limit);
-    this.dolist = [...this.dolist,...symbolLists]
+  async getRsilist(path: string, limit: number = 100, dayrange: number = 7) {
+    const data = await this.FireBaseApi(
+      'get',
+      `stock-related/${path}.json`,
+      '',
+    );
+    const symbolLists = dbrs.getlastXdays(data, dayrange, limit);
+    this.dolist = [...this.dolist, ...symbolLists];
     console.log(`✅ Loaded: ${path} : ${symbolLists.length} symbols`);
-    return symbolLists
+    return symbolLists;
   }
 
-  async FireBaseApi(method:'post'|'patch'|'put'|'delete'|'get',endpoint:string, data: any,) {
-    const firebaseRoot = this.configService.get<any>('FIREBASE_DATA')
+  async FireBaseApi(
+    method: 'post' | 'patch' | 'put' | 'delete' | 'get',
+    endpoint: string,
+    data: any,
+  ) {
+    const firebaseRoot = this.configService.get<any>('FIREBASE_DATA');
     let BASE_URL = `${firebaseRoot}/${endpoint}`;
     try {
       const response = await axios.request({
@@ -524,10 +574,9 @@ export class WebhookService {
         data: data,
         maxBodyLength: Infinity,
       });
-    
+
       // Axios automatically parses JSON, so just return response.data
       return response.data;
-    
     } catch (error) {
       // Match fetch's "return 'skipped'" behavior
       if (error.response) {
@@ -539,7 +588,11 @@ export class WebhookService {
     }
   }
 
-  async tiingo(ticker: string, timefame: string, apikey='54c43c0fc7b27681254eeac1d7138d6b5477cf10') {
+  async tiingo(
+    ticker: string,
+    timefame: string,
+    apikey = '54c43c0fc7b27681254eeac1d7138d6b5477cf10',
+  ) {
     const daytestBF = 0;
     let dayStart;
 
@@ -549,42 +602,41 @@ export class WebhookService {
       dayStart = this.stockHelperService.getDateNDaysAgo(20 + daytestBF);
     } else if (timefame.includes('min')) {
       dayStart = this.stockHelperService.getDateNDaysAgo(3 + daytestBF);
-    } 
-    else{
-      return null
+    } else {
+      return null;
     }
-    const urls= `https://api.tiingo.com/tiingo/fx/${ticker}/prices?startDate=${dayStart}&token=${apikey}&resampleFreq=${timefame}`
-    console.log(urls)
+    const urls = `https://api.tiingo.com/tiingo/fx/${ticker}/prices?startDate=${dayStart}&token=${apikey}&resampleFreq=${timefame}`;
+    console.log(urls);
     const responsesArray = await this.tryCatcht_tiingo(urls);
     // return responsesArray
-    const response = plainToInstance(
-      DTO.ChartOutTiingo,
-      responsesArray, {
-        excludeExtraneousValues: true,
-      }
-    ) as any;
+    const response = plainToInstance(DTO.ChartOutTiingo, responsesArray, {
+      excludeExtraneousValues: true,
+    }) as any;
     // return response
     const result = await this.stockHelperService.returnNewData(response);
     const reversedData = [...result].reverse(); // clone + reverse
     // return reversedData; // success!
-    return  reversedData.slice(0, 300);;
+    return reversedData.slice(0, 300);
   }
 
   async tryCatcht_tiingo(BASE_URL: string) {
     try {
       const response = await axios.get(BASE_URL);
-      return response.data
+      return response.data;
     } catch (error: any) {
       throw new Error(':tiingo: All API keys failed');
     }
   }
 
-  async captureChart(chartData: any)  {
-    if(!chartData || chartData.length === 0) {
+  async captureChart(chartData: any) {
+    if (!chartData || chartData.length === 0) {
       return null;
     }
     try {
-      const browser = await puppeteer.launch({ headless: false , args: ['--no-sandbox', '--disable-setuid-sandbox'], });
+      const browser = await puppeteer.launch({
+        headless: false,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
+      });
       const page = await browser.newPage();
       // Set the viewport to the full screen size
       const screenWidth = 1920; // Example screen width (can be dynamic)
@@ -668,20 +720,23 @@ export class WebhookService {
         </body>
       </html>
     `;
-   
+
       // Set the page content
       await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
-   
+
       // Capture console logs for debugging
       page.on('console', (msg) => {
         console.log('PAGE LOG:', msg.text());
       });
-   
+
       // Wait for the custom element to be fully loaded
-      await page.waitForSelector('stock-chart-display', { visible: true, timeout: 10000 });
+      await page.waitForSelector('stock-chart-display', {
+        visible: true,
+        timeout: 10000,
+      });
       const screenshotBuffer = await page.screenshot();
       await browser.close();
-      return screenshotBuffer
+      return screenshotBuffer;
     } catch (error) {
       console.error('Error capturing chart:', error);
       return null;
