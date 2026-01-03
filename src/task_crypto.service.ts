@@ -21,7 +21,7 @@ export class TaskCryptoService {
     data?: any,
   ) {
     try {
-      const fileBuffer = await this.LocalPLWR.captureChart(data, ticker);
+      const fileBuffer = await this.LocalPLWR.captureChart(data, ticker,channel);
       return await this.LocalPLWR.sendDiscordNotification(
         message,
         `${channel} ${ticker}`,
