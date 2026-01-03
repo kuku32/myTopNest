@@ -1,2 +1,6 @@
-### GET
+### GET pro
+GET https://mytopnest-production.up.railway.app/webhooks
+
+
+### GET local
 GET http://localhost:3003/webhooks

@@ -364,17 +364,11 @@ export class StockHelperService {
 
   async macdCrossAB(last: StockData, prev: StockData): Promise<boolean> {
     if (!last || !prev) return false; // safety
-    return (
-      (last.MACDLine > last.SignalLine && prev.MACDLine < prev.SignalLine) ||
-      (last.divergence > 0 && prev.divergence < 0)
-    );
+    return (last.divergence > 0 && prev.divergence < 0);
   }
   async macdCrossBL(last: StockData, prev: StockData): Promise<boolean> {
     if (!last || !prev) return false; // safety
-    return (
-      (last.MACDLine < last.SignalLine && prev.MACDLine > prev.SignalLine) ||
-      (last.divergence < 0 && prev.divergence > 0)
-    );
+    return (last.divergence < 0 && prev.divergence > 0);
   }
 
   private readonly forexHolidays = [

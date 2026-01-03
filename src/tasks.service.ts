@@ -10,7 +10,6 @@ export class TasksService {
   constructor(
     private readonly webhooksService: WebhookService,
     private readonly stockHelperService: StockHelperService,
-
   ) {}
   private readonly logger = new Logger(TasksService.name);
   async sendDiscord(
@@ -32,23 +31,26 @@ export class TasksService {
   }
   @Cron(CronExpression.EVERY_5_MINUTES)
   async wakeupcall() {
-    this.sendDiscord(
-      `WAKEUPCALL`,
-      `RAILWAY BOTBOT`,
-      'Nono',
-      'CRON_CHECK',
-    );
     try {
-      this.logger.log('⏱️ koyeb Keep-alive ping success:')
+      const date = new Date();
+      await this.sendDiscord(
+        'RAILWAY WAKEUPCALL:' + date,
+        'RSIENDBOT 5MIN',
+        'Nono',
+        'CRON_CHECK',
+      );
+      const { data } = await axios.get(
+        'https://mytopnest-production.up.railway.app/webhooks',
+      );
+      this.logger.log('⏱️ Keep-alive ping success:', data.status);
     } catch (err) {
-      this.logger.error(`❌ Keep-alive failed: ${err.message}`);
+      this.logger.error(`❌ RAILWAY Keep-alive failed: ${err.message}`);
       this.sendDiscord(
-        `❌ koyeb Keep-alive failed:`,
-        `RAILWAY BOTBOT`,
+        `❌ RAILWAY Keep-alive failed:`,
+        `RSIENDBOT BOTBOT`,
         'Nono',
         'ERORR_CALL',
       );
     }
   }
 }
-
