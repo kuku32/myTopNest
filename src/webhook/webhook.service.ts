@@ -173,7 +173,7 @@ export class WebhookService {
     message: string,
     botname: string = 'Bot Alert',
     lastData: string,
-    file?:  import('multer').File,
+    file?:  any,
     extra?: any
   ) {
     try {
@@ -584,7 +584,7 @@ export class WebhookService {
       return null;
     }
     try {
-      const browser = await puppeteer.launch({ headless: true , args: ['--no-sandbox', '--disable-setuid-sandbox'], });
+      const browser = await puppeteer.launch({ headless: true  });
       const page = await browser.newPage();
       // Set the viewport to the full screen size
       const screenWidth = 1920; // Example screen width (can be dynamic)
