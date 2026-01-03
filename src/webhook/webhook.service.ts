@@ -634,8 +634,7 @@ export class WebhookService {
     }
     try {
       const browser = await puppeteer.launch({
-        headless: false,
-        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
+        headless: true,
       });
       const page = await browser.newPage();
       // Set the viewport to the full screen size
@@ -732,7 +731,7 @@ export class WebhookService {
       // Wait for the custom element to be fully loaded
       await page.waitForSelector('stock-chart-display', {
         visible: true,
-        timeout: 10000,
+        timeout: 5000,
       });
       const screenshotBuffer = await page.screenshot();
       await browser.close();
