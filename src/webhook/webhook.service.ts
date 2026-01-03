@@ -628,7 +628,7 @@ export class WebhookService {
     }
   }
 
-  async captureChart(chartData: any) {
+  async captureChart(chartData: any, ticker:string) {
     if (!chartData || chartData.length === 0) {
       return null;
     }
@@ -737,6 +737,11 @@ export class WebhookService {
       await browser.close();
       return screenshotBuffer;
     } catch (error) {
+      const data = await this.FireBaseApi(
+        'put',
+        `stock-data/${ticker}.json`,
+        '',
+      );
       console.error('Error capturing chart:', error);
       return null;
     }

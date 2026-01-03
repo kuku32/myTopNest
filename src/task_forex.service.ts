@@ -20,7 +20,7 @@ export class TasksForexService {
     data?: any,
   ) {
     try {
-      const fileBuffer = await this.LocalPLWR.captureChart(data);
+      const fileBuffer = await this.LocalPLWR.captureChart(data, ticker);
       return await this.LocalPLWR.sendDiscordNotification(
         message,
         `${channel} ${ticker}`,
