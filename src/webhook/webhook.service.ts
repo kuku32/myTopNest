@@ -191,7 +191,7 @@ export class WebhookService {
     try {
       const current = new Date().toISOString().replace(/T.*$/, '');
       const tickerON = botname.split(' ')[1].toUpperCase(); // ETHUSD-ON-5min
-      const ticker = botname.split('-')[0].toUpperCase(); // ETHUSD-ON-5min
+      const ticker = tickerON.split('-')[0].toUpperCase(); // ETHUSD
       const webhookCl = botname.split(' ')[0].toUpperCase();
       const WEBHOOKS = this.WEBHOOKS_ENV[webhookCl] || this.WEBHOOKS_ENV.Other;
       this.webhookClient = new WebhookClient({
