@@ -69,7 +69,7 @@ export class TasksUSMKService {
     channel: string,
     delay = 2,
   ) {
-    const limit = pLimit(8); // Limit the concurrency to 8 at a time
+    const limit = pLimit(2); // Limit the concurrency to 8 at a time
 
     const date = new Date();
 

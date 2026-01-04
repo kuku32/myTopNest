@@ -696,7 +696,7 @@ export class WebhookService {
           <!-- Display the chart date dynamically if chartData is available -->
           <h3 class="center">${ticker} | <span id="stockDate"></span> </h3>
           <!-- Container for the chart to fill the screen -->
-          <div style="width: 100%; height: 100%; background: white;">
+          <div style="width: 100%; height: 100%; background: rgb(243, 235, 235);">
             <!-- Properly passing chartData using .stockData binding -->
             <stock-chart-display id="stockChart" .stockData=""></stock-chart-display>
           </div>

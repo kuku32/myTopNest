@@ -44,7 +44,7 @@ export class TasksForexService {
     sellChannel: string,
     delay = 5,
   ) {
-    const limit = pLimit(8); // Limit the concurrency to 8 at a time
+    const limit = pLimit(2); // Limit the concurrency to 8 at a time
 
     // Check if the forex market is open
     if (!this.stockHelperService.isForexMarketOpen()) {
