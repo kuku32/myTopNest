@@ -39,76 +39,48 @@ export class TasksForexService {
   private async processTickers1hour(
     tickers: string[],
     timeframe: string,
-    apikey: string,
-    buyChannel: string,
-    sellChannel: string,
+    apikey,
+    buyChannel,
+    sellChannel,
     delay = 5,
   ) {
-    const limit = pLimit(2); // Limit the concurrency to 8 at a time
-
-    // Check if the forex market is open
     if (!this.stockHelperService.isForexMarketOpen()) {
       this.logger.log(`🕒 Forex market is CLOSED`);
       return;
     }
     this.logger.log(`✅ Forex market is OPEN`);
-
-    // Delay before processing
+    // Delay 2 minutes before processing
     await new Promise((resolve) => setTimeout(resolve, delay * 60 * 1000));
+    for (const ticker of tickers) {
+      try {
+        let data = await this.LocalPLWR.tiingo(ticker, timeframe, apikey);
+        const lastData = data[0];
+        const secondLastData = data[1];
+        // const lastData = data[data.length - 1];
+        // const secondLastData = data[data.length - 2];
 
-    // Prepare for the concurrency limit and processing tickers
-    const date = new Date();
-    const washselllists =
-      (await this.LocalPLWR.loadWashSellList()) ||
-      this.LocalPLWR.getWashSellList();
-
-    // Map through tickers and limit concurrency
-    const tickerPromises = tickers.map((ticker) =>
-      limit(async () => {
-        if (washselllists.includes(ticker)) {
-          console.log(`⏭️ Skipping ${ticker} — in wash sell list`);
-          return; // Skip this ticker and move on
-        }
-
-        try {
-          let data;
-          if (apikey === 'all') {
-            data = await this.LocalPLWR.TwReveseNOAPI(ticker, timeframe);
-          } else {
-            data = await this.LocalPLWR.get12for(ticker, timeframe, apikey);
-          }
-
-          const lastData = data[data.length - 1];
-          const secondLastData = data[data.length - 2];
-
-          // Process the data
-          await this.compareAndSend1hour(
-            data.reverse(), // Reverse data if necessary
-            lastData,
-            secondLastData,
-            ticker,
-            timeframe,
-            buyChannel,
-            sellChannel,
-          );
-          this.logger.log(`${ticker} processed successfully.`);
-        } catch (error) {
-          // Send error notification and log the error
-          await this.sendDiscord(
-            `ERROR ON TasksForexService: ${timeframe} On ${date}: ${JSON.stringify(
-              error,
-            )}`,
-            `RLWAYBOT ${ticker} at ${timeframe}`,
-            'Nono',
-            'ERORR_CALL',
-          );
-          this.logger.error(`Error processing ${ticker}: ${error.message}`);
-        }
-      }),
-    );
-
-    // Wait for all ticker promises to complete concurrently (with concurrency limit)
-    await Promise.all(tickerPromises);
+        await this.compareAndSend1hour(data.reverse(),
+          lastData,
+          secondLastData,
+          ticker,
+          timeframe,
+          buyChannel,
+          sellChannel,
+        );
+        this.logger.log(`${ticker} processed successfully.`);
+      } catch (error) {
+        const date = new Date();
+        this.sendDiscord(
+          `ERROR ON TasksForexService: ${timeframe} On ${date}: ${JSON.stringify(
+            error,
+          )}`,
+          `RSIENDBOT ${ticker} at ${timeframe}`,
+          'Nono',
+          'ERORR_CALL',
+        );
+        this.logger.error(`Error processing ${ticker}: ${error.message}`);
+      }
+    }
   }
   async compareAndSend1hour(
     data,
