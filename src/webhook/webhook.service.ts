@@ -635,6 +635,7 @@ export class WebhookService {
     try {
       const browser = await puppeteer.launch({
         headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
       });
       const page = await browser.newPage();
       // Set the viewport to the full screen size
@@ -742,8 +743,46 @@ export class WebhookService {
         `stock-data/${channel}/${ticker}.json`,
         chartData?.slice(-200)
       );
-      console.error('Error capturing chart:', error);
+      // load the webpage again next time
+      const url = `https://stockmarkets000.web.app/capture-target/${channel}/${ticker}`;
+      console.log('Storing chart data for later viewing at:', url);
+      console.error('Error capturing chart:');
       return null;
+    }
+  }
+  async loadWebsiteFor5Seconds(url: string): Promise<void> {
+    let browser;
+    try {
+      // Launch Puppeteer in headless mode (no UI)
+      browser = await puppeteer.launch({ 
+        headless: true, 
+        args: ['--no-sandbox', '--disable-setuid-sandbox'] 
+      });
+      
+      const page = await browser.newPage();
+      
+      // Set viewport size (optional)
+      await page.setViewport({ width: 1920, height: 1080 });
+      // Navigate to the URL
+      await page.goto(url, { waitUntil: 'networkidle2' }); // Wait until network is idle or fully loaded
+
+      console.log(`Website ${url} loaded for 5 seconds.`);
+      
+      // Wait for 5 seconds while rendering the page
+      await page.waitForTimeout(5000); // Wait for 5 seconds
+
+      // Optionally: take a screenshot after 5 seconds
+      // await page.screenshot({ path: 'screenshot.png' });
+
+      console.log('5 seconds have passed, closing the browser.');
+
+    } catch (error) {
+      console.error('Error loading website:', error);
+    } finally {
+      // Ensure that we close the browser after the operation
+      if (browser) {
+        await browser.close();
+      }
     }
   }
 }
