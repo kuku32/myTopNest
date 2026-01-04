@@ -190,7 +190,8 @@ export class WebhookService {
   ) {
     try {
       const current = new Date().toISOString().replace(/T.*$/, '');
-      const ticker = botname.split(' ')[1].toUpperCase();
+      const tickerON = botname.split(' ')[1].toUpperCase(); // ETHUSD-ON-5min
+      const ticker = botname.split('-')[0].toUpperCase(); // ETHUSD-ON-5min
       const webhookCl = botname.split(' ')[0].toUpperCase();
       const WEBHOOKS = this.WEBHOOKS_ENV[webhookCl] || this.WEBHOOKS_ENV.Other;
       this.webhookClient = new WebhookClient({
@@ -216,7 +217,10 @@ export class WebhookService {
         const id = parts[parts.length - 1];
         gptres = `**[ASK GPT](${extra})** | **[GPT RES](https://todocalender.web.app/home/stock-track/${id}?sym=${ticker}&date=${current})**`;
       }
-      const setmess = extra ? `${origin} | ${gptres}` : origin;
+      let setmess = extra ? `${origin} | ${gptres}` : origin;
+      if(!file){
+        setmess = `${setmess} | **[CHART MISSING](https://stockmarkets000.web.app/capture-target/${webhookCl}/${tickerON})**`;
+      }
       if (botdt.includes('RLWAYBOT')) {
         options = {
           username: botdt,
@@ -738,9 +742,9 @@ export class WebhookService {
       );
       // load the webpage again next time
       const url = `https://stockmarkets000.web.app/capture-target/${channel}/${ticker}`;
-      console.log('Storing chart data for later viewing at:', url);
       // Load the website and render for 5 seconds
       await this.loadWebsiteFor5Seconds(url);
+      console.log('Storing chart data for later viewing at:', url);
       console.error('Error capturing chart:');
       return null;
     }
