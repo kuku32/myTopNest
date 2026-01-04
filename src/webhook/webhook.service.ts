@@ -707,7 +707,7 @@ export class WebhookService {
             const chartData = ${datstring};
     
             // Set the date dynamically (if chartData is available)
-            document.getElementById('stockDate').innerText = chartData[1]?.date || 'No Date Found';
+            document.getElementById('stockDate').innerText = chartData[chartData.length - 1]?.date || 'No Date Found';
     
             // Get the stock-chart-display element by its ID
             const stockChartElement = document.getElementById('stockChart');
