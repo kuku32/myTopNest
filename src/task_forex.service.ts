@@ -133,62 +133,6 @@ export class TasksForexService {
       );
       return
     }
-    const macdCrossAB = await this.stockHelperService.macdCrossAB(
-      lastdata,
-      Secondlastdata,
-    );
-    if (macdCrossAB) {
-      await this.sendDiscord(
-        `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker}-ON-${timeframe}`,
-        lastdata,
-        buyChannel,
-        data,
-      );
-      return
-    }
-    const earlyBuyInRSI = await this.stockHelperService.earlyBuyInRSI(
-      lastdata,
-      Secondlastdata,
-    );
-    if (earlyBuyInRSI) {
-      await this.sendDiscord(
-        `BUY earlyBuyInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker}-ON-${timeframe}`,
-        lastdata,
-        buyChannel,
-        data,
-      );
-      return;
-    }
-    const macdCrossBL = await this.stockHelperService.macdCrossBL(
-      lastdata,
-      Secondlastdata,
-    );
-    if (macdCrossBL) {
-      await this.sendDiscord(
-        `SELLLLLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker}-ON-${timeframe}`,
-        lastdata,
-        sellChannel,
-        data,
-      );
-      return
-    }
-    const earlySellInRSI = await this.stockHelperService.earlySellInRSI(
-      lastdata,
-      Secondlastdata,
-    );
-    if (earlySellInRSI) {
-      await this.sendDiscord(
-        `SELLLLLLLL sell_earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker}-ON-${timeframe}`,
-        lastdata,
-        sellChannel,
-        data,
-      );
-      return
-    }
     const priceAbMA200BUY = await this.stockHelperService.priceAbMA200BUY(
       lastdata,
       Secondlastdata,
@@ -210,13 +154,69 @@ export class TasksForexService {
     );
     if (priceBlMA200SELL) {
       await this.sendDiscord(
-        `SELLLLLLLL priceBlMA200SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `SELLFXLLLL priceBlMA200SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        buyChannel,
+        data,
+      );
+      return;
+    }
+    const macdCrossAB = await this.stockHelperService.macdCrossAB(
+      lastdata,
+      Secondlastdata,
+    );
+    if (macdCrossAB) {
+      await this.sendDiscord(
+        `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        sellChannel,
+        data,
+      );
+      return
+    }
+    const earlyBuyInRSI = await this.stockHelperService.earlyBuyInRSI(
+      lastdata,
+      Secondlastdata,
+    );
+    if (earlyBuyInRSI) {
+      await this.sendDiscord(
+        `BUY earlyBuyInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
         sellChannel,
         data,
       );
       return;
+    }
+    const macdCrossBL = await this.stockHelperService.macdCrossBL(
+      lastdata,
+      Secondlastdata,
+    );
+    if (macdCrossBL) {
+      await this.sendDiscord(
+        `SELLFXLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        sellChannel,
+        data,
+      );
+      return
+    }
+    const earlySellInRSI = await this.stockHelperService.earlySellInRSI(
+      lastdata,
+      Secondlastdata,
+    );
+    if (earlySellInRSI) {
+      await this.sendDiscord(
+        `SELLFXLLLL sell_earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        sellChannel,
+        data,
+      );
+      return
     }
   }
 
