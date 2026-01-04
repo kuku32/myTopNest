@@ -116,7 +116,7 @@ export class TaskCryptoService {
         `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        channel,
+        'CRYPTO_EARLY_15MIN',
         data,
       );
     }
@@ -129,7 +129,7 @@ export class TaskCryptoService {
         `BUY earlyBuyInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        channel,
+        'CRYPTO_EARLY_15MIN',
         data,
       );
     }
@@ -143,7 +143,6 @@ export class TaskCryptoService {
         `${ticker}-ON-${timeframe}`,
         lastdata,
         'CRYPTO_ALL',
-        data,
       );
     }
     const sell_earlySellInRSI = await this.stockHelperService.earlySellInRSI(
@@ -156,9 +155,23 @@ export class TaskCryptoService {
         `${ticker}-ON-${timeframe}`,
         lastdata,
         'CRYPTO_ALL',
+      );
+    }
+
+    const macdCrossAB_BL0 = await this.stockHelperService.macdCrossAB_BL0(
+      lastdata,
+      Secondlastdata,
+    );
+    if (macdCrossAB_BL0) {
+      await this.sendDiscord(
+        `BUY macdCrossAB_BL0-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        'CRYPTO_EARLY_5MIN',
         data,
       );
     }
+
     const priceAbMA200BUY = await this.stockHelperService.priceAbMA200BUY(
       lastdata,
       Secondlastdata,
@@ -169,7 +182,7 @@ export class TaskCryptoService {
         `BUY priceAbMA200BUY-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        channel,
+        'CRYPTO_EARLY_5MIN',
         data,
       );
     }
@@ -182,8 +195,7 @@ export class TaskCryptoService {
         `SELLLLLLLL priceBlMA200SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        'CRYPTO_ALL',
-        data,
+        'CRYPTO_EARLY_5MIN',
       );
     }
   }

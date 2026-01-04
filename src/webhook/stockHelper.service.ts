@@ -372,7 +372,10 @@ export class StockHelperService {
     if (!last || !prev) return false; // safety
     return last.divergence < 0 && prev.divergence > 0;
   }
-
+  async macdCrossAB_BL0(last: StockData, prev: StockData): Promise<boolean> {
+    if (!last || !prev) return false; // safety
+    return last.divergence > 0 && prev.divergence < 0 && (last.MACDLine <0 || last.SignalLine<0 || prev.MACDLine <0 || prev.SignalLine<0);
+  }
   private readonly forexHolidays = [
     '2026-01-01', // New Year's Day (global)
     '2026-12-25', // Christmas
