@@ -735,13 +735,14 @@ export class WebhookService {
       await browser.close();
       return screenshotBuffer;
     } catch (error) {
+      const path = `${channel}/${ticker}`.toUpperCase();
       const data = await this.FireBaseApi(
         'put',
-        `stock-data/${channel}/${ticker}.json`,
+        `stock-data/${path}.json`,
         chartData?.slice(-200),
       );
       // load the webpage again next time
-      const url = `https://stockmarkets000.web.app/capture-target/${channel}/${ticker}`;
+      const url = `https://stockmarkets000.web.app/capture-target/${path}`;
       // Load the website and render for 5 seconds
       await this.loadWebsiteFor5Seconds(url);
       console.log('Storing chart data for later viewing at:', url);
