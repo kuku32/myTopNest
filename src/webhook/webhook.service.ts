@@ -6,7 +6,7 @@ import * as DTO from './dto';
 import { AttachmentBuilder, EmbedBuilder, WebhookClient } from 'discord.js';
 import { ConfigService } from '@nestjs/config';
 import * as dbrs from './database.api';
-import puppeteer from 'puppeteer';
+import * as puppeteer from 'puppeteer';
 @Injectable()
 export class WebhookService {
   getHello() {
@@ -628,7 +628,7 @@ export class WebhookService {
     }
   }
 
-  async captureChart(chartData: any, ticker:string, channel: string) {
+  async captureChart(chartData: any, ticker: string, channel: string) {
     if (!chartData || chartData.length === 0) {
       return null;
     }
@@ -741,12 +741,12 @@ export class WebhookService {
       const data = await this.FireBaseApi(
         'put',
         `stock-data/${channel}/${ticker}.json`,
-        chartData?.slice(-200)
+        chartData?.slice(-200),
       );
       // load the webpage again next time
       const url = `https://stockmarkets000.web.app/capture-target/${channel}/${ticker}`;
       console.log('Storing chart data for later viewing at:', url);
-          // Load the website and render for 5 seconds
+      // Load the website and render for 5 seconds
       await this.loadWebsiteFor5Seconds(url);
       console.error('Error capturing chart:');
       return null;
@@ -768,15 +768,15 @@ export class WebhookService {
       // Navigate to the URL
       await page.goto(url, { waitUntil: 'networkidle2' }); // Wait until network is idle or fully loaded
 
-      console.log(`Website ${url} loaded for 5 seconds.`);
-      
-      // Wait for 5 seconds while rendering the page
-      await page.waitForTimeout(5000); // Wait for 5 seconds
+      console.log(`Website ${url} loaded, waiting for 5 seconds.`);
+
+      // Wait for 5 seconds using setTimeout
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+
+      console.log('5 seconds have passed, closing the browser.');
 
       // Optionally: take a screenshot after 5 seconds
       // await page.screenshot({ path: 'screenshot.png' });
-
-      console.log('5 seconds have passed, closing the browser.');
 
     } catch (error) {
       console.error('Error loading website:', error);
