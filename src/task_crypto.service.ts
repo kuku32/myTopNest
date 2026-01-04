@@ -21,7 +21,11 @@ export class TaskCryptoService {
     data?: any,
   ) {
     try {
-      const fileBuffer = await this.LocalPLWR.captureChart(data, ticker,channel);
+      const fileBuffer = await this.LocalPLWR.captureChart(
+        data,
+        ticker,
+        channel,
+      );
       return await this.LocalPLWR.sendDiscordNotification(
         message,
         `${channel} ${ticker}`,
@@ -149,6 +153,33 @@ export class TaskCryptoService {
     if (sell_earlySellInRSI) {
       await this.sendDiscord(
         `SELLLLLLLL sell_earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        'CRYPTO_ALL',
+        data,
+      );
+    }
+    const priceAbMA200BUY = await this.stockHelperService.priceAbMA200BUY(
+      lastdata,
+      Secondlastdata,
+    );
+    if (priceAbMA200BUY) {
+      // add to uplist and delete out downlist
+      await this.sendDiscord(
+        `BUY priceAbMA200BUY-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        channel,
+        data,
+      );
+    }
+    const priceBlMA200SELL = await this.stockHelperService.priceBlMA200SELL(
+      lastdata,
+      Secondlastdata,
+    );
+    if (priceBlMA200SELL) {
+      await this.sendDiscord(
+        `SELLLLLLLL priceBlMA200SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
         'CRYPTO_ALL',

@@ -4,7 +4,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import axios from 'axios';
 import { WebhookService } from './webhook/webhook.service';
 import { StockHelperService } from './webhook/stockHelper.service';
-
+import pLimit from 'p-limit';
 @Injectable()
 export class TasksForexService {
   constructor(
@@ -20,12 +20,16 @@ export class TasksForexService {
     data?: any,
   ) {
     try {
-      const fileBuffer = await this.LocalPLWR.captureChart(data, ticker,channel);
+      const fileBuffer = await this.LocalPLWR.captureChart(
+        data,
+        ticker,
+        channel,
+      );
       return await this.LocalPLWR.sendDiscordNotification(
         message,
         `${channel} ${ticker}`,
         JSON.stringify(lastdata),
-        fileBuffer
+        fileBuffer,
       );
     } catch (err) {
       console.error('❌ Error in controller:', err);
@@ -35,53 +39,79 @@ export class TasksForexService {
   private async processTickers1hour(
     tickers: string[],
     timeframe: string,
-    apikey,
-    buyChannel,
-    sellChannel,
+    apikey: string,
+    buyChannel: string,
+    sellChannel: string,
     delay = 5,
   ) {
+    const limit = pLimit(8); // Limit the concurrency to 8 at a time
+
+    // Check if the forex market is open
     if (!this.stockHelperService.isForexMarketOpen()) {
       this.logger.log(`🕒 Forex market is CLOSED`);
       return;
     }
     this.logger.log(`✅ Forex market is OPEN`);
-    // Delay 2 minutes before processing
-    await new Promise((resolve) => setTimeout(resolve, delay * 60 * 1000));
-    for (const ticker of tickers) {
-      try {
-        let data = await this.LocalPLWR.tiingo(ticker, timeframe, apikey);
-        if(!data){
-          return
-        }
-        const lastData = data[0];
-        const secondLastData = data[1];
-        // const lastData = data[data.length - 1];
-        // const secondLastData = data[data.length - 2];
 
-        await this.compareAndSend1hour(data.reverse(),
-          lastData,
-          secondLastData,
-          ticker,
-          timeframe,
-          buyChannel,
-          sellChannel,
-        );
-        this.logger.log(`${ticker} processed successfully.`);
-      } catch (error) {
-        const date = new Date();
-        this.sendDiscord(
-          `ERROR ON TasksForexService: ${timeframe} On ${date}: ${JSON.stringify(
-            error,
-          )}`,
-          `RLWAYBOT ${ticker} at ${timeframe}`,
-          'Nono',
-          'ERORR_CALL',
-        );
-        this.logger.error(`Error processing ${ticker}: ${error.message}`);
-      }
-    }
+    // Delay before processing
+    await new Promise((resolve) => setTimeout(resolve, delay * 60 * 1000));
+
+    // Prepare for the concurrency limit and processing tickers
+    const date = new Date();
+    const washselllists =
+      (await this.LocalPLWR.loadWashSellList()) ||
+      this.LocalPLWR.getWashSellList();
+
+    // Map through tickers and limit concurrency
+    const tickerPromises = tickers.map((ticker) =>
+      limit(async () => {
+        if (washselllists.includes(ticker)) {
+          console.log(`⏭️ Skipping ${ticker} — in wash sell list`);
+          return; // Skip this ticker and move on
+        }
+
+        try {
+          let data;
+          if (apikey === 'all') {
+            data = await this.LocalPLWR.TwReveseNOAPI(ticker, timeframe);
+          } else {
+            data = await this.LocalPLWR.get12for(ticker, timeframe, apikey);
+          }
+
+          const lastData = data[data.length - 1];
+          const secondLastData = data[data.length - 2];
+
+          // Process the data
+          await this.compareAndSend1hour(
+            data.reverse(), // Reverse data if necessary
+            lastData,
+            secondLastData,
+            ticker,
+            timeframe,
+            buyChannel,
+            sellChannel,
+          );
+          this.logger.log(`${ticker} processed successfully.`);
+        } catch (error) {
+          // Send error notification and log the error
+          await this.sendDiscord(
+            `ERROR ON TasksForexService: ${timeframe} On ${date}: ${JSON.stringify(
+              error,
+            )}`,
+            `RLWAYBOT ${ticker} at ${timeframe}`,
+            'Nono',
+            'ERORR_CALL',
+          );
+          this.logger.error(`Error processing ${ticker}: ${error.message}`);
+        }
+      }),
+    );
+
+    // Wait for all ticker promises to complete concurrently (with concurrency limit)
+    await Promise.all(tickerPromises);
   }
-  async compareAndSend1hour(data,
+  async compareAndSend1hour(
+    data,
     lastdata,
     Secondlastdata,
     ticker,
@@ -98,7 +128,8 @@ export class TasksForexService {
         `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        buyChannel,data
+        buyChannel,
+        data,
       );
     }
     const buy_earlyBuyInRSI = await this.stockHelperService.earlyBuyInRSI(
@@ -110,7 +141,8 @@ export class TasksForexService {
         `BUY earlyBuyInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        buyChannel,data
+        buyChannel,
+        data,
       );
     }
     const sellE = await this.stockHelperService.macdCrossBL(
@@ -122,7 +154,8 @@ export class TasksForexService {
         `SELLLLLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        sellChannel,data
+        sellChannel,
+        data,
       );
     }
     const sell_earlySellInRSI = await this.stockHelperService.earlySellInRSI(
@@ -134,7 +167,35 @@ export class TasksForexService {
         `SELLLLLLLL sell_earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        sellChannel,data
+        sellChannel,
+        data,
+      );
+    }
+    const priceAbMA200BUY = await this.stockHelperService.priceAbMA200BUY(
+      lastdata,
+      Secondlastdata,
+    );
+    if (priceAbMA200BUY) {
+      // add to uplist and delete out downlist
+      await this.sendDiscord(
+        `BUY priceAbMA200BUY-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        buyChannel,
+        data,
+      );
+    }
+    const priceBlMA200SELL = await this.stockHelperService.priceBlMA200SELL(
+      lastdata,
+      Secondlastdata,
+    );
+    if (priceBlMA200SELL) {
+      await this.sendDiscord(
+        `SELLLLLLLL priceBlMA200SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        sellChannel,
+        data,
       );
     }
   }

@@ -404,9 +404,12 @@ export class StockHelperService {
 
     return true; // otherwise open
   }
-  async priceAbAll1or5or15MinBUY(last: StockData): Promise<boolean> {
+  async priceAbAll1or5or15MinBUY(
+    last: StockData,
+    prev: StockData,
+  ): Promise<boolean> {
     if (!last) return false; // safety
-    const highest = Math.max(
+    const highestLast = Math.max(
       last.MA5,
       last.MA10,
       last.MA20,
@@ -414,13 +417,39 @@ export class StockHelperService {
       last.MA100,
       last.MA200,
     );
-    const aboveAll = last.high > highest;
-    return aboveAll && last.divergence > 0;
+    const LastaboveAll = last.close > highestLast;
+
+    const highestPrev = Math.max(
+      prev.MA5,
+      prev.MA10,
+      prev.MA20,
+      prev.MA50,
+      prev.MA100,
+      prev.MA200,
+    );
+    const PrevBlowAll = prev.close < highestPrev;
+    return LastaboveAll && PrevBlowAll;
+  }
+  async priceAbMA200BUY(last: StockData, prev: StockData): Promise<boolean> {
+    if (!last || !prev) return false; // safety
+    const LastAbMA200 = last.close > last.MA200;
+    const PrevBlMa200 = prev.close < prev.MA200;
+    return LastAbMA200 && PrevBlMa200;
   }
 
-  async priceBlAll1or5or15MinSELL(last: StockData): Promise<boolean> {
+  async priceBlMA200SELL(last: StockData, prev: StockData): Promise<boolean> {
+    if (!last || !prev) return false; // safety
+    const LastAbMA200 = last.close < last.MA200;
+    const PrevBlMa200 = prev.close > prev.MA200;
+    return LastAbMA200 && PrevBlMa200;
+  }
+
+  async priceBlAll1or5or15MinSELL(
+    last: StockData,
+    prev: StockData,
+  ): Promise<boolean> {
     if (!last) return false; // safety
-    const lowest = Math.min(
+    const lowestLast = Math.min(
       last.MA5,
       last.MA10,
       last.MA20,
@@ -428,7 +457,7 @@ export class StockHelperService {
       last.MA100,
       last.MA200,
     );
-    const blowAll = last.low < lowest;
+    const blowAll = last.low < lowestLast;
     return blowAll && last.divergence < 0;
   }
 }

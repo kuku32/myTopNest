@@ -7,11 +7,26 @@ import { StockHelperService } from './webhook/stockHelper.service';
 import { ConfigService } from '@nestjs/config';
 import * as Timer from './webhook/compareTime';
 import { StockData } from './webhook/dto/chartData';
-
+import pLimit from 'p-limit';
 @Injectable()
 export class TasksUSMKService {
   allkeys = 'all'; // test
-  mysymbols = ['INTC', 'SMCI', 'BULL','RDW','CRWV',"TSLA","BILL",'QQQ', 'SPY', 'SNAP','BULL','UNH',"TTD","CNC"]; // test symbols
+  mysymbols = [
+    'INTC',
+    'SMCI',
+    'BULL',
+    'RDW',
+    'CRWV',
+    'TSLA',
+    'BILL',
+    'QQQ',
+    'SPY',
+    'SNAP',
+    'BULL',
+    'UNH',
+    'TTD',
+    'CNC',
+  ]; // test symbols
   constructor(
     private readonly configService: ConfigService,
     private readonly stockHelperService: StockHelperService,
@@ -54,6 +69,8 @@ export class TasksUSMKService {
     channel: string,
     delay = 2,
   ) {
+    const limit = pLimit(8); // Limit the concurrency to 8 at a time
+
     const date = new Date();
 
     const washselllists =
@@ -62,100 +79,138 @@ export class TasksUSMKService {
     // Delay 2 minutes before processing
     await new Promise((resolve) => setTimeout(resolve, delay * 60 * 1000));
 
-    for (const ticker of tickers) {
-      if (washselllists.includes(ticker)) {
-        console.log(`⏭️ Skipping ${ticker} — in wash sell list`);
-        continue; // ✅ Skip this ticker and move on
-      }
-      try {
-        let data;
-        if (apikey === 'all') {
-          data = await this.LocalPLWR.TwReveseNOAPI(ticker, timeframe);
-        } else {
-          data = await this.LocalPLWR.get12for(ticker, timeframe, apikey);
+    // Prepare ticker promises with concurrency limit
+    const tickerPromises = tickers.map((ticker) =>
+      limit(async () => {
+        if (washselllists.includes(ticker)) {
+          console.log(`⏭️ Skipping ${ticker} — in wash sell list`);
+          return; // Skip this ticker and move on
         }
 
-        const lastData = data[data.length - 1];
-        const secondLastData = data[data.length - 2];
+        try {
+          let data;
+          if (apikey === 'all') {
+            data = await this.LocalPLWR.TwReveseNOAPI(ticker, timeframe);
+          } else {
+            data = await this.LocalPLWR.get12for(ticker, timeframe, apikey);
+          }
 
-        await this.compareAndSend(data,
-          lastData,
-          secondLastData,
-          ticker,
-          timeframe,
-          channel,
-        );
-        this.logger.log(`${ticker} processed successfully.`);
-      } catch (error) {
-        this.sendDiscord(
-          `ERROR ON API AT: ${timeframe} On ${date}`,
-          `RLWAYBOT ${ticker} at ${timeframe}`,
-          'Nono',
-          'ERORR_CALL',
-        );
-        this.logger.error(`Error processing ${ticker}: ${error.message}`);
-      }
-    }
+          const lastData = data[data.length - 1];
+          const secondLastData = data[data.length - 2];
+
+          // Process the data
+          await this.compareAndSend(
+            data,
+            lastData,
+            secondLastData,
+            ticker,
+            timeframe,
+            channel,
+          );
+          this.logger.log(`${ticker} processed successfully.`);
+        } catch (error) {
+          // Send error notification and log the error
+          await this.sendDiscord(
+            `ERROR ON API AT: ${timeframe} On ${date}`,
+            `RLWAYBOT ${ticker} at ${timeframe}`,
+            'Nono',
+            'ERORR_CALL',
+          );
+          this.logger.error(`Error processing ${ticker}: ${error.message}`);
+        }
+      }),
+    );
+
+    // Wait for all ticker promises to complete concurrently (with concurrency limit)
+    await Promise.all(tickerPromises);
   }
-  uplist: string[] = [];
-  downlist: string[] = [];
-  async compareAndSend(data, lastdata, Secondlastdata, ticker, timeframe, channel) {
-    const buyALL =
-      await this.stockHelperService.priceAbAll1or5or15MinBUY(lastdata);
-    if (buyALL && !this.uplist.includes(ticker)) {
+  async compareAndSend(
+    data,
+    lastdata,
+    Secondlastdata,
+    ticker,
+    timeframe,
+    channel,
+  ) {
+    const priceAbMA200BUY = await this.stockHelperService.priceAbMA200BUY(
+      lastdata,
+      Secondlastdata,
+    );
+    if (priceAbMA200BUY) {
       // add to uplist and delete out downlist
       await this.sendDiscord(
-        `BUY priceAbAll-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `BUY priceAbMA200BUY-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
         'US_EARLY_5MIN',
-        data
+        data,
       );
-      this.uplist.push(ticker);
     }
-
-    // const downtime = await this.stockHelperService.macdCrossBL(
-    //   lastdata,
-    //   Secondlastdata,
-    // );
-    // if (downtime) {
-    //   if (this.uplist.includes(ticker)) {
-    //     this.uplist = this.uplist.filter((sym) => sym !== ticker);
-    //   }
-    //   await this.sendDiscord(
-    //     `SELLLLLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-    //     `${ticker}-ON-${timeframe}`,
-    //     lastdata,
-    //     'US_ALL',
-    //   );
-    // }
-    const sellALl =
-      await this.stockHelperService.priceBlAll1or5or15MinSELL(lastdata);
-    if (sellALl && !this.downlist.includes(ticker)) {
+    const priceBlMA200SELL = await this.stockHelperService.priceBlMA200SELL(
+      lastdata,
+      Secondlastdata,
+    );
+    if (priceBlMA200SELL) {
       await this.sendDiscord(
-        `SELLLLLLLL priceBlAll-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `SELLLLLLLL priceBlMA200SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        'US_ALL',data
+        'US_ALL',
+        data,
       );
-      // add to downlist and remove from uplist
-      this.downlist.push(ticker);
     }
-    // const uptime = await this.stockHelperService.macdCrossAB(
-    //   lastdata,
-    //   Secondlastdata,
-    // );
-    // if (uptime) {
-    //   if (this.downlist.includes(ticker)) {
-    //     this.downlist = this.downlist.filter((sym) => sym !== ticker);
-    //   }
-    //   await this.sendDiscord(
-    //     `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-    //     `${ticker}-ON-${timeframe}`,
-    //     lastdata,
-    //     'US_EARLY_15MIN',
-    //   );
-    // }
+    const buyE = await this.stockHelperService.macdCrossAB(
+      lastdata,
+      Secondlastdata,
+    );
+    if (buyE) {
+      await this.sendDiscord(
+        `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        channel,
+        data,
+      );
+    }
+    const buy_earlyBuyInRSI = await this.stockHelperService.earlyBuyInRSI(
+      lastdata,
+      Secondlastdata,
+    );
+    if (buy_earlyBuyInRSI) {
+      await this.sendDiscord(
+        `BUY earlyBuyInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        channel,
+        data,
+      );
+    }
+    const sellE = await this.stockHelperService.macdCrossBL(
+      lastdata,
+      Secondlastdata,
+    );
+    if (sellE) {
+      await this.sendDiscord(
+        `SELLLLLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        'US_ALL',
+        data,
+      );
+    }
+    const sell_earlySellInRSI = await this.stockHelperService.earlySellInRSI(
+      lastdata,
+      Secondlastdata,
+    );
+    if (sell_earlySellInRSI) {
+      await this.sendDiscord(
+        `SELLLLLLLL sell_earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        'US_ALL',
+        data,
+      );
+    }
   }
   async sendDiscord(
     message: string,
@@ -165,12 +220,16 @@ export class TasksUSMKService {
     data?: any,
   ) {
     try {
-      const fileBuffer = await this.LocalPLWR.captureChart(data, ticker,channel);
+      const fileBuffer = await this.LocalPLWR.captureChart(
+        data,
+        ticker,
+        channel,
+      );
       return await this.LocalPLWR.sendDiscordNotification(
         message,
         `${channel} ${ticker}`,
         JSON.stringify(lastdata),
-        fileBuffer
+        fileBuffer,
       );
     } catch (err) {
       console.error('❌ Error in controller:', err);
@@ -188,7 +247,6 @@ export class TasksUSMKService {
 
   @Cron('*/15 14-21 * * 1-5', { timeZone: 'UTC' })
   async runAllWatL15min() {
-
     const symbols = (await this.LocalPLWR.getDolist()) || [];
     const combined = [...this.mysymbols, ...symbols];
     await Promise.all([
