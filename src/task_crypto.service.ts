@@ -199,7 +199,6 @@ export class TaskCryptoService {
       'ZECUSD',
       'XMRUSD',
       'SOLUSD',
-      'ADAUSD',
       'XRPUSD',
       'BNBUSD',
       'LINKUSD',
