@@ -107,57 +107,6 @@ export class TaskCryptoService {
     timeframe,
     channel,
   ) {
-    const buyE = await this.stockHelperService.macdCrossAB(
-      lastdata,
-      Secondlastdata,
-    );
-    if (buyE) {
-      await this.sendDiscord(
-        `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker}-ON-${timeframe}`,
-        lastdata,
-        'CRYPTO_EARLY_15MIN',
-        data,
-      );
-    }
-    const buy_earlyBuyInRSI = await this.stockHelperService.earlyBuyInRSI(
-      lastdata,
-      Secondlastdata,
-    );
-    if (buy_earlyBuyInRSI) {
-      await this.sendDiscord(
-        `BUY earlyBuyInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker}-ON-${timeframe}`,
-        lastdata,
-        'CRYPTO_EARLY_15MIN',
-        data,
-      );
-    }
-    const sellE = await this.stockHelperService.macdCrossBL(
-      lastdata,
-      Secondlastdata,
-    );
-    if (sellE) {
-      await this.sendDiscord(
-        `SELLLLLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker}-ON-${timeframe}`,
-        lastdata,
-        'CRYPTO_ALL',
-      );
-    }
-    const sell_earlySellInRSI = await this.stockHelperService.earlySellInRSI(
-      lastdata,
-      Secondlastdata,
-    );
-    if (sell_earlySellInRSI) {
-      await this.sendDiscord(
-        `SELLLLLLLL sell_earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker}-ON-${timeframe}`,
-        lastdata,
-        'CRYPTO_ALL',
-      );
-    }
-
     const macdCrossAB_BL0 = await this.stockHelperService.macdCrossAB_BL0(
       lastdata,
       Secondlastdata,
@@ -170,6 +119,7 @@ export class TaskCryptoService {
         'CRYPTO_EARLY_5MIN',
         data,
       );
+      return;
     }
 
     const priceAbMA200BUY = await this.stockHelperService.priceAbMA200BUY(
@@ -185,6 +135,7 @@ export class TaskCryptoService {
         'CRYPTO_EARLY_5MIN',
         data,
       );
+      return;
     }
     const priceBlMA200SELL = await this.stockHelperService.priceBlMA200SELL(
       lastdata,
@@ -197,6 +148,61 @@ export class TaskCryptoService {
         lastdata,
         'CRYPTO_EARLY_5MIN',
       );
+      return;
+    }
+    const buyE = await this.stockHelperService.macdCrossAB(
+      lastdata,
+      Secondlastdata,
+    );
+    if (buyE) {
+      await this.sendDiscord(
+        `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        'CRYPTO_EARLY_15MIN',
+        data,
+      );
+      return;
+    }
+    const buy_earlyBuyInRSI = await this.stockHelperService.earlyBuyInRSI(
+      lastdata,
+      Secondlastdata,
+    );
+    if (buy_earlyBuyInRSI) {
+      await this.sendDiscord(
+        `BUY earlyBuyInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        'CRYPTO_EARLY_15MIN',
+        data,
+      );
+      return;
+    }
+    const sellE = await this.stockHelperService.macdCrossBL(
+      lastdata,
+      Secondlastdata,
+    );
+    if (sellE) {
+      await this.sendDiscord(
+        `SELLLLLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        'CRYPTO_ALL',
+      );
+      return;
+    }
+    const sell_earlySellInRSI = await this.stockHelperService.earlySellInRSI(
+      lastdata,
+      Secondlastdata,
+    );
+    if (sell_earlySellInRSI) {
+      await this.sendDiscord(
+        `SELLLLLLLL sell_earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        'CRYPTO_ALL',
+      );
+      return;
     }
   }
   @Cron(CronExpression.EVERY_5_MINUTES)
