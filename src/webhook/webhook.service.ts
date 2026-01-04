@@ -620,7 +620,7 @@ export class WebhookService {
     const result = await this.stockHelperService.returnNewData(response);
     const reversedData = [...result].reverse(); // clone + reverse
     // return reversedData; // success!
-    return reversedData.slice(0, 300);
+    return reversedData.slice(0, 400);
   }
 
   async tryCatcht_tiingo(BASE_URL: string) {
