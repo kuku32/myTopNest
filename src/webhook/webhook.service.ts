@@ -746,6 +746,8 @@ export class WebhookService {
       // load the webpage again next time
       const url = `https://stockmarkets000.web.app/capture-target/${channel}/${ticker}`;
       console.log('Storing chart data for later viewing at:', url);
+          // Load the website and render for 5 seconds
+      await this.loadWebsiteFor5Seconds(url);
       console.error('Error capturing chart:');
       return null;
     }
