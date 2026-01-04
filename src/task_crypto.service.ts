@@ -143,18 +143,18 @@ export class TaskCryptoService {
     );
     if (priceBlMA200SELL) {
       await this.sendDiscord(
-        `SELLLLLLLL priceBlMA200SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `SELLCRLLLL priceBlMA200SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
         'CRYPTO_EARLY_5MIN',
       );
       return;
     }
-    const buyE = await this.stockHelperService.macdCrossAB(
+    const macdCrossAB = await this.stockHelperService.macdCrossAB(
       lastdata,
       Secondlastdata,
     );
-    if (buyE) {
+    if (macdCrossAB) {
       await this.sendDiscord(
         `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
@@ -164,11 +164,11 @@ export class TaskCryptoService {
       );
       return;
     }
-    const buy_earlyBuyInRSI = await this.stockHelperService.earlyBuyInRSI(
+    const earlyBuyInRSI = await this.stockHelperService.earlyBuyInRSI(
       lastdata,
       Secondlastdata,
     );
-    if (buy_earlyBuyInRSI) {
+    if (earlyBuyInRSI) {
       await this.sendDiscord(
         `BUY earlyBuyInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
@@ -178,26 +178,26 @@ export class TaskCryptoService {
       );
       return;
     }
-    const sellE = await this.stockHelperService.macdCrossBL(
+    const macdCrossBL = await this.stockHelperService.macdCrossBL(
       lastdata,
       Secondlastdata,
     );
-    if (sellE) {
+    if (macdCrossBL) {
       await this.sendDiscord(
-        `SELLLLLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `SELLCRLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
         'CRYPTO_ALL',
       );
       return;
     }
-    const sell_earlySellInRSI = await this.stockHelperService.earlySellInRSI(
+    const earlySellInRSI = await this.stockHelperService.earlySellInRSI(
       lastdata,
       Secondlastdata,
     );
-    if (sell_earlySellInRSI) {
+    if (earlySellInRSI) {
       await this.sendDiscord(
-        `SELLLLLLLL sell_earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `SELLCRLLLL earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
         'CRYPTO_ALL',

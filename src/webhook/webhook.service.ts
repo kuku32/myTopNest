@@ -218,7 +218,7 @@ export class WebhookService {
         gptres = `**[ASK GPT](${extra})** | **[GPT RES](https://todocalender.web.app/home/stock-track/${id}?sym=${ticker}&date=${current})**`;
       }
       let setmess = extra ? `${origin} | ${gptres}` : origin;
-      if(!file){
+      if(!file && !message.includes('SELLCR')){
         setmess = `${setmess} | **[CHART MISSING](https://stockmarkets000.web.app/capture-click/${webhookCl}/${tickerON})**`;
       }
       if (botdt.includes('RLWAYBOT')) {
@@ -636,6 +636,7 @@ export class WebhookService {
     if (!chartData || chartData.length === 0) {
       return null;
     }
+    const slicedData = chartData && chartData.length > 0 ? chartData.slice(-200) : [];
     try {
       const browser = await puppeteer.launch({
         headless: true,
@@ -646,7 +647,7 @@ export class WebhookService {
       const screenWidth = 1920; // Example screen width (can be dynamic)
       const screenHeight = 1080; // Example screen height (can be dynamic)
       await page.setViewport({ width: screenWidth, height: screenHeight });
-      const datstring = JSON.stringify(chartData?.slice(-200));
+      const datstring = JSON.stringify(slicedData);
       // Ensure the LitElement component is loaded and render the chart using the stock-chart-display component
       const htmlContent = `
       <html>
@@ -739,7 +740,7 @@ export class WebhookService {
       const data = await this.FireBaseApi(
         'put',
         `stock-data/${path}.json`,
-        chartData?.slice(-200),
+        slicedData,
       );
       // load the webpage again next time
       const url = `https://stockmarkets000.web.app/capture-target/${path}`;
