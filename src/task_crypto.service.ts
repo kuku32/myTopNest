@@ -45,7 +45,7 @@ export class TaskCryptoService {
     channel: string,
     delay = 5,
   ) {
-    const limit = pLimit(2); // Limit the concurrency to 5 at a time
+    const limit = pLimit(1); // Limit the concurrency to 5 at a time
 
     const date = new Date();
     const washselllists =
@@ -243,7 +243,7 @@ export class TaskCryptoService {
       '5min',
       'all',
       'CRYPTO_EARLY_5MIN',
-      0,
+      1,
     );
   }
 
