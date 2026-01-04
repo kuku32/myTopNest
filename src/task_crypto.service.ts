@@ -107,6 +107,15 @@ export class TaskCryptoService {
     timeframe,
     channel,
   ) {
+    if(timeframe==='4h' || timeframe==='1day'){
+      await this.sendDiscord(
+        `JUST WATCH_ME-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        channel,
+        data,
+      );
+    }
     const macdCrossAB_BL0 = await this.stockHelperService.macdCrossAB_BL0(
       lastdata,
       Secondlastdata,
@@ -147,6 +156,7 @@ export class TaskCryptoService {
         `${ticker}-ON-${timeframe}`,
         lastdata,
         'CRYPTO_EARLY_5MIN',
+        data,
       );
       return;
     }
@@ -377,7 +387,7 @@ export class TaskCryptoService {
       tickers,
       '4h',
       apikey,
-      'CRYPTO_EARLY_15MIN',
+      'CRYPTO_WATCH',
       0,
     );
   }
@@ -391,7 +401,7 @@ export class TaskCryptoService {
       tickers,
       '4h',
       apikey,
-      'CRYPTO_EARLY_15MIN',
+      'CRYPTO_WATCH',
       0,
     );
   }
@@ -412,7 +422,7 @@ export class TaskCryptoService {
       tickers,
       '4h',
       apikey,
-      'CRYPTO_EARLY_15MIN',
+      'CRYPTO_WATCH',
       0,
     );
   }
@@ -436,7 +446,7 @@ export class TaskCryptoService {
       tickers,
       '1day',
       apikey,
-      'CRYPTO_EARLY_15MIN',
+      'CRYPTO_WATCH',
       0,
     );
   }
@@ -450,7 +460,7 @@ export class TaskCryptoService {
       tickers,
       '1day',
       apikey,
-      'CRYPTO_EARLY_15MIN',
+      'CRYPTO_WATCH',
       0,
     );
   }
@@ -471,7 +481,7 @@ export class TaskCryptoService {
       tickers,
       '1day',
       apikey,
-      'CRYPTO_EARLY_15MIN',
+      'CRYPTO_WATCH',
       0,
     );
   }
