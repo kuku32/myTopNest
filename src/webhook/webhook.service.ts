@@ -219,7 +219,7 @@ export class WebhookService {
       }
       let setmess = extra ? `${origin} | ${gptres}` : origin;
       if(!file){
-        setmess = `${setmess} | **[CHART MISSING](https://stockmarkets000.web.app/capture-target/${webhookCl}/${tickerON})**`;
+        setmess = `${setmess} | **[CHART MISSING](https://stockmarkets000.web.app/capture-click/${webhookCl}/${tickerON})**`;
       }
       if (botdt.includes('RLWAYBOT')) {
         options = {
