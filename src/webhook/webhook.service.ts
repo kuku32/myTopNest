@@ -683,21 +683,14 @@ export class WebhookService {
               width: 100% !important;
               height: 100% !important;
             }
-    
-            /* Optional: style the heading */
-            h1 {
-              position: absolute;
-              top: 20px;
-              left: 20px;
-              color: white;
-              z-index: 9999;
-              font-size: 24px;
+            .center{
+                text-align: center;
             }
           </style>
         </head>
         <body id="capture-target">
           <!-- Display the chart date dynamically if chartData is available -->
-          <h1>Stock Chart Capture <span id="stockDate"></span></h1>
+          <h3 class="center">${ticker} | <span id="stockDate"></span> </h3>
           <!-- Container for the chart to fill the screen -->
           <div style="width: 100%; height: 100%; background: white;">
             <!-- Properly passing chartData using .stockData binding -->
@@ -756,13 +749,13 @@ export class WebhookService {
     let browser;
     try {
       // Launch Puppeteer in headless mode (no UI)
-      browser = await puppeteer.launch({ 
-        headless: true, 
-        args: ['--no-sandbox', '--disable-setuid-sandbox'] 
+      browser = await puppeteer.launch({
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
       });
-      
+
       const page = await browser.newPage();
-      
+
       // Set viewport size (optional)
       await page.setViewport({ width: 1920, height: 1080 });
       // Navigate to the URL
@@ -777,7 +770,6 @@ export class WebhookService {
 
       // Optionally: take a screenshot after 5 seconds
       // await page.screenshot({ path: 'screenshot.png' });
-
     } catch (error) {
       console.error('Error loading website:', error);
     } finally {
