@@ -28,7 +28,7 @@ import { TasksUSMK_1MIN_Service } from './task_usmk_1min.service';
     SendEverydayService,
     TasksService,
     TasksForexService,
-    TasksUSMKService,
+    // TasksUSMKService,
     TaskCryptoService,
     // TasksUSMK_1MIN_Service,
   ],
