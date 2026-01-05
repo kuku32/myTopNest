@@ -679,6 +679,7 @@ export class WebhookService {
               padding: 0;
               width: 100%;
               height: 100%;
+              background: rgb(243, 235, 235);
             }
     
             /* Override styles for the stock-chart-display by targeting the #stockChart ID specifically */
