@@ -39,14 +39,14 @@ export class SendEverydayService {
       // CLOSE YESTERDAY
       await this.LocalPLWR.sendDiscordNotification(
         `${equal}==END-${yesterday}${equal}`,
-        `${channel} RWBOT`,
+        `${channel} RLWAYBOT`,
         JSON.stringify('lastdata'),
       );
 
       // START TODAY
       await this.LocalPLWR.sendDiscordNotification(
         `${equal}START-${today}${equal}`,
-        `${channel} RWBOT`,
+        `${channel} RLWAYBOT`,
         JSON.stringify('lastdata'),
       );
 
