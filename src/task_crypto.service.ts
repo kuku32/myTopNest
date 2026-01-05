@@ -25,6 +25,7 @@ export class TaskCryptoService {
         data,
         ticker,
         channel,
+        message,
       );
       return await this.LocalPLWR.sendDiscordNotification(
         message,
@@ -107,7 +108,7 @@ export class TaskCryptoService {
     timeframe,
     channel,
   ) {
-    if(timeframe==='4h' || timeframe==='1day'){
+    if (timeframe === '4h' || timeframe === '1day') {
       await this.sendDiscord(
         `JUST WATCH_ME-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
@@ -383,13 +384,7 @@ export class TaskCryptoService {
     // const tickers = ['BTCUSD'];
     const apikey = '2711824a92bc40498c8bc30728813e2a'; //liamsterling1@outlook.com
     this.logger.log('Running scheduled every 1 hour for CRYPTOs...');
-    await this.processTickers1hour(
-      tickers,
-      '4h',
-      apikey,
-      'CRYPTO_WATCH',
-      0,
-    );
+    await this.processTickers1hour(tickers, '4h', apikey, 'CRYPTO_WATCH', 0);
   }
   @Cron('10 */4 * * *') // Every 4 hours at minute 10
   async handle4hourCrypto3() {
@@ -397,13 +392,7 @@ export class TaskCryptoService {
     // const tickers = ['BTCUSD'];
     const apikey = '2711824a92bc40498c8bc30728813e2a'; //liamsterling1@outlook.com
     this.logger.log('Running scheduled every 1 hour for CRYPTOs...');
-    await this.processTickers1hour(
-      tickers,
-      '4h',
-      apikey,
-      'CRYPTO_WATCH',
-      0,
-    );
+    await this.processTickers1hour(tickers, '4h', apikey, 'CRYPTO_WATCH', 0);
   }
   @Cron('12 */4 * * *') // Every 4 hours at minute 12
   async handle4hourCrypto4() {
@@ -418,13 +407,7 @@ export class TaskCryptoService {
     // const tickers = ['BTCUSD'];
     const apikey = '2711824a92bc40498c8bc30728813e2a'; //liamsterling1@outlook.com
     this.logger.log('Running scheduled every 1 hour for CRYPTOs...');
-    await this.processTickers1hour(
-      tickers,
-      '4h',
-      apikey,
-      'CRYPTO_WATCH',
-      0,
-    );
+    await this.processTickers1hour(tickers, '4h', apikey, 'CRYPTO_WATCH', 0);
   }
 
   @Cron('14 1 * * *') // Every day at 1:14 AM
@@ -442,13 +425,7 @@ export class TaskCryptoService {
     // const tickers = ['BTCUSD'];
     const apikey = '2711824a92bc40498c8bc30728813e2a'; //liamsterling1@outlook.com
     this.logger.log('Running scheduled every 1 hour for CRYPTOs...');
-    await this.processTickers1hour(
-      tickers,
-      '1day',
-      apikey,
-      'CRYPTO_WATCH',
-      0,
-    );
+    await this.processTickers1hour(tickers, '1day', apikey, 'CRYPTO_WATCH', 0);
   }
   @Cron('16 1 * * *') // Every day at 1:16 AM
   async handledailyCrypto1() {
@@ -456,13 +433,7 @@ export class TaskCryptoService {
     // const tickers = ['BTCUSD'];
     const apikey = '2711824a92bc40498c8bc30728813e2a'; //liamsterling1@outlook.com
     this.logger.log('Running scheduled every 1 hour for CRYPTOs...');
-    await this.processTickers1hour(
-      tickers,
-      '1day',
-      apikey,
-      'CRYPTO_WATCH',
-      0,
-    );
+    await this.processTickers1hour(tickers, '1day', apikey, 'CRYPTO_WATCH', 0);
   }
   @Cron('18 1 * * *') // Every day at 1:18 AM
   async handledailyCrypto2() {
@@ -477,13 +448,7 @@ export class TaskCryptoService {
     // const tickers = ['BTCUSD'];
     const apikey = '2711824a92bc40498c8bc30728813e2a'; //liamsterling1@outlook.com
     this.logger.log('Running scheduled every 1 hour for CRYPTOs...');
-    await this.processTickers1hour(
-      tickers,
-      '1day',
-      apikey,
-      'CRYPTO_WATCH',
-      0,
-    );
+    await this.processTickers1hour(tickers, '1day', apikey, 'CRYPTO_WATCH', 0);
   }
 }
 

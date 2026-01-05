@@ -187,6 +187,7 @@ export class TasksUSMK_1MIN_Service {
         data,
         ticker,
         channel,
+        message,
       );
       return await this.LocalPLWR.sendDiscordNotification(
         message,

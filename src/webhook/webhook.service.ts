@@ -218,7 +218,7 @@ export class WebhookService {
         gptres = `**[ASK GPT](${extra})** | **[GPT RES](https://todocalender.web.app/home/stock-track/${id}?sym=${ticker}&date=${current})**`;
       }
       let setmess = extra ? `${origin} | ${gptres}` : origin;
-      if(!file && !message.includes('SELLCR')){
+      if (!file && !message.includes('SELLCR')) {
         setmess = `${setmess} | **[CHART MISSING](https://stockmarkets000.web.app/capture-click/${webhookCl}/${tickerON})**`;
       }
       if (botdt.includes('RLWAYBOT')) {
@@ -632,11 +632,17 @@ export class WebhookService {
     }
   }
 
-  async captureChart(chartData: any, ticker: string, channel: string) {
+  async captureChart(
+    chartData: any,
+    ticker: string,
+    channel: string,
+    message: string,
+  ) {
     if (!chartData || chartData.length === 0) {
       return null;
     }
-    const slicedData = chartData && chartData.length > 0 ? chartData.slice(-200) : [];
+    const slicedData =
+      chartData && chartData.length > 0 ? chartData.slice(-200) : [];
     try {
       const browser = await puppeteer.launch({
         headless: true,
@@ -695,7 +701,7 @@ export class WebhookService {
         </head>
         <body id="capture-target">
           <!-- Display the chart date dynamically if chartData is available -->
-          <h3 class="center">${ticker} | <span id="stockDate"></span> </h3>
+          <h3 class="center">${ticker} | ${message} </h3>
           <!-- Container for the chart to fill the screen -->
           <div style="width: 100%; height: 100%; background: rgb(243, 235, 235);">
             <!-- Properly passing chartData using .stockData binding -->
@@ -705,9 +711,6 @@ export class WebhookService {
           <script>
             // Your data (replace this with your actual chart data)
             const chartData = ${datstring};
-    
-            // Set the date dynamically (if chartData is available)
-            document.getElementById('stockDate').innerText = chartData[chartData.length - 1]?.date || 'No Date Found';
     
             // Get the stock-chart-display element by its ID
             const stockChartElement = document.getElementById('stockChart');

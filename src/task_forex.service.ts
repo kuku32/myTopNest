@@ -24,6 +24,7 @@ export class TasksForexService {
         data,
         ticker,
         channel,
+        message,
       );
       return await this.LocalPLWR.sendDiscordNotification(
         message,
@@ -59,7 +60,8 @@ export class TasksForexService {
         // const lastData = data[data.length - 1];
         // const secondLastData = data[data.length - 2];
 
-        await this.compareAndSend1hour(data.reverse(),
+        await this.compareAndSend1hour(
+          data.reverse(),
           lastData,
           secondLastData,
           ticker,
@@ -103,7 +105,7 @@ export class TasksForexService {
         buyChannel,
         data,
       );
-      return
+      return;
     }
     const priceAbMA200BUY = await this.stockHelperService.priceAbMA200BUY(
       lastdata,
@@ -118,7 +120,7 @@ export class TasksForexService {
         buyChannel,
         data,
       );
-      return
+      return;
     }
     const priceBlMA200SELL = await this.stockHelperService.priceBlMA200SELL(
       lastdata,
@@ -146,7 +148,7 @@ export class TasksForexService {
         sellChannel,
         data,
       );
-      return
+      return;
     }
     const earlyBuyInRSI = await this.stockHelperService.earlyBuyInRSI(
       lastdata,
@@ -174,7 +176,7 @@ export class TasksForexService {
         sellChannel,
         data,
       );
-      return
+      return;
     }
     const earlySellInRSI = await this.stockHelperService.earlySellInRSI(
       lastdata,
@@ -188,7 +190,7 @@ export class TasksForexService {
         sellChannel,
         data,
       );
-      return
+      return;
     }
   }
 
