@@ -603,9 +603,9 @@ export class WebhookService {
     if (timefame.includes('day')) {
       dayStart = this.stockHelperService.getDateNDaysAgo(500 + daytestBF);
     } else if (timefame.includes('hour')) {
-      dayStart = this.stockHelperService.getDateNDaysAgo(20 + daytestBF);
+      dayStart = this.stockHelperService.getDateNDaysAgo(100 + daytestBF);
     } else if (timefame.includes('min')) {
-      dayStart = this.stockHelperService.getDateNDaysAgo(3 + daytestBF);
+      dayStart = this.stockHelperService.getDateNDaysAgo(16 + daytestBF);
     } else {
       return null;
     }
@@ -620,7 +620,7 @@ export class WebhookService {
     const result = await this.stockHelperService.returnNewData(response);
     const reversedData = [...result].reverse(); // clone + reverse
     // return reversedData; // success!
-    return reversedData.slice(0, 400);
+    return reversedData;
   }
 
   async tryCatcht_tiingo(BASE_URL: string) {
