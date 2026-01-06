@@ -29,7 +29,7 @@ import { TaskCryptoService_1day } from './task_crypto_daily.service';
   providers: [
     WebhookService,
     StockHelperService,
-    SendEverydayService,
+    //SendEverydayService,
     TasksService,
     TasksForexService,
     TaskCryptoService_1day,
