@@ -13,32 +13,6 @@ export class TaskCryptoService_1Hour {
   ) {}
   private readonly logger = new Logger(TaskCryptoService_1Hour.name);
 
-  async sendDiscord(
-    message: string,
-    ticker: string,
-    lastdata: any,
-    channel: string,
-    data?: any,
-  ) {
-    try {
-      const fileBuffer = await this.LocalPLWR.captureChart(
-        data,
-        ticker,
-        channel,
-        message,
-      );
-      return await this.LocalPLWR.sendDiscordNotification(
-        message,
-        `${channel} ${ticker}`,
-        JSON.stringify(lastdata),
-        fileBuffer,
-      );
-    } catch (err) {
-      console.error('❌ Error in controller:', err);
-      throw err;
-    }
-  }
-
   private async processTickers1hour(
     tickers: string[],
     timeframe: string,
@@ -75,7 +49,7 @@ export class TaskCryptoService_1Hour {
 
           const lastData = data[data.length - 1];
           const secondLastData = data[data.length - 2];
-          await this.compareAndSend1hour(
+          await this.LocalPLWR.compareAndSend1hour(
             data,
             lastData,
             secondLastData,
@@ -86,7 +60,7 @@ export class TaskCryptoService_1Hour {
           );
           this.logger.log(`${ticker} processed successfully.`);
         } catch (error) {
-          await this.sendDiscord(
+          await this.LocalPLWR.sendDiscord(
             `ERROR ON API AT: ${timeframe} On ${date}: ${JSON.stringify(
               error,
             )}`,
@@ -101,123 +75,6 @@ export class TaskCryptoService_1Hour {
 
     // Wait for all ticker promises to complete concurrently (with concurrency limit)
     await Promise.all(tickerPromises);
-  }
-  async compareAndSend1hour(
-    data,
-    lastdata,
-    Secondlastdata,
-    ticker,
-    timeframe,
-    B_Channel,
-    HT_Channel,
-  ) {
-    if (timeframe === '4h' || timeframe === '1day') {
-      await this.sendDiscord(
-        `JUST WATCH_ME-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker}-ON-${timeframe}`,
-        lastdata,
-        HT_Channel,
-        data,
-      );
-    }
-    const macdCrossAB_BL0 = await this.stockHelperService.macdCrossAB_BL0(
-      lastdata,
-      Secondlastdata,
-    );
-    if (macdCrossAB_BL0) {
-      await this.sendDiscord(
-        `BUY macdCrossAB_BL0-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker}-ON-${timeframe}`,
-        lastdata,
-        B_Channel,
-        data,
-      );
-      return;
-    }
-
-    const priceAbMA200BUY = await this.stockHelperService.priceAbMA200BUY(
-      lastdata,
-      Secondlastdata,
-    );
-    if (priceAbMA200BUY) {
-      // add to uplist and delete out downlist
-      await this.sendDiscord(
-        `BUY priceAbMA200BUY-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker}-ON-${timeframe}`,
-        lastdata,
-        B_Channel,
-        data,
-      );
-      return;
-    }
-    const priceBlMA200SELL = await this.stockHelperService.priceBlMA200SELL(
-      lastdata,
-      Secondlastdata,
-    );
-    if (priceBlMA200SELL) {
-      await this.sendDiscord(
-        `SELLCRLLLL priceBlMA200SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker}-ON-${timeframe}`,
-        lastdata,
-        B_Channel,
-        data,
-      );
-      return;
-    }
-    const macdCrossAB = await this.stockHelperService.macdCrossAB(
-      lastdata,
-      Secondlastdata,
-    );
-    if (macdCrossAB) {
-      await this.sendDiscord(
-        `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker}-ON-${timeframe}`,
-        lastdata,
-        HT_Channel,
-        data,
-      );
-      return;
-    }
-    const earlyBuyInRSI = await this.stockHelperService.earlyBuyInRSI(
-      lastdata,
-      Secondlastdata,
-    );
-    if (earlyBuyInRSI) {
-      await this.sendDiscord(
-        `BUY earlyBuyInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker}-ON-${timeframe}`,
-        lastdata,
-        HT_Channel,
-        data,
-      );
-      return;
-    }
-    const macdCrossBL = await this.stockHelperService.macdCrossBL(
-      lastdata,
-      Secondlastdata,
-    );
-    if (macdCrossBL) {
-      await this.sendDiscord(
-        `SELLCRLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker}-ON-${timeframe}`,
-        lastdata,
-        HT_Channel,
-      );
-      return;
-    }
-    const earlySellInRSI = await this.stockHelperService.earlySellInRSI(
-      lastdata,
-      Secondlastdata,
-    );
-    if (earlySellInRSI) {
-      await this.sendDiscord(
-        `SELLCRLLLL earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker}-ON-${timeframe}`,
-        lastdata,
-        HT_Channel,
-      );
-      return;
-    }
   }
 
   @Cron('0 * * * *') // every 1 hour

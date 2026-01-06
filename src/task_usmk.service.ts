@@ -256,21 +256,21 @@ export class TasksUSMKService {
       throw err;
     }
   }
-  @Cron('*/5 14-21 * * 1-5', { timeZone: 'UTC' })
+  @Cron('0 14-21 * * 1-5', { timeZone: 'UTC' })
   async runAllWatchLists() {
     const symbols = (await this.LocalPLWR.getDolist()) || [];
     const combined = [...this.mysymbols, ...symbols];
     await Promise.all([
-      this.USTIMERUN(combined, this.allkeys, 'US_EARLY_5MIN', 2, '5min'),
+      this.USTIMERUN(combined, this.allkeys, 'US_EARLY_5MIN', 0, '1hour'),
     ]);
   }
 
-  @Cron('*/15 14-21 * * 1-5', { timeZone: 'UTC' })
+  @Cron('*/30 14-21 * * 1-5', { timeZone: 'UTC' })
   async runAllWatL15min() {
     const symbols = (await this.LocalPLWR.getDolist()) || [];
     const combined = [...this.mysymbols, ...symbols];
     await Promise.all([
-      this.USTIMERUN(combined, this.allkeys, 'US_EARLY_15MIN', 3, '15min'),
+      this.USTIMERUN(combined, this.allkeys, 'US_EARLY_15MIN', 3, '30min'),
     ]);
   }
 }
