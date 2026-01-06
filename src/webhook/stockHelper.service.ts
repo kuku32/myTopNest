@@ -435,15 +435,15 @@ export class StockHelperService {
   }
   async priceAbMA200BUY(last: StockData, prev: StockData): Promise<boolean> {
     if (!last || !prev) return false; // safety
-    const LastAbMA200 = last.close > last.MA200;
-    const PrevBlMa200 = prev.close < prev.MA200;
+    const LastAbMA200 = last.high > last.MA200;
+    const PrevBlMa200 = prev.low < prev.MA200;
     return LastAbMA200 && PrevBlMa200;
   }
 
   async priceBlMA200SELL(last: StockData, prev: StockData): Promise<boolean> {
     if (!last || !prev) return false; // safety
-    const LastAbMA200 = last.close < last.MA200;
-    const PrevBlMa200 = prev.close > prev.MA200;
+    const LastAbMA200 = last.low < last.MA200;
+    const PrevBlMa200 = prev.high > prev.MA200;
     return LastAbMA200 && PrevBlMa200;
   }
 
@@ -462,5 +462,15 @@ export class StockHelperService {
     );
     const blowAll = last.low < lowestLast;
     return blowAll && last.divergence < 0;
+  }
+
+  async Over200NUpBuy(last: StockData, prev: StockData): Promise<boolean> {
+    if (!last || !prev) return false; // safety
+    return last.divergence > 0 && await this.priceAbMA200BUY(last, prev);
+  }
+
+  async Under200NDownSell(last: StockData, prev: StockData): Promise<boolean> {
+    if (!last || !prev) return false; // safety
+    return last.divergence < 0 && await this.priceBlMA200SELL(last, prev);
   }
 }

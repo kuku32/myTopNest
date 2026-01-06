@@ -6,6 +6,7 @@ import * as DTO from './dto';
 import { AttachmentBuilder, EmbedBuilder, WebhookClient } from 'discord.js';
 import { ConfigService } from '@nestjs/config';
 import * as dbrs from './database.api';
+import * as Timer from './compareTime';
 import * as puppeteer from 'puppeteer';
 import pLimit from 'p-limit';
 @Injectable()
@@ -823,6 +824,21 @@ export class WebhookService {
       throw err;
     }
   }
+  async checktimeMinutesEST(ticker:string,date,time:number) {
+    const isWithinRange = Timer.checkIfWithin5MinutesEST(date, time);
+    if (isWithinRange) {
+      console.log(ticker, `✅ Within ±${time} minutes of EST time`);
+      // check one
+    } else {
+      console.log(
+        ticker,
+        `❌ Outside  ±${time} minutes of EST time: `,
+        date,
+      );
+      return;
+    }
+  }
+
   async compareAndSend1hour(
     data,
     lastdata,
@@ -840,6 +856,20 @@ export class WebhookService {
         HT_Channel,
         data,
       );
+    }
+    const Over200NUpBuy = await this.stockHelperService.Over200NUpBuy(
+      lastdata,
+      Secondlastdata,
+    );
+    if (Over200NUpBuy) {
+      await this.sendDiscord(
+        `BUY Over200NUpBuy-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return;
     }
     const macdCrossAB_BL0 = await this.stockHelperService.macdCrossAB_BL0(
       lastdata,
@@ -871,6 +901,7 @@ export class WebhookService {
       );
       return;
     }
+
     const priceBlMA200SELL = await this.stockHelperService.priceBlMA200SELL(
       lastdata,
       Secondlastdata,
@@ -885,6 +916,7 @@ export class WebhookService {
       );
       return;
     }
+
     const macdCrossAB = await this.stockHelperService.macdCrossAB(
       lastdata,
       Secondlastdata,
@@ -933,6 +965,20 @@ export class WebhookService {
     if (earlySellInRSI) {
       await this.sendDiscord(
         `SELLCRLLLL earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        HT_Channel,
+      );
+      return;
+    }
+
+    const Under200NDownSell = await this.stockHelperService.Under200NDownSell(
+      lastdata,
+      Secondlastdata,
+    );
+    if (Under200NDownSell) {
+      await this.sendDiscord(
+        `SELLCRLLLL Under200NDownSell-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
         HT_Channel,
