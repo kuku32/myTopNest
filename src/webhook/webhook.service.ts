@@ -7,6 +7,7 @@ import { AttachmentBuilder, EmbedBuilder, WebhookClient } from 'discord.js';
 import { ConfigService } from '@nestjs/config';
 import * as dbrs from './database.api';
 import * as puppeteer from 'puppeteer';
+import pLimit from 'p-limit';
 @Injectable()
 export class WebhookService {
   getHello() {
@@ -327,22 +328,30 @@ export class WebhookService {
     );
     const Ids = Object.keys(getIdsOb);
     if (Ids.length === 0) return { msg: 'nothing to delete' };
-    for (const messageId of Ids) {
-      try {
-        await this.webhookClient.deleteMessage(messageId);
-        const WEBHOOKS_CNA =
-          this.WEBHOOKS_CN[webhookCl] || this.WEBHOOKS_CN.Other;
-        await this.deleteInFB(
-          `discord_slack_id/discord/${WEBHOOKS_CNA}/${current}/${messageId}.json`,
-        );
-      } catch (error) {
-        if (error.code === 'MESSAGE_NOT_FOUND') {
-          console.log(`Message ${messageId} does not exist.`);
-        } else {
-          console.log(`Error deleting message ${messageId}`);
+
+    // Create a limit function to restrict concurrency to 20
+    const limit = pLimit(10); // This will allow only 20 promises to run in parallel
+
+    // Prepare the delete promises, wrapped in the limit function
+    const deletePromises = Ids.map((messageId) =>
+      limit(async () => {
+        try {
+          await this.webhookClient.deleteMessage(messageId);
+          const messagePath = `discord_slack_id/discord/${WEBHOOKS_CNA}/${current}/${messageId}.json`;
+          await this.deleteInFB(messagePath);
+        } catch (error) {
+          if (error.code === 'MESSAGE_NOT_FOUND') {
+            console.log(`Message ${messageId} does not exist.`);
+          } else {
+            console.log(`Error deleting message ${messageId}:`, error);
+          }
         }
-      }
-    }
+      }),
+    );
+
+    // Wait for all delete operations to complete
+    await Promise.allSettled(deletePromises);
+
     return { msg: 'delete complete' };
   }
 
