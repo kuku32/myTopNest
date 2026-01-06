@@ -219,7 +219,7 @@ export class TaskCryptoService_1day {
       return;
     }
   }
-  @Cron('14 1 * * *') // Every day at 1:14 AM
+  @Cron('14 3 * * *') // Every day at 1:14 AM
   async handledailyCrypto() {
     const tickers = [
       'BTCUSD',
@@ -243,7 +243,7 @@ export class TaskCryptoService_1day {
       0,
     );
   }
-  @Cron('16 1 * * *') // Every day at 1:16 AM
+  @Cron('16 3 * * *') // Every day at 1:16 AM
   async handledailyCrypto1() {
     const tickers = ['SOLUSD', 'ADAUSD', 'XRPUSD', 'BNBUSD', 'LINKUSD'];
     // const tickers = ['BTCUSD'];
@@ -258,7 +258,7 @@ export class TaskCryptoService_1day {
       0,
     );
   }
-  @Cron('18 1 * * *') // Every day at 1:18 AM
+  @Cron('18 3 * * *') // Every day at 1:18 AM
   async handledailyCrypto2() {
     const tickers = [
       'SUIUSD',
