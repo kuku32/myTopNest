@@ -824,17 +824,13 @@ export class WebhookService {
       throw err;
     }
   }
-  async checktimeMinutesEST(ticker:string,date,time:number) {
+  async checktimeMinutesEST(ticker: string, date, time: number) {
     const isWithinRange = Timer.checkIfWithin5MinutesEST(date, time);
     if (isWithinRange) {
       console.log(ticker, `✅ Within ±${time} minutes of EST time`);
       // check one
     } else {
-      console.log(
-        ticker,
-        `❌ Outside  ±${time} minutes of EST time: `,
-        date,
-      );
+      console.log(ticker, `❌ Outside  ±${time} minutes of EST time: `, date);
       return;
     }
   }
@@ -955,6 +951,7 @@ export class WebhookService {
         `${ticker}-ON-${timeframe}`,
         lastdata,
         HT_Channel,
+        data,
       );
       return;
     }
@@ -968,6 +965,7 @@ export class WebhookService {
         `${ticker}-ON-${timeframe}`,
         lastdata,
         HT_Channel,
+        data,
       );
       return;
     }
@@ -982,6 +980,7 @@ export class WebhookService {
         `${ticker}-ON-${timeframe}`,
         lastdata,
         HT_Channel,
+        data,
       );
       return;
     }
