@@ -31,7 +31,7 @@ import { TaskCryptoService_1day } from './task_crypto_daily.service';
     StockHelperService,
     SendEverydayService,
     TasksService,
-    TasksForexService,
+    // TasksForexService,
     TaskCryptoService_1day,
     TaskCryptoService_4Hour,
     TaskCryptoService_1Hour,
