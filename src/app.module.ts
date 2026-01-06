@@ -37,7 +37,7 @@ import { TaskCryptoService_1day } from './task_crypto_daily.service';
     TaskCryptoService_1Hour,
     TaskCryptoService_30Min,
     TaskCryptoService_15Min,
-    // TasksUSMKService,
+    TasksUSMKService,
     // TasksUSMK_1MIN_Service,
   ],
 })

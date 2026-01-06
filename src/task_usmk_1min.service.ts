@@ -5,7 +5,7 @@ import axios from 'axios';
 import { WebhookService } from './webhook/webhook.service';
 import { StockHelperService } from './webhook/stockHelper.service';
 import { ConfigService } from '@nestjs/config';
-import * as Timer from './webhook/compareTime';
+
 import { StockData } from './webhook/dto/chartData';
 import pLimit from 'p-limit';
 @Injectable()
@@ -120,16 +120,8 @@ export class TasksUSMK_1MIN_Service {
     timeframe,
     channel,
   ) {
-    const isWithinRange = Timer.checkIfWithin5MinutesEST(lastdata?.date,3);
-    if (isWithinRange) {
-      console.log(ticker, '✅ Within ±2 minutes of EST time');
-            // check one
-    } else {
-      console.log(
-        ticker,
-        '❌ Outside ±2 minutes of EST time: ',
-        lastdata?.date,
-      );
+    const isWithinRange = this.LocalPLWR.checktimeMinutesEST(ticker,lastdata?.date,3);
+    if (!isWithinRange) {
       return;
     }
     const macdCrossAB_BL0 = await this.stockHelperService.macdCrossAB_BL0(
