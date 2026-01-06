@@ -69,8 +69,6 @@ export class TasksUSMK_1MIN_Service {
     channel: string,
     delay = 2,
   ) {
-    const limit = pLimit(5); // Limit the concurrency to 8 at a time
-
     const date = new Date();
 
     const washselllists =
@@ -79,50 +77,40 @@ export class TasksUSMK_1MIN_Service {
     // Delay 2 minutes before processing
     await new Promise((resolve) => setTimeout(resolve, delay * 60 * 1000));
 
-    // Prepare ticker promises with concurrency limit
-    const tickerPromises = tickers.map((ticker) =>
-      limit(async () => {
-        if (washselllists.includes(ticker)) {
-          console.log(`⏭️ Skipping ${ticker} — in wash sell list`);
-          return; // Skip this ticker and move on
+    for (const ticker of tickers) {
+      if (washselllists.includes(ticker)) {
+        console.log(`⏭️ Skipping ${ticker} — in wash sell list`);
+        continue; // ✅ Skip this ticker and move on
+      }
+      try {
+        let data;
+        if (apikey === 'all') {
+          data = await this.LocalPLWR.TwReveseNOAPI(ticker, timeframe);
+        } else {
+          data = await this.LocalPLWR.get12for(ticker, timeframe, apikey);
         }
 
-        try {
-          let data;
-          if (apikey === 'all') {
-            data = await this.LocalPLWR.TwReveseNOAPI(ticker, timeframe);
-          } else {
-            data = await this.LocalPLWR.get12for(ticker, timeframe, apikey);
-          }
+        const lastData = data[data.length - 1];
+        const secondLastData = data[data.length - 2];
 
-          const lastData = data[data.length - 1];
-          const secondLastData = data[data.length - 2];
-
-          // Process the data
-          await this.compareAndSend(
-            data,
-            lastData,
-            secondLastData,
-            ticker,
-            timeframe,
-            ticker,
-          );
-          this.logger.log(`${ticker} processed successfully.`);
-        } catch (error) {
-          // Send error notification and log the error
-          await this.sendDiscord(
-            `ERROR ON API AT: ${timeframe} On ${date}`,
-            `RLWAYBOT ${ticker} at ${timeframe}`,
-            'Nono',
-            'ERORR_CALL',
-          );
-          this.logger.error(`Error processing ${ticker}: ${error.message}`);
-        }
-      }),
-    );
-
-    // Wait for all ticker promises to complete concurrently (with concurrency limit)
-    await Promise.all(tickerPromises);
+        await this.compareAndSend(data,
+          lastData,
+          secondLastData,
+          ticker,
+          timeframe,
+          ticker,
+        );
+        this.logger.log(`${ticker} processed successfully.`);
+      } catch (error) {
+        this.sendDiscord(
+          `ERROR ON API AT: ${timeframe} On ${date}`,
+          `RSIENDBOT ${ticker} at ${timeframe}`,
+          'Nono',
+          'ERORR_CALL',
+        );
+        this.logger.error(`Error processing ${ticker}: ${error.message}`);
+      }
+    }
   }
   async compareAndSend(
     data,
@@ -132,6 +120,18 @@ export class TasksUSMK_1MIN_Service {
     timeframe,
     channel,
   ) {
+    const isWithinRange = Timer.checkIfWithin5MinutesEST(lastdata?.date,3);
+    if (isWithinRange) {
+      console.log(ticker, '✅ Within ±2 minutes of EST time');
+            // check one
+    } else {
+      console.log(
+        ticker,
+        '❌ Outside ±2 minutes of EST time: ',
+        lastdata?.date,
+      );
+      return;
+    }
     const macdCrossAB_BL0 = await this.stockHelperService.macdCrossAB_BL0(
       lastdata,
       Secondlastdata,
@@ -200,8 +200,8 @@ export class TasksUSMK_1MIN_Service {
       throw err;
     }
   }
-  @Cron('10 14-21 * * 1-5', { timeZone: 'UTC' })
-  // @Cron('10 * * * * *', { timeZone: 'UTC' }) // every minute at the 10th second in UTC for testing
+  // @Cron('10 14-21 * * 1-5', { timeZone: 'UTC' })
+  @Cron('10 * * * * *', { timeZone: 'UTC' }) // every minute at the 10th second in UTC for testing
   async runAllWatchLists() {
     await Promise.all([
       this.USTIMERUN(this.mysymbols, this.allkeys, 'US_EARLY_5MIN', 0, '1min'),

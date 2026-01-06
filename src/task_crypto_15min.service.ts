@@ -43,7 +43,8 @@ export class TaskCryptoService_15Min {
     tickers: string[],
     timeframe: string,
     apikey: string,
-    channel: string,
+    B_Channel,
+    HT_Channel,
     delay = 5,
   ) {
     const limit = pLimit(1); // Limit the concurrency to 5 at a time
@@ -80,7 +81,8 @@ export class TaskCryptoService_15Min {
             secondLastData,
             ticker,
             timeframe,
-            channel,
+            B_Channel,
+            HT_Channel,
           );
           this.logger.log(`${ticker} processed successfully.`);
         } catch (error) {
@@ -106,14 +108,15 @@ export class TaskCryptoService_15Min {
     Secondlastdata,
     ticker,
     timeframe,
-    channel,
+    B_Channel,
+    HT_Channel,
   ) {
     if (timeframe === '4h' || timeframe === '1day') {
       await this.sendDiscord(
         `JUST WATCH_ME-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        channel,
+        HT_Channel,
         data,
       );
     }
@@ -126,7 +129,7 @@ export class TaskCryptoService_15Min {
         `BUY macdCrossAB_BL0-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        'CRYPTO_EARLY_5MIN',
+        B_Channel,
         data,
       );
       return;
@@ -142,7 +145,7 @@ export class TaskCryptoService_15Min {
         `BUY priceAbMA200BUY-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        'CRYPTO_EARLY_5MIN',
+        B_Channel,
         data,
       );
       return;
@@ -156,7 +159,7 @@ export class TaskCryptoService_15Min {
         `SELLCRLLLL priceBlMA200SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        'CRYPTO_EARLY_5MIN',
+        B_Channel,
         data,
       );
       return;
@@ -170,7 +173,7 @@ export class TaskCryptoService_15Min {
         `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        'CRYPTO_EARLY_15MIN',
+        HT_Channel,
         data,
       );
       return;
@@ -184,7 +187,7 @@ export class TaskCryptoService_15Min {
         `BUY earlyBuyInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        'CRYPTO_EARLY_15MIN',
+        HT_Channel,
         data,
       );
       return;
@@ -198,7 +201,7 @@ export class TaskCryptoService_15Min {
         `SELLCRLLLL macdCrossBL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        'CRYPTO_ALL',
+        HT_Channel,
       );
       return;
     }
@@ -211,7 +214,7 @@ export class TaskCryptoService_15Min {
         `SELLCRLLLL earlySellInRSI-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        'CRYPTO_ALL',
+        HT_Channel,
       );
       return;
     }
@@ -243,7 +246,7 @@ export class TaskCryptoService_15Min {
       tickers,
       '15min',
       'all',
-      'CRYPTO_EARLY_5MIN',
+      'CRYPTO_EARLY_5MIN','CR_15_HT',
       2,
     );
   }
