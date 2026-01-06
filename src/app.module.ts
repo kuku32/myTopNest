@@ -10,8 +10,8 @@ import { TasksForexService } from './task_forex.service';
 import { SendEverydayService } from './send_everyday.service';
 import { TasksUSMKService } from './task_usmk.service';
 import { TasksUSMK_1MIN_Service } from './task_usmk_1min.service';
-import { TaskCryptoServic_4Hour } from './task_crypto_4hour.service';
-import { TaskCryptoServic_1Hour } from './task_crypto_1hour.service';
+import { TaskCryptoService_4Hour } from './task_crypto_4hour.service';
+import { TaskCryptoService_1Hour } from './task_crypto_1hour.service';
 import { TaskCryptoService_30Min } from './task_crypto_30min.service';
 import { TaskCryptoService_15Min } from './task_crypto_15min.service';
 import { TaskCryptoService_1day } from './task_crypto_daily.service';
@@ -33,8 +33,8 @@ import { TaskCryptoService_1day } from './task_crypto_daily.service';
     TasksService,
     TasksForexService,
     TaskCryptoService_1day,
-    TaskCryptoServic_4Hour,
-    TaskCryptoServic_1Hour,
+    TaskCryptoService_4Hour,
+    TaskCryptoService_1Hour,
     TaskCryptoService_30Min,
     TaskCryptoService_15Min,
     // TasksUSMKService,

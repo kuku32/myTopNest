@@ -6,12 +6,12 @@ import { StockHelperService } from './webhook/stockHelper.service';
 import pLimit from 'p-limit';
 import { WebhookService } from './webhook/webhook.service';
 @Injectable()
-export class TaskCryptoServic_1Hour {
+export class TaskCryptoService_1Hour {
   constructor(
     private readonly stockHelperService: StockHelperService,
     private readonly LocalPLWR: WebhookService,
   ) {}
-  private readonly logger = new Logger(TaskCryptoServic_1Hour.name);
+  private readonly logger = new Logger(TaskCryptoService_1Hour.name);
 
   async sendDiscord(
     message: string,
