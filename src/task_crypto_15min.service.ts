@@ -53,7 +53,7 @@ export class TaskCryptoService_15Min {
           if (!isWithinRange) {
             return;
           }
-          await this.LocalPLWR.compareAndSend1hour(
+          await this.LocalPLWR.crossAB_bl0_not15(
             data,
             lastData,
             secondLastData,

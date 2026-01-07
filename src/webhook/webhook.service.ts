@@ -1074,4 +1074,82 @@ export class WebhookService {
       return;
     }
   }
+
+  async crossAB_bl0_not15(
+    data,
+    lastdata,
+    Secondlastdata,
+    ticker,
+    timeframe,
+    B_Channel,
+    HT_Channel,
+  ) {
+    const macdCrossAB_BL0 = await this.stockHelperService.macdCrossAB_BL0(
+      lastdata,
+      Secondlastdata,
+    );
+    if (macdCrossAB_BL0) {
+      await this.sendDiscord(
+        `BUY macdCrossAB_BL0-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return;
+    }
+    const macdCrossAB = await this.stockHelperService.macdCrossAB(
+      lastdata,
+      Secondlastdata,
+    );
+    if (macdCrossAB) {
+      await this.sendDiscord(
+        `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        HT_Channel,
+        data,
+      );
+      return;
+    }
+  }
+
+  async crossAB_bl0_not5(
+    data,
+    lastdata,
+    Secondlastdata,
+    ticker,
+    timeframe,
+    B_Channel,
+    HT_Channel,
+  ) {
+    const macdCrossAB_BL0 = await this.stockHelperService.macdCrossAB_BL0(
+      lastdata,
+      Secondlastdata,
+    );
+    if (macdCrossAB_BL0) {
+      await this.sendDiscord(
+        `BUY macdCrossAB_BL0-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return;
+    }
+    const earlySellInRSI = await this.stockHelperService.earlySellInRSI(
+      lastdata,
+      Secondlastdata,
+    );
+    if (earlySellInRSI) {
+      await this.sendDiscord(
+        `BUY macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        HT_Channel,
+        data,
+      );
+      return;
+    }
+  }
 }
