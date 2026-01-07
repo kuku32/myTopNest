@@ -59,7 +59,7 @@ export class SendEverydayService {
   async delete() {
     const yesterday = this.stockHelperService.getDateNDaysAgo(1);
     const Channels = [
-      'US_ALL',
+      'US_ALL','TSLA','OTHER','SMCI','US_5M_HT',
       'ERORR_CALL',
       'CRON_CHECK',
       '15MIN_BUY_FX',
