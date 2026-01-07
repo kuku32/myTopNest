@@ -14,6 +14,7 @@ import { TaskCryptoService_4Hour } from './task_crypto_4hour.service';
 import { TaskCryptoService_1Hour } from './task_crypto_1hour.service';
 import { TaskCryptoService_30Min } from './task_crypto_30min.service';
 import { TaskCryptoService_15Min } from './task_crypto_15min.service';
+import { TaskCryptoService_5Min } from './task_crypto_5min.service';
 import { TaskCryptoService_1day } from './task_crypto_daily.service';
 
 @Module({
@@ -31,12 +32,13 @@ import { TaskCryptoService_1day } from './task_crypto_daily.service';
     StockHelperService,
     //SendEverydayService,
     TasksService,
-    // TasksForexService,
+    TasksForexService,
     TaskCryptoService_1day,
     TaskCryptoService_4Hour,
     TaskCryptoService_1Hour,
     TaskCryptoService_30Min,
     TaskCryptoService_15Min,
+    TaskCryptoService_5Min,
     // TasksUSMKService,
     // TasksUSMK_1MIN_Service,
   ],
