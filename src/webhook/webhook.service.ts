@@ -1050,7 +1050,7 @@ export class WebhookService {
     );
     if (BlMA200_MA20_MA50_MA100_SELL) {
       await this.sendDiscord(
-        `SELLCRLLLL BlMA200_MA20_MA50_MA100_SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `SELLLLLL BlMA200_MA20_MA50_MA100_SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
         B_Channel,
@@ -1065,7 +1065,7 @@ export class WebhookService {
     );
     if (ABMA200_macdCrossBL_SELL) {
       await this.sendDiscord(
-        `SELLCRLLLL ABMA200_macdCrossBL_SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `SELLLLLL ABMA200_macdCrossBL_SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
         B_Channel,
