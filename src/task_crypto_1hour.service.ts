@@ -49,6 +49,10 @@ export class TaskCryptoService_1Hour {
 
           const lastData = data[data.length - 1];
           const secondLastData = data[data.length - 2];
+          const isWithinRange = this.LocalPLWR.checktimeMinutesEST(ticker,lastData?.date,60);
+          if (!isWithinRange) {
+            return;
+          }
           await this.LocalPLWR.compareAndSend1hour(
             data,
             lastData,
