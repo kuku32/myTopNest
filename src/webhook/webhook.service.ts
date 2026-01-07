@@ -846,7 +846,7 @@ export class WebhookService {
     }
   }
 
-  async compareAndSend1hour(
+  async compareAndSend1hour1(
     data,
     lastdata,
     Secondlastdata,
@@ -991,6 +991,84 @@ export class WebhookService {
         `${ticker}-ON-${timeframe}`,
         lastdata,
         HT_Channel,
+        data,
+      );
+      return;
+    }
+  }
+
+  async compareAndSend1hour(
+    data,
+    lastdata,
+    Secondlastdata,
+    ticker,
+    timeframe,
+    B_Channel,
+    HT_Channel,
+  ) {
+    if (timeframe === '4h' || timeframe === '1day') {
+      await this.sendDiscord(
+        `JUST WATCH_ME-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        HT_Channel,
+        data,
+      );
+    }
+    const BlMA200_MA20_MA50_MA100_BUY = await this.stockHelperService.BlMA200_MA20_MA50_MA100_BUY(
+      lastdata,
+      Secondlastdata,
+    );
+    if (BlMA200_MA20_MA50_MA100_BUY) {
+      await this.sendDiscord(
+        `BUY BlMA200_MA20_MA50_MA100_BUY-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return;
+    }
+    const ABMA200_macdCrossAB_BUY = await this.stockHelperService.ABMA200_macdCrossAB_BUY(
+      lastdata,
+      Secondlastdata,
+    );
+    if (ABMA200_macdCrossAB_BUY) {
+      await this.sendDiscord(
+        `BUY ABMA200_macdCrossAB_BUY-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return;
+    }
+
+    const BlMA200_MA20_MA50_MA100_SELL = await this.stockHelperService.BlMA200_MA20_MA50_MA100_SELL(
+      lastdata,
+      Secondlastdata,
+    );
+    if (BlMA200_MA20_MA50_MA100_SELL) {
+      await this.sendDiscord(
+        `SELLCRLLLL BlMA200_MA20_MA50_MA100_SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return;
+    }
+
+    const ABMA200_macdCrossBL_SELL = await this.stockHelperService.ABMA200_macdCrossBL_SELL(
+      lastdata,
+      Secondlastdata,
+    );
+    if (ABMA200_macdCrossBL_SELL) {
+      await this.sendDiscord(
+        `SELLCRLLLL ABMA200_macdCrossBL_SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
         data,
       );
       return;
