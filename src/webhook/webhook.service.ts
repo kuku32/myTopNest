@@ -1053,7 +1053,7 @@ export class WebhookService {
         `SELLLLLL BlMA200_MA20_MA50_MA100_SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        B_Channel,
+        HT_Channel,
         data,
       );
       return;
@@ -1068,7 +1068,7 @@ export class WebhookService {
         `SELLLLLL ABMA200_macdCrossBL_SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
-        B_Channel,
+        HT_Channel,
         data,
       );
       return;
