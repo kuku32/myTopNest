@@ -36,7 +36,7 @@ export class TasksForexService {
         // const lastData = data[data.length - 1];
         // const secondLastData = data[data.length - 2];
 
-        await this.LocalPLWR.h4_daily(
+        await this.LocalPLWR.StochRSICross(
           data.reverse(),
           lastData,
           secondLastData,

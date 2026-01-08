@@ -50,7 +50,7 @@ export class TaskCryptoService_30Min {
           const lastData = data[data.length - 1];
           const secondLastData = data[data.length - 2];
 
-          await this.LocalPLWR.compareAndSend_BUY(
+          await this.LocalPLWR.StochRSICross(
             data,
             lastData,
             secondLastData,

@@ -1247,4 +1247,40 @@ export class WebhookService {
       return;
     }
   }
+
+
+  async StochRSICross(
+    data,
+    lastdata,
+    Secondlastdata,
+    ticker,
+    timeframe,
+    B_Channel,
+    HT_Channel,
+  ) {
+    const StochRSICross = await this.stockHelperService.StochRSICross(
+      lastdata,
+      Secondlastdata,
+    );
+    if (StochRSICross.crossUp) {
+      await this.sendDiscord(
+        `BUY-StochRSICross-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return;
+    }
+    if (StochRSICross.crossDo) {
+      await this.sendDiscord(
+        `SELL-StochRSICross 80-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        HT_Channel,
+        data,
+      );
+      return;
+    }
+  }
 }

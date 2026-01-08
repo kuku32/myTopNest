@@ -53,7 +53,7 @@ export class TaskCryptoService_5Min {
           if (!isWithinRange) {
             return;
           }
-          await this.LocalPLWR.compareAndSend_BUY(
+          await this.LocalPLWR.StochRSICross(
             data,
             lastData,
             secondLastData,

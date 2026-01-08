@@ -610,15 +610,33 @@ SELL ALL
     return abMa50 && MacdLine_divergen && BlMa200;
   }
 
-  async StochRSIBuy_HOLD(last: StockData, prev: StockData): Promise<{upside:boolean, upside80:boolean}> {
-    if (!last || !prev) return {upside:false, upside80:false}; // safety
-    const stockRSILAUP= last.StochRSI_K - last.StochRSI_D > 0
-    const stockRSIPRUP= prev.StochRSI_K - prev.StochRSI_D > 0
-    const compare2day = stockRSILAUP >= stockRSIPRUP
-    const inrange2080=  last.StochRSI_K < 80  && prev.StochRSI_K < 80
+  async StochRSIBuy_HOLD(
+    last: StockData,
+    prev: StockData,
+  ): Promise<{ upside: boolean; upside80: boolean }> {
+    if (!last || !prev) return { upside: false, upside80: false }; // safety
+    const stockRSILAUP = last.StochRSI_K - last.StochRSI_D > 0;
+    const stockRSIPRUP = prev.StochRSI_K - prev.StochRSI_D > 0;
+    const compare2day = stockRSILAUP >= stockRSIPRUP;
+    const inrange2080 = last.StochRSI_K < 80 && prev.StochRSI_K < 80;
     return {
-      upside : stockRSILAUP && compare2day,
-      upside80 : stockRSILAUP && stockRSIPRUP && inrange2080
+      upside: stockRSILAUP && compare2day,
+      upside80: stockRSILAUP && stockRSIPRUP && inrange2080,
+    };
+  }
+
+  async StochRSICross(
+    last: StockData,
+    prev: StockData,
+  ): Promise<{ crossUp: boolean; crossDo: boolean }> {
+    if (!last || !prev) return { crossUp: false, crossDo: false }; // safety
+    const stockRSILast = last.StochRSI_K - last.StochRSI_D;
+    const stockRSIPrev = prev.StochRSI_K - prev.StochRSI_D;
+    const crossUp = stockRSILast >= 0 && stockRSIPrev <= 0;
+    const crossDo = stockRSILast <= 0 && stockRSIPrev >= 0;
+    return {
+      crossUp,
+      crossDo,
     };
   }
 }
