@@ -1006,15 +1006,6 @@ export class WebhookService {
     B_Channel,
     HT_Channel,
   ) {
-    if (timeframe === '4h' || timeframe === '1day') {
-      await this.sendDiscord(
-        `JUST WATCH_ME-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker}-ON-${timeframe}`,
-        lastdata,
-        HT_Channel,
-        data,
-      );
-    }
     const BlMA200_MA20_MA50_MA100_BUY = await this.stockHelperService.BlMA200_MA20_MA50_MA100_BUY(
       lastdata,
       Secondlastdata,

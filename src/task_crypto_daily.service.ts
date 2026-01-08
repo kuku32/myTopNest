@@ -58,6 +58,13 @@ export class TaskCryptoService_1day {
             B_Channel,
             HT_Channel,
           );
+          await this.LocalPLWR.sendDiscord(
+            `JUST WATCH_ME-${timeframe}(MACD:${lastData?.MACDLine}): ${lastData?.date}`,
+            `${ticker}-ON-${timeframe}`,
+            lastData,
+            HT_Channel,
+            data,
+          );
           this.logger.log(`${ticker} processed successfully.`);
         } catch (error) {
           await this.LocalPLWR.sendDiscord(

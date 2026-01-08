@@ -33,6 +33,9 @@ export class SendEverydayService {
       '4HOUR_SELL_FX',
       'CRYPTO_EARLY_15MIN',
       'CRYPTO_ALL',
+      'CRYPTO_WATCH',
+      'CR_4H_BUY',
+      'CR_4H_HT',
     ]; // example list
 
     for (const channel of Channels) {
@@ -57,9 +60,13 @@ export class SendEverydayService {
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT) // close yesterday and open today
   async delete() {
-    const yesterday = this.stockHelperService.getDateNDaysAgo(1);
+    const yesterday = this.stockHelperService.getDateNDaysAgo(2);
     const Channels = [
-      'US_ALL','TSLA','OTHER','SMCI','US_5M_HT',
+      'US_ALL',
+      'TSLA',
+      'OTHER',
+      'SMCI',
+      'US_5M_HT',
       'ERORR_CALL',
       'CRON_CHECK',
       '15MIN_BUY_FX',
@@ -75,6 +82,7 @@ export class SendEverydayService {
       'US_EARLY_15MIN',
       'US_EARLY_5MIN',
       'BUYSELL',
+      'CRYPTO_WATCH',
     ]; // example list
 
     await new Promise((resolve) => setTimeout(resolve, 2 * 60 * 1000));

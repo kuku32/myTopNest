@@ -58,6 +58,17 @@ export class TaskCryptoService_4Hour {
             B_Channel,
             HT_Channel,
           );
+          if (
+            ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD'].includes(ticker)
+          ) {
+            await this.LocalPLWR.sendDiscord(
+              `JUST WATCH_ME-${timeframe}(MACD:${lastData?.MACDLine}): ${lastData?.date}`,
+              `${ticker}-ON-${timeframe}`,
+              lastData,
+              HT_Channel,
+              data,
+            );
+          }
           this.logger.log(`${ticker} processed successfully.`);
         } catch (error) {
           await this.LocalPLWR.sendDiscord(
@@ -138,7 +149,6 @@ export class TaskCryptoService_4Hour {
       0,
     );
   }
-
 }
 
 export interface StockData {
