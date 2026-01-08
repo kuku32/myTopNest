@@ -49,7 +49,7 @@ export class TaskCryptoService_4Hour {
 
           const lastData = data[data.length - 1];
           const secondLastData = data[data.length - 2];
-          await this.LocalPLWR.compareAndSend1hour(
+          await this.LocalPLWR.compareAndSend_BUY(
             data,
             lastData,
             secondLastData,

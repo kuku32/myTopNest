@@ -49,7 +49,16 @@ export class TaskCryptoService_1day {
 
           const lastData = data[data.length - 1];
           const secondLastData = data[data.length - 2];
-          await this.LocalPLWR.compareAndSend1hour(
+          await this.LocalPLWR.compareAndSend_BUY(
+            data,
+            lastData,
+            secondLastData,
+            ticker,
+            timeframe,
+            B_Channel,
+            HT_Channel,
+          );
+          await this.LocalPLWR.crossAB_bl0_not15(
             data,
             lastData,
             secondLastData,
