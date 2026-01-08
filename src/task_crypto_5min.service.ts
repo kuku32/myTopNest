@@ -53,7 +53,7 @@ export class TaskCryptoService_5Min {
           if (!isWithinRange) {
             return;
           }
-          await this.LocalPLWR.crossAB_bl0_not5(
+          await this.LocalPLWR.compareAndSend_BUY(
             data,
             lastData,
             secondLastData,

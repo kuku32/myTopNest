@@ -1143,4 +1143,43 @@ export class WebhookService {
       return;
     }
   }
+
+  async compareAndSend_BUY(
+    data,
+    lastdata,
+    Secondlastdata,
+    ticker,
+    timeframe,
+    B_Channel,
+    HT_Channel,
+  ) {
+    const RSI_28 = await this.stockHelperService.RSI_28(
+      lastdata,
+      Secondlastdata,
+    );
+    if (RSI_28) {
+      await this.sendDiscord(
+        `BUY-BlMA200 RSI_28-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return;
+    }
+    const BlMA200_MA50_BUY = await this.stockHelperService.BlMA200_MA50_BUY(
+      lastdata,
+      Secondlastdata,
+    );
+    if (BlMA200_MA50_BUY) {
+      await this.sendDiscord(
+        `BUY-BlMA200_MA50_BUY-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return;
+    }
+  }
 }
