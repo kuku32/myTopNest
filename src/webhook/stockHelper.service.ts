@@ -609,4 +609,16 @@ SELL ALL
     const MacdLine_divergen = last.divergence > 0;
     return abMa50 && MacdLine_divergen && BlMa200;
   }
+
+  async StochRSIBuy_HOLD(last: StockData, prev: StockData): Promise<{upside:boolean, upside80:boolean}> {
+    if (!last || !prev) return {upside:false, upside80:false}; // safety
+    const stockRSILAUP= last.StochRSI_K - last.StochRSI_D > 0
+    const stockRSIPRUP= prev.StochRSI_K - prev.StochRSI_D > 0
+    const compare2day = stockRSILAUP >= stockRSIPRUP
+    const inrange2080=  last.StochRSI_K < 80  && prev.StochRSI_K < 80
+    return {
+      upside : stockRSILAUP && compare2day,
+      upside80 : stockRSILAUP && stockRSIPRUP && inrange2080
+    };
+  }
 }

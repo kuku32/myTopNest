@@ -193,7 +193,7 @@ export class TasksUSMK_1MIN_Service {
     }
   }
   // @Cron('10 14-21 * * 1-5', { timeZone: 'UTC' })
-  @Cron('10 * * * * *', { timeZone: 'UTC' }) // every minute at the 10th second in UTC for testing
+ // @Cron('10 * * * * *', { timeZone: 'UTC' }) // every minute at the 10th second in UTC for testing
   async runAllWatchLists() {
     await Promise.all([
       this.USTIMERUN(this.mysymbols, this.allkeys, 'US_EARLY_5MIN', 0, '1min'),

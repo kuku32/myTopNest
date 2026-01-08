@@ -12,6 +12,8 @@ export interface StockData {
   MA100: number
   MA200: number
   RSI: number
+  StochRSI_K: number
+  StochRSI_D: number
   MACDLine: number
   SignalLine: number
   divergence: number

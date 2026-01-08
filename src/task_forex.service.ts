@@ -36,7 +36,7 @@ export class TasksForexService {
         // const lastData = data[data.length - 1];
         // const secondLastData = data[data.length - 2];
 
-        await this.LocalPLWR.compareAndSend1hour(
+        await this.LocalPLWR.h4_daily(
           data.reverse(),
           lastData,
           secondLastData,

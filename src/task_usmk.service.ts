@@ -12,6 +12,14 @@ import pLimit from 'p-limit';
 export class TasksUSMKService {
   allkeys = 'all'; // test
   mysymbols = [
+    'MSFT',
+    'PLTR',
+    'SOXX',
+    'NVDA',
+    'MSTR',
+    'ORCL',
+    'HE',
+    'AVGO',
     'INTC',
     'SMCI',
     'BULL',
@@ -26,7 +34,7 @@ export class TasksUSMKService {
     'UNH',
     'TTD',
     'CNC',
-  ]; // test symbols
+  ];// test symbols
   constructor(
     private readonly configService: ConfigService,
     private readonly stockHelperService: StockHelperService,
@@ -108,7 +116,7 @@ export class TasksUSMKService {
           const secondLastData = data[data.length - 2];
 
           // Process the data
-          await this.LocalPLWR.compareAndSend1hour(
+          await this.LocalPLWR.compareAndSend_BUY(
             data,
             lastData,
             secondLastData,
@@ -141,7 +149,7 @@ export class TasksUSMKService {
     const combined = [...this.mysymbols, ...symbols];
     await Promise.all([
       this.USTIMERUN(
-        combined,
+        this.mysymbols,
         this.allkeys,
         'US_ALL',
         'USSTOCK_WATCH',
@@ -157,7 +165,7 @@ export class TasksUSMKService {
     const combined = [...this.mysymbols, ...symbols];
     await Promise.all([
       this.USTIMERUN(
-        combined,
+        this.mysymbols,
         this.allkeys,
         'US_30M_BUY',
         'US_30M_HT',

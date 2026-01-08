@@ -1181,5 +1181,70 @@ export class WebhookService {
       );
       return;
     }
+
+    const Over200NUpBuy = await this.stockHelperService.Over200NUpBuy(
+      lastdata,
+      Secondlastdata,
+    );
+    if (Over200NUpBuy) {
+      await this.sendDiscord(
+        `BUY-Over200NUpBuy-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return;
+    }
+
+    const priceAbMA200BUY = await this.stockHelperService.priceAbMA200BUY(
+      lastdata,
+      Secondlastdata,
+    );
+    if (priceAbMA200BUY) {
+      await this.sendDiscord(
+        `BUY-priceAbMA200BUY-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return;
+    }
+  }
+
+  async h4_daily(
+    data,
+    lastdata,
+    Secondlastdata,
+    ticker,
+    timeframe,
+    B_Channel,
+    HT_Channel,
+  ) {
+    const StochRSIBuy_HOLD = await this.stockHelperService.StochRSIBuy_HOLD(
+      lastdata,
+      Secondlastdata,
+    );
+    if (StochRSIBuy_HOLD.upside) {
+      await this.sendDiscord(
+        `BUY-StochRSIBuy_HOLD-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return;
+    }
+    if (StochRSIBuy_HOLD.upside80) {
+      await this.sendDiscord(
+        `BUY-StochRSIBuy_HOLD_above 80-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return;
+    }
   }
 }

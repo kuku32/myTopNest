@@ -50,7 +50,7 @@ export class TaskCryptoService_1Hour {
           const lastData = data[data.length - 1];
           const secondLastData = data[data.length - 2];
 
-          await this.LocalPLWR.compareAndSend_BUY(
+          await this.LocalPLWR.h4_daily(
             data,
             lastData,
             secondLastData,
@@ -140,22 +140,3 @@ export class TaskCryptoService_1Hour {
   }
 }
 
-export interface StockData {
-  date: string;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  volume: number;
-  MA5: number;
-  MA10: number;
-  MA20: number;
-  MA50: number;
-  MA100: number;
-  MA200: number;
-  RSI: number;
-  MACDLine: number;
-  SignalLine: number;
-  divergence: number;
-  MACDDivergence: any;
-}
