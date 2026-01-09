@@ -1264,7 +1264,7 @@ export class WebhookService {
     );
     if (StochRSICross.crossUp) {
       await this.sendDiscord(
-        `BUY-StochRSICross-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `BUY-StochRSICrossUP-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
         B_Channel,
@@ -1274,7 +1274,7 @@ export class WebhookService {
     }
     if (StochRSICross.crossDo) {
       await this.sendDiscord(
-        `SELL-StochRSICross 80-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `SELL-StochRSICrossDOWN -${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
         HT_Channel,
