@@ -61,7 +61,7 @@ export class TasksForexService {
     }
   }
 
-  @Cron('*/15 * * * *') // every 15 minutes
+  // @Cron('*/15 * * * *') // every 15 minutes
   async handle15minForex() {
     const tickers = [
       'CHFUSD',
