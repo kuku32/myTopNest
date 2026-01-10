@@ -632,7 +632,13 @@ SELL ALL
     if (!last || !prev) return { crossUp: false, crossDo: false }; // safety
     const stockRSILast = last.StochRSI_K - last.StochRSI_D;
     const stockRSIPrev = prev.StochRSI_K - prev.StochRSI_D;
-    const crossUp = stockRSILast >= 0 && stockRSIPrev <= 0;
+    const crossUp =
+      stockRSILast >= 0 &&
+      stockRSIPrev <= 0 &&
+      (last.MACDLine < 0 ||
+        last.SignalLine < 0 ||
+        prev.MACDLine < 0 ||
+        prev.SignalLine < 0);
     const crossDo = stockRSILast <= 0 && stockRSIPrev >= 0;
     return {
       crossUp,
