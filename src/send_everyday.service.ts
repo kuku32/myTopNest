@@ -21,6 +21,11 @@ export class SendEverydayService {
     const twoDayAgo = this.stockHelperService.getDateNDaysAgo(2);
     const equal = `===========================================`;
     const Channels = [
+      'US_ALL',
+      'TSLA',
+      'OTHER',
+      'SMCI',
+      'US_5M_HT',
       'ERORR_CALL',
       'CRON_CHECK',
       '15MIN_BUY_FX',
@@ -33,9 +38,20 @@ export class SendEverydayService {
       '4HOUR_SELL_FX',
       'CRYPTO_EARLY_15MIN',
       'CRYPTO_ALL',
+      'US_EARLY_15MIN',
+      'US_EARLY_5MIN',
+      'BUYSELL',
       'CRYPTO_WATCH',
-      'CR_4H_BUY',
+      'US_15M_HT',
+      'US_30M_BUY',
+      'US_30M_HT',
+      'USSTOCK_WATCH',
       'CR_4H_HT',
+      'CR_4H_BUY',
+      'CR_1H_HT',
+      'CR_1H_BUY',
+      'CR_30MIN_HT',
+      'CR_30M_BUY',
     ]; // example list
 
     for (const channel of Channels) {
@@ -83,6 +99,16 @@ export class SendEverydayService {
       'US_EARLY_5MIN',
       'BUYSELL',
       'CRYPTO_WATCH',
+      'US_15M_HT',
+      'US_30M_BUY',
+      'US_30M_HT',
+      'USSTOCK_WATCH',
+      'CR_4H_HT',
+      'CR_4H_BUY',
+      'CR_1H_HT',
+      'CR_1H_BUY',
+      'CR_30MIN_HT',
+      'CR_30M_BUY',
     ]; // example list
 
     await new Promise((resolve) => setTimeout(resolve, 2 * 60 * 1000));
