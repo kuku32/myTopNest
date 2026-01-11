@@ -49,7 +49,7 @@ export class TaskCryptoService_1day {
 
           const lastData = data[data.length - 1];
           const secondLastData = data[data.length - 2];
-          await this.LocalPLWR.compareAndSend_BUY(
+          await this.LocalPLWR.daily_crypto(
             data,
             lastData,
             secondLastData,
@@ -57,22 +57,6 @@ export class TaskCryptoService_1day {
             timeframe,
             B_Channel,
             HT_Channel,
-          );
-          await this.LocalPLWR.h4_daily(
-            data,
-            lastData,
-            secondLastData,
-            ticker,
-            timeframe,
-            B_Channel,
-            HT_Channel,
-          );
-          await this.LocalPLWR.sendDiscord(
-            `JUST WATCH_ME-${timeframe}(MACD:${lastData?.MACDLine}): ${lastData?.date}`,
-            `${ticker}-ON-${timeframe}`,
-            lastData,
-            HT_Channel,
-            data,
           );
           this.logger.log(`${ticker} processed successfully.`);
         } catch (error) {

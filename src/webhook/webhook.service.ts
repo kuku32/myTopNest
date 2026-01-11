@@ -557,17 +557,102 @@ export class WebhookService {
     return this.washSell30;
   }
   getDolist() {
-    return ["OGN", "BRO", "CHTR", "CHD", "TPL", "INVH", "OC", "FND", "LBRDK", "PRMB", 
-      "GPK", "ABM", "FCPT", "LINE", "CACC", "AI", "GEO", "CRVL", "IPAR", "PRCT", 
-      "BWIN", "MAN", "CNMD", "IART", "DRVN", "LBRDA", "DEA", "SAFE", "AESI", "PLAY", 
-      "OXM", "IBTA", "FRPH", "MLR", "GOOD", "XRX", "NCMI", "HY", "SCVL", "OLP", "UIS", 
-      "MEI", "PTLO", "LPRO", "KLC", "HUMA", "RCEL", "MYPS", "SEAT", "ATYR", "TRON", 
-      "AFCG", "SENS", "NAKA", "OBDC", "BIOX", "SGMO", "CURV", "LESL", "BTAI", "NEON", 
-      "MRNO", "BIT", "JQC", "ATOM", "NMFC", "AIFU", "TUSK", "BTAI", "SUNS", "WLKP", 
-      "PFE", "POR", "NWE", "CVBF", "VCEL", "NBTB", "BHE", "GTY", "SRCE", "MOFG", "BLMN", 
-      "UTL", "UHT", "ALT", "DNUT", "BLSH", "BXSL", "QEPC", "TSLQ", "TKC", "HBIO", "HOLO", 
-      "BMEA"]
-     ;
+    return [
+      'OGN',
+      'BRO',
+      'CHTR',
+      'CHD',
+      'TPL',
+      'INVH',
+      'OC',
+      'FND',
+      'LBRDK',
+      'PRMB',
+      'GPK',
+      'ABM',
+      'FCPT',
+      'LINE',
+      'CACC',
+      'AI',
+      'GEO',
+      'CRVL',
+      'IPAR',
+      'PRCT',
+      'BWIN',
+      'MAN',
+      'CNMD',
+      'IART',
+      'DRVN',
+      'LBRDA',
+      'DEA',
+      'SAFE',
+      'AESI',
+      'PLAY',
+      'OXM',
+      'IBTA',
+      'FRPH',
+      'MLR',
+      'GOOD',
+      'XRX',
+      'NCMI',
+      'HY',
+      'SCVL',
+      'OLP',
+      'UIS',
+      'MEI',
+      'PTLO',
+      'LPRO',
+      'KLC',
+      'HUMA',
+      'RCEL',
+      'MYPS',
+      'SEAT',
+      'ATYR',
+      'TRON',
+      'AFCG',
+      'SENS',
+      'NAKA',
+      'OBDC',
+      'BIOX',
+      'SGMO',
+      'CURV',
+      'LESL',
+      'BTAI',
+      'NEON',
+      'MRNO',
+      'BIT',
+      'JQC',
+      'ATOM',
+      'NMFC',
+      'AIFU',
+      'TUSK',
+      'BTAI',
+      'SUNS',
+      'WLKP',
+      'PFE',
+      'POR',
+      'NWE',
+      'CVBF',
+      'VCEL',
+      'NBTB',
+      'BHE',
+      'GTY',
+      'SRCE',
+      'MOFG',
+      'BLMN',
+      'UTL',
+      'UHT',
+      'ALT',
+      'DNUT',
+      'BLSH',
+      'BXSL',
+      'QEPC',
+      'TSLQ',
+      'TKC',
+      'HBIO',
+      'HOLO',
+      'BMEA',
+    ];
   }
   async getRsilist(path: string, limit: number = 100, dayrange: number = 7) {
     const data = await this.FireBaseApi(
@@ -839,7 +924,7 @@ export class WebhookService {
     if (isWithinRange) {
       console.log(ticker, `✅ Within ±${time} minutes of EST time`);
       // check one
-      return true
+      return true;
     } else {
       console.log(ticker, `❌ Outside  ±${time} minutes of EST time: `, date);
       return false;
@@ -1006,10 +1091,11 @@ export class WebhookService {
     B_Channel,
     HT_Channel,
   ) {
-    const BlMA200_MA20_MA50_MA100_BUY = await this.stockHelperService.BlMA200_MA20_MA50_MA100_BUY(
-      lastdata,
-      Secondlastdata,
-    );
+    const BlMA200_MA20_MA50_MA100_BUY =
+      await this.stockHelperService.BlMA200_MA20_MA50_MA100_BUY(
+        lastdata,
+        Secondlastdata,
+      );
     if (BlMA200_MA20_MA50_MA100_BUY) {
       await this.sendDiscord(
         `BUY BlMA200_MA20_MA50_MA100_BUY-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
@@ -1020,10 +1106,11 @@ export class WebhookService {
       );
       return;
     }
-    const ABMA200_macdCrossAB_BUY = await this.stockHelperService.ABMA200_macdCrossAB_BUY(
-      lastdata,
-      Secondlastdata,
-    );
+    const ABMA200_macdCrossAB_BUY =
+      await this.stockHelperService.ABMA200_macdCrossAB_BUY(
+        lastdata,
+        Secondlastdata,
+      );
     if (ABMA200_macdCrossAB_BUY) {
       await this.sendDiscord(
         `BUY ABMA200_macdCrossAB_BUY-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
@@ -1035,10 +1122,11 @@ export class WebhookService {
       return;
     }
 
-    const BlMA200_MA20_MA50_MA100_SELL = await this.stockHelperService.BlMA200_MA20_MA50_MA100_SELL(
-      lastdata,
-      Secondlastdata,
-    );
+    const BlMA200_MA20_MA50_MA100_SELL =
+      await this.stockHelperService.BlMA200_MA20_MA50_MA100_SELL(
+        lastdata,
+        Secondlastdata,
+      );
     if (BlMA200_MA20_MA50_MA100_SELL) {
       await this.sendDiscord(
         `SELLLLLL BlMA200_MA20_MA50_MA100_SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
@@ -1050,10 +1138,11 @@ export class WebhookService {
       return;
     }
 
-    const ABMA200_macdCrossBL_SELL = await this.stockHelperService.ABMA200_macdCrossBL_SELL(
-      lastdata,
-      Secondlastdata,
-    );
+    const ABMA200_macdCrossBL_SELL =
+      await this.stockHelperService.ABMA200_macdCrossBL_SELL(
+        lastdata,
+        Secondlastdata,
+      );
     if (ABMA200_macdCrossBL_SELL) {
       await this.sendDiscord(
         `SELLLLLL ABMA200_macdCrossBL_SELL-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
@@ -1165,7 +1254,7 @@ export class WebhookService {
         B_Channel,
         data,
       );
-      return;
+      return true;
     }
     const BlMA200_MA50_BUY = await this.stockHelperService.BlMA200_MA50_BUY(
       lastdata,
@@ -1179,7 +1268,7 @@ export class WebhookService {
         B_Channel,
         data,
       );
-      return;
+      return true;
     }
 
     const Over200NUpBuy = await this.stockHelperService.Over200NUpBuy(
@@ -1194,7 +1283,7 @@ export class WebhookService {
         B_Channel,
         data,
       );
-      return;
+      return true;
     }
 
     const priceAbMA200BUY = await this.stockHelperService.priceAbMA200BUY(
@@ -1209,11 +1298,12 @@ export class WebhookService {
         B_Channel,
         data,
       );
-      return;
+      return true;
     }
+    return false;
   }
 
-  async h4_daily(
+  async h4_crypto(
     data,
     lastdata,
     Secondlastdata,
@@ -1234,7 +1324,7 @@ export class WebhookService {
         B_Channel,
         data,
       );
-      return;
+      return true;
     }
     if (StochRSIBuy_HOLD.upside80) {
       await this.sendDiscord(
@@ -1244,10 +1334,77 @@ export class WebhookService {
         B_Channel,
         data,
       );
-      return;
+      return true;
+    }
+
+    if (
+      ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD'].includes(ticker)
+    ) {
+      await this.sendDiscord(
+        `JUST WATCH_ME-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        HT_Channel,
+        data,
+      );
     }
   }
 
+  async daily_crypto(
+    data,
+    lastdata,
+    Secondlastdata,
+    ticker,
+    timeframe,
+    B_Channel,
+    HT_Channel,
+  ) {
+    const StochRSIBuy_HOLD = await this.stockHelperService.StochRSIBuy_HOLD(
+      lastdata,
+      Secondlastdata,
+    );
+    if (StochRSIBuy_HOLD.upside) {
+      await this.sendDiscord(
+        `BUY-StochRSIBuy_HOLD-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return true;
+    }
+    if (StochRSIBuy_HOLD.upside80) {
+      await this.sendDiscord(
+        `BUY-StochRSIBuy_HOLD_above 80-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return true;
+    }
+
+    const nextcheck = await this.compareAndSend_BUY(
+      data,
+      lastdata,
+      Secondlastdata,
+      ticker,
+      timeframe,
+      B_Channel,
+      HT_Channel,
+    );
+
+    if (!nextcheck) {
+      // not meet anthing in the compareAndSend; send 1 to watchme
+      await this.sendDiscord(
+        `JUST WATCH_ME-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        HT_Channel,
+        data,
+      );
+    }
+  }
 
   async StochRSICross(
     data,

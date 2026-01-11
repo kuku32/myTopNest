@@ -49,7 +49,7 @@ export class TaskCryptoService_4Hour {
 
           const lastData = data[data.length - 1];
           const secondLastData = data[data.length - 2];
-          await this.LocalPLWR.h4_daily(
+          await this.LocalPLWR.h4_crypto(
             data,
             lastData,
             secondLastData,
@@ -58,17 +58,6 @@ export class TaskCryptoService_4Hour {
             B_Channel,
             HT_Channel,
           );
-          if (
-            ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD'].includes(ticker)
-          ) {
-            await this.LocalPLWR.sendDiscord(
-              `JUST WATCH_ME-${timeframe}(MACD:${lastData?.MACDLine}): ${lastData?.date}`,
-              `${ticker}-ON-${timeframe}`,
-              lastData,
-              HT_Channel,
-              data,
-            );
-          }
           this.logger.log(`${ticker} processed successfully.`);
         } catch (error) {
           await this.LocalPLWR.sendDiscord(
