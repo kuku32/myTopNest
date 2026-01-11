@@ -1283,4 +1283,60 @@ export class WebhookService {
       return;
     }
   }
+
+  async BuyOnly_StochRSICrossAB200(
+    data,
+    lastdata,
+    Secondlastdata,
+    ticker,
+    timeframe,
+    B_Channel,
+    HT_Channel,
+  ) {
+    const BuyOnly_StochRSICrossAB200 =
+      await this.stockHelperService.BuyOnly_StochRSICrossAB200(
+        lastdata,
+        Secondlastdata,
+      );
+    if (BuyOnly_StochRSICrossAB200.CrUpMacdBl0) {
+      await this.sendDiscord(
+        `SBUY-BuyOnly_StochRSICrossAB200-CrUpMacdBl0 -${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return;
+    }
+    if (BuyOnly_StochRSICrossAB200.CrUpAll) {
+      await this.sendDiscord(
+        `BUY-BuyOnly_StochRSICrossAB200-CrUpAll -${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        HT_Channel,
+        data,
+      );
+      return;
+    }
+    if (BuyOnly_StochRSICrossAB200.PriceCrMA200) {
+      await this.sendDiscord(
+        `SBUY-BuyOnly_StochRSICrossAB200-PriceCrMA200 -${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return;
+    }
+    if (BuyOnly_StochRSICrossAB200.macdCrAB) {
+      await this.sendDiscord(
+        `BUY-BuyOnly_StochRSICrossAB200-macdCrAB -${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        HT_Channel,
+        data,
+      );
+      return;
+    }
+  }
 }

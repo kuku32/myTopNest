@@ -645,4 +645,47 @@ SELL ALL
       crossDo,
     };
   }
+
+  async BuyOnly_StochRSICrossAB200(
+    last: StockData,
+    prev: StockData,
+  ): Promise<{
+    CrUpAll: boolean;
+    CrUpMacdBl0: boolean;
+    PriceCrMA200: boolean;
+    macdCrAB: boolean;
+  }> {
+    if (!last || !prev)
+      return {
+        CrUpAll: false,
+        CrUpMacdBl0: false,
+        PriceCrMA200: false,
+        macdCrAB: false,
+      }; // safety
+    const lastAb200 = last.MA200 > last.close;
+    if (lastAb200)
+      return {
+        CrUpAll: false,
+        CrUpMacdBl0: false,
+        PriceCrMA200: false,
+        macdCrAB: false,
+      }; // safety
+    const MACDbelow0 =
+      last.MACDLine < 0 ||
+      last.SignalLine < 0 ||
+      prev.MACDLine < 0 ||
+      prev.SignalLine < 0;
+    const stockRSILast = last.StochRSI_K - last.StochRSI_D;
+    const stockRSIPrev = prev.StochRSI_K - prev.StochRSI_D;
+    const CrUpAll = stockRSILast >= 0 && stockRSIPrev <= 0;
+    const CrUpMacdBl0 = CrUpAll && MACDbelow0;
+    const PriceCrMA200 = await this.priceAbMA200BUY(last, prev);
+    const macdCrAB = await this.macdCrossAB(last, prev);
+    return {
+      CrUpAll,
+      CrUpMacdBl0,
+      PriceCrMA200,
+      macdCrAB,
+    };
+  }
 }

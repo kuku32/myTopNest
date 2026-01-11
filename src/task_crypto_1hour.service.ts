@@ -50,7 +50,7 @@ export class TaskCryptoService_1Hour {
           const lastData = data[data.length - 1];
           const secondLastData = data[data.length - 2];
 
-          await this.LocalPLWR.h4_daily(
+          await this.LocalPLWR.BuyOnly_StochRSICrossAB200(
             data,
             lastData,
             secondLastData,
@@ -137,6 +137,26 @@ export class TaskCryptoService_1Hour {
       'CR_1H_HT',
       5,
     );
+  }
+
+  @Cron('10 * * * *') // every hour at 10min
+  async SendEverydayService() {
+    const equal = `===========================================`;
+    const Channels = [
+      'CR_1H_BUY',
+      'CR_1H_HT',
+    ]; // example list
+
+    for (const channel of Channels) {
+      // CLOSE YESTERDAY
+      await this.LocalPLWR.sendDiscordNotification(
+        `${equal}==${equal}`,
+        `${channel} RLWAYBOT`,
+        JSON.stringify('lastdata'),
+      );
+      // Log completion
+      this.logger.error(`✅ Finished sending for`, channel);
+    }
   }
 }
 

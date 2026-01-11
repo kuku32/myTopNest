@@ -149,5 +149,25 @@ export class TaskCryptoService_4Hour {
       0,
     );
   }
+
+  @Cron('15 */4 * * *') // Every 4 hours at minute 12
+  async SendEverydayService() {
+    const equal = `===========================================`;
+    const Channels = [
+      'CR_4H_BUY',
+      'CR_4H_HT',
+    ]; // example list
+
+    for (const channel of Channels) {
+      // CLOSE YESTERDAY
+      await this.LocalPLWR.sendDiscordNotification(
+        `${equal}==${equal}`,
+        `${channel} RLWAYBOT`,
+        JSON.stringify('lastdata'),
+      );
+      // Log completion
+      this.logger.error(`✅ Finished sending for`, channel);
+    }
+  }
 }
 
