@@ -807,7 +807,7 @@ export class WebhookService {
         </head>
         <body id="capture-target">
           <!-- Display the chart date dynamically if chartData is available -->
-          <h3 class="center">${ticker} | ${message} </h3>
+          <h3 class="center">${ticker} | ${message} | <span id="closePrice"></span> </h3>
           <!-- Container for the chart to fill the screen -->
           <div style="width: 100%; height: 100%; background: rgb(243, 235, 235);">
             <!-- Properly passing chartData using .stockData binding -->
@@ -823,6 +823,12 @@ export class WebhookService {
     
             // Ensure the chartData is passed as a property to the component
             stockChartElement.stockData = chartData;
+
+                        // Get the stock-chart-display element by its ID
+            const closePrice = document.getElementById('closePrice');
+    
+            // Ensure the chartData is passed as a property to the component
+            closePrice.textContent = ${slicedData[slicedData.length-1].close};
           </script>
         </body>
       </html>
