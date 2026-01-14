@@ -84,9 +84,8 @@ export class TaskCryptoService_1day {
       'LTCUSD',
       'ETHUSD',
       'ETCUSD',
-      'DASHUSD',
       'ZECUSD',
-      'XMRUSD',
+      'DOTUSD',
     ];
     // const tickers = ['BTCUSD'];
     const apikey = '2711824a92bc40498c8bc30728813e2a'; //liamsterling1@outlook.com

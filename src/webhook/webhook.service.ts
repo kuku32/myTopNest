@@ -1502,4 +1502,51 @@ export class WebhookService {
       return;
     }
   }
+
+
+  async Crypto_1Hour_ab200_n_o_macdcross(
+    data,
+    lastdata,
+    Secondlastdata,
+    ticker,
+    timeframe,
+    B_Channel,
+    HT_Channel,
+  ) {
+    const Crypto_1Hour_ab200_n_o_macdcross =
+      await this.stockHelperService.Crypto_1Hour_ab200_n_o_macdcross(
+        lastdata,
+        Secondlastdata,
+      );
+    if (Crypto_1Hour_ab200_n_o_macdcross.PriceCrMA100) {
+      await this.sendDiscord(
+        `SBUY-BuyEaryly-PriceCrMA100 -${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return;
+    }
+    if (Crypto_1Hour_ab200_n_o_macdcross.PriceCrMA200) {
+      await this.sendDiscord(
+        `BUY-PriceCrMA200 -${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        B_Channel,
+        data,
+      );
+      return;
+    }
+    if (Crypto_1Hour_ab200_n_o_macdcross.AbMA200BUY_MACDCR) {
+      await this.sendDiscord(
+        `SBUY-AbMA200BUY_MACDCR -${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `${ticker}-ON-${timeframe}`,
+        lastdata,
+        HT_Channel,
+        data,
+      );
+      return;
+    }
+  }
 }

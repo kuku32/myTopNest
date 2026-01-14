@@ -35,7 +35,7 @@ export class TasksService {
   @Cron('*/15 * * * *') // every 15 minutes
   async handle15Min() {
     await this.sendDiscord('WAKEUPCALL:15min', 'RWBOT 15min', 'CRYTO','CRON_CHECK');
-    // const tickers = ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD', 'DASHUSD', 'ZECUSD', 'XMRUSD'];
+    // const tickers = ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD', 'TONUSD', 'ZECUSD', 'DOTUSD'];
     const tickers = ['BTCUSD'];
     // const apikey = '2bbd0d305edb404aac2e2de5cc1311af'; // test
     const apikey = 'd3058ae5683b4fc19a787ceb21a87f67';

@@ -50,7 +50,7 @@ export class TaskCryptoService_1Hour {
           const lastData = data[data.length - 1];
           const secondLastData = data[data.length - 2];
 
-          await this.LocalPLWR.BuyOnly_StochRSICrossAB200(
+          await this.LocalPLWR.Crypto_1Hour_ab200_n_o_macdcross(
             data,
             lastData,
             secondLastData,
@@ -86,9 +86,8 @@ export class TaskCryptoService_1Hour {
       'LTCUSD',
       'ETHUSD',
       'ETCUSD',
-      'DASHUSD',
       'ZECUSD',
-      'XMRUSD',
+      'DOTUSD',
     ];
     // const tickers = ['BTCUSD'];
     const apikey = '2711824a92bc40498c8bc30728813e2a'; //liamsterling1@outlook.com

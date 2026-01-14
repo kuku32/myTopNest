@@ -688,4 +688,36 @@ SELL ALL
       macdCrAB,
     };
   }
+
+  async priceAbMABUY(
+    last: StockData,
+    prev: StockData,
+    maType: 'MA100' | 'MA200',
+  ): Promise<boolean> {
+    if (!last || !prev) return false; // safety
+
+    const lastAbMA = last.high > last[maType]; // Check if the last high is above the MA
+    const prevBlMA = prev.low < prev[maType]; // Check if the previous low is below the MA
+
+    return lastAbMA && prevBlMA;
+  }
+
+  async Crypto_1Hour_ab200_n_o_macdcross(
+    last: StockData,
+    prev: StockData,
+  ): Promise<{
+    PriceCrMA100: boolean;
+    PriceCrMA200: boolean;
+    AbMA200BUY_MACDCR: boolean;
+  }> {
+    const PriceCrMA200 = await this.priceAbMABUY(last, prev, 'MA200');
+    const lastBl200 = last.MA200 > last.close;
+    const PriceCrMA100 = await this.priceAbMABUY(last, prev, 'MA100') && lastBl200;
+    const AbMA200BUY_MACDCR = await this.AbMA200BUY_MACDCR(last, prev)
+    return {
+      PriceCrMA100,
+      PriceCrMA200,
+      AbMA200BUY_MACDCR,
+    };
+  }
 }
