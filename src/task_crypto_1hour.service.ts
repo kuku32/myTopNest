@@ -138,7 +138,7 @@ export class TaskCryptoService_1Hour {
     );
   }
 
-  @Cron('10 * * * *') // every hour at 10min
+  @Cron('10 */4 * * *') // Every 4 hours at minute 12
   async SendEverydayService() {
     const equal = `===========================================`;
     const Channels = [
