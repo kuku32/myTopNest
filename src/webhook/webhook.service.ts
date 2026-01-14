@@ -828,7 +828,7 @@ export class WebhookService {
             const closePrice = document.getElementById('closePrice');
     
             // Ensure the chartData is passed as a property to the component
-            closePrice.textContent = ${slicedData[slicedData.length-1].close};
+            closePrice.textContent = ${slicedData[slicedData.length - 1].close};
           </script>
         </body>
       </html>
@@ -1318,13 +1318,13 @@ export class WebhookService {
     B_Channel,
     HT_Channel,
   ) {
-    const StochRSIBuy_HOLD = await this.stockHelperService.StochRSIBuy_HOLD(
+    const macdCrossAB = await this.stockHelperService.macdCrossAB(
       lastdata,
       Secondlastdata,
     );
-    if (StochRSIBuy_HOLD.upside) {
+    if (macdCrossAB) {
       await this.sendDiscord(
-        `BUY-StochRSIBuy_HOLD-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
+        `BUY-macdCrossAB-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
         lastdata,
         B_Channel,
@@ -1332,20 +1332,7 @@ export class WebhookService {
       );
       return true;
     }
-    if (StochRSIBuy_HOLD.upside80) {
-      await this.sendDiscord(
-        `BUY-StochRSIBuy_HOLD_above 80-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
-        `${ticker}-ON-${timeframe}`,
-        lastdata,
-        B_Channel,
-        data,
-      );
-      return true;
-    }
-
-    if (
-      ['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD'].includes(ticker)
-    ) {
+    if (['BTCUSD', 'BCHUSD', 'LTCUSD', 'ETHUSD', 'ETCUSD'].includes(ticker)) {
       await this.sendDiscord(
         `JUST WATCH_ME-${timeframe}(MACD:${lastdata?.MACDLine}): ${lastdata?.date}`,
         `${ticker}-ON-${timeframe}`,
@@ -1502,7 +1489,6 @@ export class WebhookService {
       return;
     }
   }
-
 
   async Crypto_1Hour_ab200_n_o_macdcross(
     data,
