@@ -76,12 +76,12 @@ export class SendEverydayService {
 
   async onModuleInit() {
     // This runs ONCE when the app starts
-    // await this.delete();
+    await this.delete();
     // console.log(  stock_500_symbols.length)
   }
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT) // close yesterday and open today
-  async delete() {
-    const yesterday = this.stockHelperService.getDateNDaysAgo(2);
+  async delete(dayago=1) {
+    const yesterday = this.stockHelperService.getDateNDaysAgo(dayago);
     const Channels = [
       'ERORR_CALL',
       'CRON_CHECK',
@@ -137,7 +137,7 @@ export class SendEverydayService {
       'SRA_AB200',
     ]; // example list
 
-    await new Promise((resolve) => setTimeout(resolve, 10 * 60 * 1000));
+    await new Promise((resolve) => setTimeout(resolve, 0 * 60 * 1000));
     for (const channel of Channels) {
       // Log completion
       this.logger.log(`✅ Finished sending for`, channel);
