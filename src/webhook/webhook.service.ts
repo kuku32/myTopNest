@@ -3,7 +3,8 @@ import { plainToClass, plainToInstance } from 'class-transformer';
 import axios from 'axios';
 import { StockHelperService } from 'src/webhook/stockHelper.service';
 import * as DTO from './dto';
-import { AttachmentBuilder, EmbedBuilder, WebhookClient } from 'discord.js';
+import { AttachmentBuilder, EmbedBuilder, WebhookClient,  Client,
+  GatewayIntentBits, } from 'discord.js';
 import { ConfigService } from '@nestjs/config';
 import * as dbrs from './database.api';
 import * as Timer from './compareTime';
@@ -19,6 +20,7 @@ export class WebhookService {
     };
   }
   private webhookClient: WebhookClient;
+  private discordBot: Client;
   private WEBHOOKS_ENV: Record<string, string>;
   private WEBHOOKS_CN: Record<string, string>;
   private keys: string[]; // Declare the keys property
@@ -38,13 +40,16 @@ export class WebhookService {
     );
     this.keys = this.configService.get<any>('twelvedata').split(',');
     this.index = this.getRandomNumber(this.keys.length - 1);
+    this.discordBot = new Client({
+      intents: [GatewayIntentBits.Guilds],
+    });
   }
-  async get12for(ticker: string, timefame: string, apikey) {
+  async get12for(ticker: string, timeframe: string, apikey) {
     try {
       if (ticker.includes('USD')) {
         ticker = this.stockHelperService.formatSymbol(ticker);
       }
-      let BASE_URL = `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=${timefame}&outputsize=400&dp=2&apikey=${apikey}`;
+      let BASE_URL = `https://api.twelvedata.com/time_series?symbol=${ticker}&interval=${timeframe}&outputsize=400&dp=2&apikey=${apikey}`;
       const response = await axios.get(BASE_URL);
       if (response.data.status === 'error') {
         throw new Error('API returned error status');
@@ -380,7 +385,7 @@ export class WebhookService {
     let BASE_URL = `${firebaseRoot}/${endpoint}`;
     try {
       const response = await axios.delete(BASE_URL);
-      console.log('Data deleted successfully');
+      console.log('Data deleted successfully: ',endpoint);
     } catch (error) {
       console.log('error', error);
     }
@@ -440,13 +445,13 @@ export class WebhookService {
       );
   }
 
-  async TwReveseNOAPI(ticker: string, timefame: string) {
-    let tem = timefame;
-    if (timefame.includes('hour')) {
-      tem = timefame.slice(0, 2);
-    } else if (timefame.includes('week')) {
+  async TwReveseNOAPI(ticker: string, timeframe: string) {
+    let tem = timeframe;
+    if (timeframe.includes('hour')) {
+      tem = timeframe.slice(0, 2);
+    } else if (timeframe.includes('week')) {
       tem = '1week';
-    } else if (timefame.includes('month')) {
+    } else if (timeframe.includes('month')) {
       tem = '1month';
     }
     if (ticker.includes('USD')) {
@@ -527,18 +532,7 @@ export class WebhookService {
     // If none of the API keys work, throw an error
   }
 
-  async onModuleInit() {
-    // This runs ONCE when the app starts
-    await this.loadWashSellList();
-    // await this.getRsilist('rsiD-0-15', 7,7)
-    // await this.getRsilist('MACD_AB_NEG', 5,20)
-    // await this.getRsilist('MACD_BL_NEG', 5,30)
-    // await this.getRsilist('MACD_AB_POS')
-    // await this.getRsilist('MACD_BL_POS')
-    // await this.getRsilist('MACD_AB_NEG')
-    await this.getRsilist('weekly_daily_pos_blo', 150);
-    // await this.getRsilist('1day_yes_neg',20)
-  }
+
   washSell30: any[] = [];
   dolist: any[] = [];
   async loadWashSellList() {
@@ -699,22 +693,22 @@ export class WebhookService {
 
   async tiingo(
     ticker: string,
-    timefame: string,
+    timeframe: string,
     apikey = '54c43c0fc7b27681254eeac1d7138d6b5477cf10',
   ) {
     const daytestBF = 0;
     let dayStart;
 
-    if (timefame.includes('day')) {
+    if (timeframe.includes('day')) {
       dayStart = this.stockHelperService.getDateNDaysAgo(500 + daytestBF);
-    } else if (timefame.includes('hour')) {
+    } else if (timeframe.includes('hour')) {
       dayStart = this.stockHelperService.getDateNDaysAgo(100 + daytestBF);
-    } else if (timefame.includes('min')) {
+    } else if (timeframe.includes('min')) {
       dayStart = this.stockHelperService.getDateNDaysAgo(16 + daytestBF);
     } else {
       return null;
     }
-    const urls = `https://api.tiingo.com/tiingo/fx/${ticker}/prices?startDate=${dayStart}&token=${apikey}&resampleFreq=${timefame}`;
+    const urls = `https://api.tiingo.com/tiingo/fx/${ticker}/prices?startDate=${dayStart}&token=${apikey}&resampleFreq=${timeframe}`;
     console.log(urls);
     const responsesArray = await this.tryCatcht_tiingo(urls);
     // return responsesArray
@@ -1534,5 +1528,59 @@ export class WebhookService {
       );
       return;
     }
+  }
+
+  async getArrSymbolFFire(endpoint:string) {
+    // const data = await dbrs.getData('post-wash-sell');
+    const data = await this.FireBaseApi('get',`stock-related/${endpoint}.json`,'')
+    if(data){
+      const result = [...new Set(Object?.keys(data))];
+      console.log(`✅ Loaded ${endpoint}: has ${result.length} symbols`);
+      return result
+    }
+  }
+  async clearChannel(channelId: string) {
+    const channel = await this.discordBot.channels.fetch(channelId);
+    if (!channel || !channel.isTextBased()) {
+      throw new Error('Invalid channel');
+    }
+    while (true) {
+      const messages = await channel.messages.fetch({ limit: 100 });
+
+      if (messages.size === 0) break;
+  
+      for (const message of messages.values()) {
+        console.log(message.id, message.author.username);
+        try {
+          await message.delete();
+        } catch (err) {
+          console.log(`Failed to delete ${message.id}`, err.rawError);
+        }
+      }
+    }
+  }
+
+  async onModuleInit() {
+    // This runs ONCE when the app starts
+    await this.loadWashSellList();
+    // await this.getRsilist('rsiD-0-15', 7,7)
+    // await this.getRsilist('MACD_AB_NEG', 5,20)
+    // await this.getRsilist('MACD_BL_NEG', 5,30)
+    // await this.getRsilist('MACD_AB_POS')
+    // await this.getRsilist('MACD_BL_POS')
+    // await this.getRsilist('MACD_AB_NEG')
+    // await this.getRsilist('weekly_daily_pos_blo', 150);
+    // await this.getRsilist('1day_yes_neg',20)
+    await this.discordBot.login(
+      this.configService.get<string>('DISCORD_BOT_TOKEN'),
+    );
+
+    console.log('Discord bot connected');
+    // await this.clearChannel('1440511808644452493')// big_vol1
+    // await this.clearChannel('1457917895421067396')// big_vol2
+    Object.values(this.stockHelperService.CR_DWS_CR_NAME_ID).forEach(async each=>{
+      console.log(each)
+      await this.clearChannel(each)
+    })
   }
 }

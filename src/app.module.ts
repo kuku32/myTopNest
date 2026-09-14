@@ -16,6 +16,7 @@ import { TaskCryptoService_30Min } from './task_crypto_30min.service';
 import { TaskCryptoService_15Min } from './task_crypto_15min.service';
 import { TaskCryptoService_5Min } from './task_crypto_5min.service';
 import { TaskCryptoService_1day } from './task_crypto_daily.service';
+import { FmpFutureService } from './webhook/fmpFuture.service';
 
 @Module({
   imports: [
@@ -30,16 +31,17 @@ import { TaskCryptoService_1day } from './task_crypto_daily.service';
   providers: [
     WebhookService,
     StockHelperService,
-    SendEverydayService,
-    TasksService,
+    FmpFutureService,
+    // SendEverydayService, 
+    // TasksService,
     // TasksForexService,
-    TaskCryptoService_1day,
-    TaskCryptoService_4Hour,
-    TaskCryptoService_1Hour,
+    // TaskCryptoService_1day,
+    // TaskCryptoService_4Hour,
+    // TaskCryptoService_1Hour,
     // TaskCryptoService_30Min,
     // TaskCryptoService_15Min,
     // TaskCryptoService_5Min,
-    // TasksUSMKService,
+ //TasksUSMKService,
     // TasksUSMK_1MIN_Service,
   ],
 })

@@ -3,6 +3,59 @@ import { StockData } from './dto/chartData';
 
 @Injectable()
 export class StockHelperService {
+  CR_DWS_ERR_CHECK_NAME_ID = {
+    'ERORR_CALL':'1439414078962667571',
+    'CRON_CHECK':'1439511226873938020',
+  }
+  CR_DWS_CR_NAME_ID = {
+    CRYPTO_ALL: '1440513342316744794',
+    CRYPTO_WATCH: '1439772961048363169',
+    CR_4H_HT: '1457914709272428788',
+    CR_4H_BUY: '1457914652569768134',
+    CR_1H_HT: '1457914565466652715',
+    CR_1H_BUY: '1457914508755337420',
+    CR_30MIN_HT: '1457914463930941707',
+    CR_30M_BUY: '1457914418703765535',
+    CR_5M_HT: '1457914356305231933',
+    CRYPTO_EARLY_5MIN: '1440512154590642246',
+    CR_15_HT: '1457914171944468511',
+    CRYPTO_EARLY_15MIN: '1440512201403273276',
+  };
+  CR_DWS_FX_NAME_ID = {
+    '15MIN_BUY_FX': '1448469009032024215',
+    '15MIN_SELL_FX': '1448469043978960906',
+    '30MIN_BUY_FX': '1448469135515451557',
+    '30MIN_SELL_FX': '1448469101285740667',
+    '1HOUR_BUY_FX': '1448469166838382687',
+    '1HOUR_SELL_FX': '1448469192369242152',
+    '4HOUR_BUY_FX': '1448469222169509999',
+    '4HOUR_SELL_FX': '1448469250351304809',
+  };
+  CR_DWS_RSI_NAME_ID = {
+    RSI15AL: '1435366425014567042',
+    RSIALERT: '1427876596798197904',
+    RSI25AL: '1429304556977782977',
+    RSI30AL: '1430556955360890930',
+    RSI40_200MAAL: '1430557184776999022',
+  };
+  CR_DWS_US_DAILY_RUN_NAME_ID = {
+    US_ALL:'1440513219541340200',
+    US_30M_BUY:'1457919296247300097',
+    USSTOCK_WATCH:'1439801822041870366',
+    US_EARLY_5MIN:'1440511742860853360',
+    US_EARLY_15MIN:'1440511808644452493',
+    TSLA:'1380037316143349922',
+    SMCI:'1348653615992143924',
+    US_5M_HT:'1457609702518292521',
+    US_15M_HT:'1457917895421067396',
+    US_30M_HT:'1457919339012296803',
+    EARLY_AB200:'1445174724954165428',
+    BUYSELL:'1379877221656694786',
+    MA_AB_50_100:'1436948948412796938',
+    MA_BL_5_20:'1436949287119622227',
+    MA_BL_5_200:'1436949330945638420',
+    OTHER:'1380037242830983250',
+  }
   async returnNewData(dataIn: any[]) {
     if (!dataIn?.length) return [];
 
@@ -19,9 +72,11 @@ export class StockHelperService {
     dataIn = await this.calculateMovingAverage(dataIn, 50, 'MA50');
     dataIn = await this.calculateMovingAverage(dataIn, 100, 'MA100');
     dataIn = await this.calculateMovingAverage(dataIn, 200, 'MA200');
+    dataIn = await this.calculateMovingAverage(dataIn, 300, 'MA300');
     dataIn = await this.calculateRSI(dataIn);
     dataIn = await this.calculateStochasticRSI(dataIn);
     dataIn = await this.calculateMACD(dataIn);
+    dataIn = await this.calculateOSC(dataIn, 20, 6);
 
     return dataIn;
   }
@@ -712,12 +767,62 @@ SELL ALL
   }> {
     const PriceCrMA200 = await this.priceAbMABUY(last, prev, 'MA200');
     const lastBl200 = last.MA200 > last.close;
-    const PriceCrMA100 = await this.priceAbMABUY(last, prev, 'MA100') && lastBl200;
-    const AbMA200BUY_MACDCR = await this.AbMA200BUY_MACDCR(last, prev)
+    const PriceCrMA100 =
+      (await this.priceAbMABUY(last, prev, 'MA100')) && lastBl200;
+    const AbMA200BUY_MACDCR = await this.AbMA200BUY_MACDCR(last, prev);
     return {
       PriceCrMA100,
       PriceCrMA200,
       AbMA200BUY_MACDCR,
     };
+  }
+
+  /**
+   * Oscillator (OSC)
+   * OSC = 100 * (Close - MA(N)) / MA(N)
+   * With optional smoothing (signal line)
+   */
+  async calculateOSC(
+    data: any[],
+    maPeriod: number = 20,
+    smoothPeriod: number = 6,
+  ) {
+    if (!data?.length) return [];
+
+    // 1️⃣ Ensure MA exists
+    const maLabel = `MA${maPeriod}`;
+    data = await this.calculateMovingAverage(data, maPeriod, maLabel);
+
+    const oscArray: number[] = Array(data.length).fill(null);
+    const signalArray: number[] = Array(data.length).fill(null);
+
+    // 2️⃣ Calculate OSC
+    for (let i = 0; i < data.length; i++) {
+      const ma = data[i][maLabel];
+      const close = data[i].close;
+
+      if (ma != null && ma !== 0) {
+        const osc = (100 * (close - ma)) / ma;
+        oscArray[i] = parseFloat(osc.toFixed(7));
+      }
+    }
+
+    // 3️⃣ Smooth OSC (Signal line using SMA)
+    for (let i = smoothPeriod - 1; i < data.length; i++) {
+      const window = oscArray.slice(i - smoothPeriod + 1, i + 1);
+      const valid = window.filter((v) => v != null);
+
+      if (valid.length === smoothPeriod) {
+        const avg = valid.reduce((sum, val) => sum + val, 0) / smoothPeriod;
+        signalArray[i] = parseFloat(avg.toFixed(7));
+      }
+    }
+
+    // 4️⃣ Merge into data
+    return data.map((item, i) => ({
+      ...item,
+      OSC: oscArray[i],
+      OSCSignal: signalArray[i],
+    }));
   }
 }

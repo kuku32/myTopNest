@@ -5,6 +5,16 @@ GET https://mytopnest-production.up.railway.app/webhooks
 ### GET local
 GET http://localhost:3003/webhooks
 
+### GET local
+GET http://localhost:3003/webhooks/fmp?ticker=AAPL&timeframe=1day
+
+
+### GET dividend
+GET http://localhost:3003/webhooks/dividend
 
 #### Getend
 GET https://eodhd.com/api/eod/AAA.VN?api_token=693e5efda56137.54562069&fmt=json
+
+
+### get po
+GET http://localhost:3000/stock/githublocalfm/fm?ticker=AAPL&timeframe=1day
