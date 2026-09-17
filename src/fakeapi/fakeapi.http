@@ -1,5 +1,5 @@
-@rootUrl = http://localhost:3000
-# @rootUrl = https://my-top-nest.vercel.app
+# @rootUrl = http://localhost:3000
+@rootUrl = https://my-top-nest.vercel.app
 
 
 ###Get Users
@@ -13,3 +13,10 @@ curl --location '{{rootUrl}}/fakeapi/comments'
 
 ###Get comments by Id
 curl --location '{{rootUrl}}/fakeapi/comments?postId=1'
+
+
+###
+https://nestjs-api.koyeb.app/slack/slack-image/F0C1QUAK022
+
+###
+{{rootUrl}}/slack/slack-image/F0C1QUAK022
