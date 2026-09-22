@@ -64,7 +64,7 @@ export class TopMangaController {
   @Throttle({
     default: {
       ttl: 60_000,
-      limit: 10,
+      limit: 50,
     },
   })
   getmangasVELE(@Param('type') type: string,@Param('chapter') chapter: string){
